@@ -1,0 +1,161 @@
+'use client';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button } from 'react-daisyui';
+
+interface PriceModalProps {
+  onSelect: (value: string) => void;
+  onClose: () => void;
+}
+
+export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [min, setMin] = useState(0);
+  const [max, setMax] = useState(20);
+  const [selected, setSelected] = useState<string | null>('Tất cả');
+
+  const quickOptions = [
+    { label: 'Tất cả', value: [0, 20] },
+    { label: 'Dưới 1 triệu', value: [0, 1] },
+    { label: '1 - 2 triệu', value: [1, 2] },
+    { label: '2 - 4 triệu', value: [2, 4] },
+    { label: '4 - 6 triệu', value: [4, 6] },
+    { label: '6 - 8 triệu', value: [6, 8] },
+    { label: '8 - 10 triệu', value: [8, 10] },
+    { label: '10 - 15 triệu', value: [10, 15] },
+    { label: '15 - 20 triệu', value: [15, 20] },
+    { label: 'Trên 20 triệu', value: [20, 100] },
+    { label: 'Thoả thuận', value: [0, 0] },
+  ];
+
+  // Đóng khi nhấn ESC
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  // Đóng khi click ngoài modal
+  const handleClickOutside = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) onClose();
+  };
+
+  const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Math.min(Number(e.target.value), max - 0.5);
+    setMin(val);
+    setSelected(null);
+  };
+
+  const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Math.max(Number(e.target.value), min + 0.5);
+    setMax(val);
+    setSelected(null);
+  };
+
+  const handleQuickSelect = (item: (typeof quickOptions)[0]) => {
+    setSelected(item.label);
+    setMin(item.value[0]);
+    setMax(item.value[1]);
+  };
+
+  const handleReset = () => {
+    setSelected('Tất cả');
+    setMin(0);
+    setMax(20);
+  };
+
+  const handleApply = () => {
+    if (selected) onSelect(selected);
+    else onSelect(`Từ ${min} - ${max} triệu+`);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3" onClick={handleClickOutside}>
+      <div ref={modalRef} className="w-full max-w-lg rounded-2xl bg-white shadow-xl transition-all">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b px-4 py-3">
+          <h5 className="text-lg font-semibold text-gray-800">KHOẢNG GIÁ</h5>
+          <button onClick={onClose} className="btn btn-ghost btn-sm text-gray-500 hover:text-gray-700">
+            ✕
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
+          <div className="mb-3 text-sm text-gray-700">
+            Từ <span className="font-semibold text-blue-600">{min}</span> - <span className="font-semibold text-blue-600">{max}</span> triệu+
+          </div>
+
+          {/* Slider */}
+          <div className="relative mb-3 h-2 w-full rounded bg-gray-200">
+            <input
+              type="range"
+              min={0}
+              max={20}
+              step={0.5}
+              value={min}
+              onChange={handleMinChange}
+              className="absolute z-20 h-2 w-full cursor-pointer appearance-none bg-transparent"
+            />
+            <input
+              type="range"
+              min={0}
+              max={20}
+              step={0.5}
+              value={max}
+              onChange={handleMaxChange}
+              className="absolute z-30 h-2 w-full cursor-pointer appearance-none bg-transparent"
+            />
+            <div
+              className="absolute top-0 h-2 rounded bg-blue-500 transition-all"
+              style={{
+                left: `${(min / 20) * 100}%`,
+                right: `${100 - (max / 20) * 100}%`,
+              }}
+            />
+          </div>
+
+          <div className="mb-2 flex justify-between text-xs text-gray-500">
+            <span>0</span>
+            <span>20 triệu+</span>
+          </div>
+
+          {/* Quick select */}
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-medium text-gray-500">Chọn nhanh</p>
+            <ul className="grid grid-cols-2 gap-2">
+              {quickOptions.map((opt) => (
+                <li
+                  key={opt.label}
+                  onClick={() => handleQuickSelect(opt)}
+                  className={`cursor-pointer rounded-md border px-3 py-2 text-center text-xs transition-all ${
+                    selected === opt.label
+                      ? 'border-blue-500 bg-blue-50 font-medium text-blue-600'
+                      : 'border-gray-200 hover:border-blue-400 hover:text-blue-600'
+                  }`}
+                >
+                  {opt.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t px-5 py-3">
+          <button className="text-sm text-blue-600 hover:underline" onClick={handleReset}>
+            Đặt lại
+          </button>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={onClose}>
+              Hủy
+            </Button>
+            <Button size="sm" color="primary" onClick={handleApply}>
+              Áp dụng
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,7 +1,9 @@
-import React from 'react'
+'use client';
+import React from 'react';
 
 export default function ClientHomePage() {
   return (
-    <div>ClientHomePage</div>
-  )
+    <div>
+    </div>
+  );
 }
