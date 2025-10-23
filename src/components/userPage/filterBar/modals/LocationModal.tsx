@@ -67,10 +67,7 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3" onClick={handleClickOutside}>
-      <div
-        ref={modalRef}
-        className="animate-fade-in w-full max-w-lg scale-95 transform rounded-2xl bg-white shadow-xl transition-all duration-200 ease-out"
-      >
+      <div ref={modalRef} className="w-full max-w-lg scale-95 transform rounded-2xl bg-white shadow-xl transition-all duration-200 ease-out">
         {/* Header */}
         <div className="flex items-center justify-between border-b px-4 py-3">
           <h5 className="text-lg font-semibold text-gray-800">{selectedProvince ? 'Chọn Quận / Huyện' : 'Chọn Tỉnh / Thành phố'}</h5>

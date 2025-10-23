@@ -30,10 +30,7 @@ export default function PropertyTypeModal({ onClose, onSelect }: BasePropertyTyp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3" onClick={handleClickOutside}>
-      <div
-        ref={modalRef}
-        className="animate-fade-in w-full max-w-lg scale-95 transform rounded-2xl bg-white p-5 shadow-xl transition-all duration-200 ease-out"
-      >
+      <div ref={modalRef} className="w-full max-w-lg scale-95 transform rounded-2xl bg-white p-5 shadow-xl transition-all duration-200 ease-out">
         <h3 className="mb-5 text-center text-lg font-semibold text-gray-800">Chọn loại bất động sản</h3>
 
         <div className="grid grid-cols-2 gap-3">

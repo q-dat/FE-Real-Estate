@@ -70,7 +70,7 @@ export default function FilterBar() {
 
   return (
     <div className="w-full bg-blue-50 p-2 shadow-md">
-      <div className="flex flex-wrap items-center justify-center gap-2">
+      <div className="flex w-full flex-row items-center justify-start gap-1.5 overflow-auto scrollbar-hide xl:justify-center">
         {[
           { key: 'type', label: 'Loại nhà đất' },
           { key: 'location', label: 'Khu vực' },
@@ -80,7 +80,7 @@ export default function FilterBar() {
           const value = filters[key as keyof typeof filters];
           const displayValue = typeof value === 'string' ? value : `${value.province ?? ''}${value.district ? ' - ' + value.district : ''}`;
 
-          const isTatCa = typeof value === 'string' && value.localeCompare('tất cả', undefined, { sensitivity: 'base' }) === 0;
+          const isAll = typeof value === 'string' && value.localeCompare('tất cả', undefined, { sensitivity: 'base' }) === 0;
 
           return (
             <button
@@ -91,7 +91,9 @@ export default function FilterBar() {
               <p className="inline-flex w-[100px] items-center justify-start">
                 <span className="text-xs font-normal text-gray-600">{label}</span> <ChevronDown size="14px" />
               </p>
-              <p className={`text-start text-sm ${isTatCa ? 'font-medium text-black' : 'font-bold text-red-600'}`}>{displayValue}</p>
+              <p className={`w-20 truncate text-start text-sm xl:w-auto ${isAll ? 'font-medium text-black' : 'font-bold text-red-600'}`}>
+                {displayValue}
+              </p>
             </button>
           );
         })}
