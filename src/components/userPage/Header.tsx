@@ -6,6 +6,7 @@ import clsx from 'clsx'; // tiện cho xử lý class động
 import { Button } from 'react-daisyui';
 import { FiEdit } from 'react-icons/fi';
 import FilterBar from './filterBar/FilterBar';
+import HeaderResponsive from './HeaderResponsive';
 
 const menuItems = [
   { title: 'Cho thuê phòng trọ', link: '/phong-tro' },
@@ -19,8 +20,11 @@ export default function Header() {
 
   return (
     <header>
+      {/* Header Responsive */}
+      <HeaderResponsive />
+      {/* Header Desktop */}
       <nav className="hidden xl:block">
-        <div className="flex w-full flex-row items-center justify-between border-b bg-white px-[50px] py-[10px] shadow-sm">
+        <div className="flex w-full flex-row items-center justify-between border-b bg-white px-desktop-padding py-[10px] shadow-sm">
           <div className="inline-flex items-center text-sm font-bold">
             {/* Logo */}
             <div className="pr-5">
