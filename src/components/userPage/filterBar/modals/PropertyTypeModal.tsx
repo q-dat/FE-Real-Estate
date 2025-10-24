@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useRef, useEffect } from 'react';
 import { Button } from 'react-daisyui';
 import { usePathname } from 'next/navigation';
@@ -12,6 +11,7 @@ export default function PropertyTypeModal({ onClose, onSelect }: BasePropertyTyp
   const modalRef = useRef<HTMLDivElement>(null);
 
   const menuItems = [
+    { title: 'Tất cả', link: '/' },
     { title: 'Cho thuê phòng trọ', link: '/phong-tro' },
     { title: 'Cho thuê nhà ở', link: '/nha-o' },
     { title: 'Cho thuê căn hộ', link: '/can-ho' },

@@ -20,7 +20,7 @@ export default function AreaModal({ onSelect, onClose }: AreaModalProps) {
   const [tempSelected, setTempSelected] = useState(selected);
 
   const quickSelect = [
-    { label: 'Tất cả', value: [0, 100] },
+    { label: 'Tất cả', value: [0, 200] },
     { label: 'Dưới 20m²', value: [0, 20] },
     { label: '20m² - 30m²', value: [20, 30] },
     { label: '30m² - 40m²', value: [30, 40] },
@@ -62,7 +62,7 @@ export default function AreaModal({ onSelect, onClose }: AreaModalProps) {
   const handleReset = () => {
     setTempSelected('Tất cả');
     setTempMin(0);
-    setTempMax(100);
+    setTempMax(200);
   };
 
   const handleApply = () => {

@@ -60,13 +60,15 @@ export default function FilterBar() {
     setActiveModal(null);
   };
 
-  const resetFilters = () =>
-    setFilters((prev) => ({
-      ...prev,
+  const resetFilters = () => {
+    setFilters({
+      type: 'Tất cả',
       location: 'Chọn khu vực',
       price: 'Tất cả',
       area: 'Tất cả',
-    }));
+    });
+    router.push('/'); // Chuyển về home khi reset
+  };
 
   return (
     <div className="w-full bg-blue-50 p-2 shadow-md">
