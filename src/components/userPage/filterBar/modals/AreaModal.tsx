@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Button } from 'react-daisyui';
 import CancelBtn from '../../ui/btn/CancelBtn';
 import SubmitBtn from '../../ui/btn/SubmitBtn';
 

@@ -1,6 +1,5 @@
 'use client';
 import React, { useRef, useEffect } from 'react';
-import { Button } from 'react-daisyui';
 import { usePathname } from 'next/navigation';
 import { BasePropertyTypeModalProps } from './types';
 import Link from 'next/link';
@@ -55,7 +54,7 @@ export default function PropertyTypeModal({ onClose, onSelect }: BasePropertyTyp
         </div>
 
         <div className="mt-6 flex justify-center">
-          <CancelBtn value='Đóng' onClick={onClose} />
+          <CancelBtn value="Đóng" onClick={onClose} />
         </div>
       </div>
     </div>
