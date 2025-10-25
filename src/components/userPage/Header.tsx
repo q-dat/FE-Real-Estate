@@ -7,13 +7,7 @@ import { Button } from 'react-daisyui';
 import { FiEdit } from 'react-icons/fi';
 import FilterBar from './filterBar/FilterBar';
 import HeaderResponsive from './HeaderResponsive';
-
-const menuItems = [
-  { title: 'Cho thuê phòng trọ', link: '/phong-tro' },
-  { title: 'Cho thuê nhà ở', link: '/nha-o' },
-  { title: 'Cho thuê căn hộ', link: '/can-ho' },
-  { title: 'Cho thuê mặt bằng', link: '/mat-bang' },
-];
+import { menuItems } from './menuItems';
 
 export default function Header() {
   const pathname = usePathname();
@@ -28,7 +22,7 @@ export default function Header() {
           <div className="inline-flex items-center text-sm font-bold">
             {/* Logo */}
             <div className="pr-5">
-              <p className="text-2xl font-black italic text-blue-600">Tìm Trọ Quốc Đạt</p>
+              <p className="text-2xl font-black italic text-blue-600">LoGo</p>
             </div>
             {/* Navigation */}
             <div className="flex flex-row items-center">

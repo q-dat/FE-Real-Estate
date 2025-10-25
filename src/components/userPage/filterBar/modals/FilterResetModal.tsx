@@ -1,6 +1,8 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
 import { Button } from 'react-daisyui';
+import CancelBtn from '../../ui/btn/CancelBtn';
+import SubmitBtn from '../../ui/btn/SubmitBtn';
 
 interface FilterResetModalProps {
   onClose: () => void;
@@ -34,12 +36,8 @@ export default function FilterResetModal({ onClose, onConfirm }: FilterResetModa
         </p>
 
         <div className="flex justify-center gap-2">
-          <Button size="sm" className="px-5 text-sm" onClick={onClose}>
-            Hủy
-          </Button>
-          <Button size="sm" color="error" className="px-5 text-sm text-white" onClick={onConfirm}>
-            Đồng ý
-          </Button>
+          <CancelBtn value="Đóng" onClick={onClose} />
+          <SubmitBtn value="Đồng ý" onClick={onConfirm} />
         </div>
       </div>
     </div>

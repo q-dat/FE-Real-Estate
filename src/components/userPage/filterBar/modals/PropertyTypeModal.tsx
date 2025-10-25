@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { BasePropertyTypeModalProps } from './types';
 import Link from 'next/link';
 import clsx from 'clsx';
+import CancelBtn from '../../ui/btn/CancelBtn';
 
 export default function PropertyTypeModal({ onClose, onSelect }: BasePropertyTypeModalProps) {
   const pathname = usePathname();
@@ -12,10 +13,11 @@ export default function PropertyTypeModal({ onClose, onSelect }: BasePropertyTyp
 
   const menuItems = [
     { title: 'Tất cả', link: '/' },
-    { title: 'Cho thuê phòng trọ', link: '/phong-tro' },
-    { title: 'Cho thuê nhà ở', link: '/nha-o' },
-    { title: 'Cho thuê căn hộ', link: '/can-ho' },
-    { title: 'Cho thuê mặt bằng', link: '/mat-bang' },
+    { title: 'Cho thuê phòng trọ', link: '/cho-thue-phong-tro' },
+    { title: 'Nhà nguyên căn', link: '/cho-thue-nha-nguyen-can' },
+    { title: 'Căn hộ cho thuê', link: '/cho-thue-can-ho' },
+    { title: 'Cho thuê mặt bằng', link: '/cho-thue-mat-bang' },
+    { title: 'Mua bán nhà đất', link: '/nha-dat' },
   ];
 
   useEffect(() => {
@@ -53,9 +55,7 @@ export default function PropertyTypeModal({ onClose, onSelect }: BasePropertyTyp
         </div>
 
         <div className="mt-6 flex justify-center">
-          <Button size="sm" color="ghost" onClick={onClose}>
-            Đóng
-          </Button>
+          <CancelBtn value='Đóng' onClick={onClose} />
         </div>
       </div>
     </div>

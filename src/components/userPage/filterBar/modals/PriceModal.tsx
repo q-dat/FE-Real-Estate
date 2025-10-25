@@ -1,6 +1,8 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from 'react-daisyui';
+import CancelBtn from '../../ui/btn/CancelBtn';
+import SubmitBtn from '../../ui/btn/SubmitBtn';
 
 interface PriceModalProps {
   onSelect: (value: string) => void;
@@ -147,12 +149,8 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
             Đặt lại
           </button>
           <div className="flex gap-2">
-            <Button size="sm" onClick={onClose}>
-              Hủy
-            </Button>
-            <Button size="sm" color="primary" onClick={handleApply}>
-              Áp dụng
-            </Button>
+            <CancelBtn value="Huỷ" onClick={onClose} />
+            <SubmitBtn value="Áp dụng" onClick={handleApply} />
           </div>
         </div>
       </div>

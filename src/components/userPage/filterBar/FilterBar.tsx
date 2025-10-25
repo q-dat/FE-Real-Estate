@@ -21,7 +21,7 @@ export default function FilterBar() {
     area: string;
   }>({
     type: 'Tất cả',
-    location: 'Chọn khu vực',
+    location: 'Toàn quốc',
     price: 'Tất cả',
     area: 'Tất cả',
   });
@@ -29,16 +29,16 @@ export default function FilterBar() {
   // tự động cập nhật "type" khi pathname thay đổi
   useEffect(() => {
     switch (pathname) {
-      case '/phong-tro':
+      case '/cho-thue-phong-tro':
         setFilters((prev) => ({ ...prev, type: 'Cho thuê phòng trọ' }));
         break;
-      case '/nha-o':
-        setFilters((prev) => ({ ...prev, type: 'Cho thuê nhà ở' }));
+      case '/cho-thue-nha-nguyen-can':
+        setFilters((prev) => ({ ...prev, type: 'Nhà nguyên căn' }));
         break;
-      case '/can-ho':
-        setFilters((prev) => ({ ...prev, type: 'Cho thuê căn hộ' }));
+      case '/cho-thue-can-ho':
+        setFilters((prev) => ({ ...prev, type: 'Căn hộ cho thuê' }));
         break;
-      case '/mat-bang':
+      case '/cho-thue-mat-bang':
         setFilters((prev) => ({ ...prev, type: 'Cho thuê mặt bằng' }));
         break;
       case '/nha-dat':
@@ -63,7 +63,7 @@ export default function FilterBar() {
   const resetFilters = () => {
     setFilters({
       type: 'Tất cả',
-      location: 'Chọn khu vực',
+      location: 'Toàn quốc',
       price: 'Tất cả',
       area: 'Tất cả',
     });
@@ -100,7 +100,7 @@ export default function FilterBar() {
           );
         })}
 
-        <button className="rounded-[10px] border border-gray-50 bg-blue-100 px-2 py-0 text-sm font-medium" onClick={() => setActiveModal('reset')}>
+        <button className="rounded-[10px] border border-gray-50 bg-white px-2 py-0 text-sm font-medium" onClick={() => setActiveModal('reset')}>
           <p className="inline-flex h-10 w-[80px] items-center justify-center gap-1">
             <RefreshCcw size="18px" /> Đặt lại
           </p>

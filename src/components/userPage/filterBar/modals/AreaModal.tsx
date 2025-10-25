@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from 'react-daisyui';
+import CancelBtn from '../../ui/btn/CancelBtn';
+import SubmitBtn from '../../ui/btn/SubmitBtn';
 
 interface AreaModalProps {
   onSelect: (value: string) => void;
@@ -12,7 +14,7 @@ export default function AreaModal({ onSelect, onClose }: AreaModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const [min, setMin] = useState(0);
-  const [max, setMax] = useState(100);
+  const [max, setMax] = useState(200);
   const [selected, setSelected] = useState<string>('Tất cả');
 
   const [tempMin, setTempMin] = useState(min);
@@ -147,12 +149,8 @@ export default function AreaModal({ onSelect, onClose }: AreaModalProps) {
             Đặt lại
           </button>
           <div className="flex gap-2">
-            <Button size="sm" onClick={onClose}>
-              Hủy
-            </Button>
-            <Button size="sm" color="primary" onClick={handleApply}>
-              Áp dụng
-            </Button>
+            <CancelBtn value="Huỷ" onClick={onClose} />
+            <SubmitBtn value="Áp dụng" onClick={handleApply} />
           </div>
         </div>
       </div>

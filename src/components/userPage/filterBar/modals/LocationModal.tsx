@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Button, Input } from 'react-daisyui';
 import { BaseLocationModalProps } from './types';
+import CancelBtn from '../../ui/btn/CancelBtn';
 
 interface Province {
   code: number;
@@ -118,9 +119,7 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
               Quay lại
             </span>
           )}
-          <Button size="sm" color="ghost" onClick={onClose}>
-            Đóng
-          </Button>
+          <CancelBtn value="Đóng" onClick={onClose} />
         </div>
       </div>
     </div>
