@@ -8,18 +8,25 @@ import PriceModal from './modals/PriceModal';
 import AreaModal from './modals/AreaModal';
 import FilterResetModal from './modals/FilterResetModal';
 
-type LocationValue = { province: string; district: string } | string;
+export type LocationValue = { province: string; district?: string } | string;
 
-export default function FilterBar() {
+export interface FilterValues {
+  type: string;
+  location: LocationValue;
+  price: string;
+  area: string;
+}
+
+interface FilterBarProps {
+  onFilterChange?: (filters: FilterValues) => void; // callback khi bộ lọc thay đổi
+}
+
+export default function FilterBar({ onFilterChange }: FilterBarProps) {
   const pathname = usePathname();
   const router = useRouter();
+
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [filters, setFilters] = useState<{
-    type: string;
-    location: LocationValue;
-    price: string;
-    area: string;
-  }>({
+  const [filters, setFilters] = useState<FilterValues>({
     type: 'Tất cả',
     location: 'Toàn quốc',
     price: 'Tất cả',
@@ -28,29 +35,40 @@ export default function FilterBar() {
 
   // tự động cập nhật "type" khi pathname thay đổi
   useEffect(() => {
+    let typeLabel = 'Tất cả';
     switch (pathname) {
       case '/cho-thue-phong-tro':
-        setFilters((prev) => ({ ...prev, type: 'Cho thuê phòng trọ' }));
+        typeLabel = 'Cho thuê phòng trọ';
         break;
       case '/cho-thue-nha-nguyen-can':
-        setFilters((prev) => ({ ...prev, type: 'Nhà nguyên căn' }));
+        typeLabel = 'Nhà nguyên căn';
         break;
       case '/cho-thue-can-ho':
-        setFilters((prev) => ({ ...prev, type: 'Căn hộ cho thuê' }));
+        typeLabel = 'Căn hộ cho thuê';
         break;
       case '/cho-thue-mat-bang':
-        setFilters((prev) => ({ ...prev, type: 'Cho thuê mặt bằng' }));
+        typeLabel = 'Cho thuê mặt bằng';
         break;
       case '/nha-dat':
-        setFilters((prev) => ({ ...prev, type: 'Mua bán nhà đất' }));
+        typeLabel = 'Mua bán nhà đất';
         break;
-      default:
-        setFilters((prev) => ({ ...prev, type: 'Tất cả' }));
     }
+    setFilters((prev) => ({ ...prev, type: typeLabel }));
   }, [pathname]);
 
-  // handle chọn modal
-  const handleSelect = (key: string, value: string | { province: string; district: string } | { title: string; link: string }) => {
+  // 🧠 emit filters ra ngoài (chuẩn bị cho gọi API)
+  useEffect(() => {
+    if (onFilterChange) {
+      onFilterChange(filters);
+      // 🚀 sau này chỉ cần gọi API tại đây
+      // fetch(`/api/rentals?type=${filters.type}&price=${filters.price}`)
+      //   .then(res => res.json())
+      //   .then(data => console.log(data))
+    }
+  }, [filters, onFilterChange]);
+
+  // 📦 chọn giá trị từ các modal
+  const handleSelect = (key: keyof FilterValues, value: string | { province: string; district?: string } | { title: string; link: string }) => {
     if (key === 'type' && typeof value === 'object' && 'link' in value) {
       setFilters((prev) => ({ ...prev, type: value.title }));
       router.push(value.link);
@@ -60,14 +78,16 @@ export default function FilterBar() {
     setActiveModal(null);
   };
 
+  // 🔁 reset toàn bộ bộ lọc
   const resetFilters = () => {
-    setFilters({
+    const reset = {
       type: 'Tất cả',
       location: 'Toàn quốc',
       price: 'Tất cả',
       area: 'Tất cả',
-    });
-    router.push('/'); // Chuyển về home khi reset
+    };
+    setFilters(reset);
+    router.push('/');
   };
 
   return (
@@ -79,8 +99,8 @@ export default function FilterBar() {
           { key: 'price', label: 'Khoảng giá' },
           { key: 'area', label: 'Diện tích' },
         ].map(({ key, label }) => {
-          const value = filters[key as keyof typeof filters];
-          const displayValue = typeof value === 'string' ? value : `${value.province ?? ''}${value.district ? ' - ' + value.district : ''}`;
+          const value = filters[key as keyof FilterValues];
+          const displayValue = typeof value === 'string' ? value : `${value.province}${value.district ? ' - ' + value.district : ''}`;
 
           const isAll = typeof value === 'string' && value.localeCompare('tất cả', undefined, { sensitivity: 'base' }) === 0;
 
