@@ -1,7 +1,7 @@
 /**
  * RentalAuthor - Người đăng bài
  */
-export interface RentalAuthor {
+export interface IRentalAuthor {
   _id: string; // id người dùng (ObjectId)
   userCode: string; // mã định danh người dùng trên hệ thống (vd: "USER-000123")
   name: string; // tên hiển thị

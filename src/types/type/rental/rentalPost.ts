@@ -1,10 +1,10 @@
-import { RentalAuthor } from '../rentalAuthor/rentalAuthor';
-import { RentalCategory } from '../rentalCategory/rentalCategory';
+import { IRentalAuthor } from '../rentalAuthor/rentalAuthor';
+import { IRentalCategory } from '../rentalCategory/rentalCategory';
 
 /**
  * RentalPost - Bài đăng cho thuê / tìm người ở ghép / nhà, mặt bằng
  */
-export interface RentalPost {
+export interface IRentalPost {
   _id: string; // id bài đăng (ObjectId)
   code: string; // mã bài đăng ngắn (vd: "POST-17234")
 
@@ -12,7 +12,7 @@ export interface RentalPost {
   title: string; // tiêu đề bài đăng
   description: string; // mô tả chi tiết nội dung bài đăng
 
-  category: RentalCategory; // danh mục (liên kết đến bảng danh mục)
+  category: IRentalCategory; // danh mục (liên kết đến bảng danh mục)
 
   price: number; // giá cho thuê (VNĐ)
   priceUnit: string; // đơn vị giá (vd: "VNĐ/tháng")
@@ -62,7 +62,7 @@ export interface RentalPost {
   favoritesCount: number; // số lượt yêu thích
 
   /** -------------------- THÔNG TIN NGƯỜI ĐĂNG -------------------- */
-  author: RentalAuthor; // người đăng tin
+  author: IRentalAuthor; // người đăng tin
 
   /** -------------------- THỜI GIAN & QUẢN TRỊ -------------------- */
   expiredAt?: string; // ngày hết hạn tin
