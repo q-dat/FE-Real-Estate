@@ -1,15 +1,12 @@
+import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-/**
- * Service quản lý danh mục cho thuê (Admin)
- * Có kiểm tra dữ liệu trả về từ BE để tránh lỗi runtime.
- */
 export const rentalCategoryService = {
+  
+  // GET ALL
   getAll: async (): Promise<IRentalCategory[]> => {
     try {
-      const res = await fetch(`${BASE_URL}api/rental-categories`, { cache: 'no-store' });
+      const res = await fetch(`${getServerApiUrl('api/rental-categories')}`, { cache: 'no-store' });
 
       if (!res.ok) {
         throw new Error(`Không thể tải danh mục (${res.status} ${res.statusText})`);
@@ -17,7 +14,7 @@ export const rentalCategoryService = {
 
       const data = await res.json();
 
-      // 🧩 Chuẩn hóa dữ liệu — BE có thể trả { rentalCategories: [...] } hoặc trực tiếp là []
+      // Chuẩn hóa dữ liệu — BE có thể trả { rentalCategories: [...] } hoặc trực tiếp là []
       if (Array.isArray(data)) {
         return data;
       }
@@ -29,13 +26,14 @@ export const rentalCategoryService = {
       console.warn('⚠️ Dữ liệu danh mục trả về không hợp lệ:', data);
       return [];
     } catch (error) {
-      console.error('❌ Lỗi khi tải danh mục:', error);
+      console.error('Lỗi khi tải danh mục:', error);
       return [];
     }
   },
 
+  // CREATE
   create: async (data: FormData) => {
-    const res = await fetch(`${BASE_URL}api/rental-category`, {
+    const res = await fetch(`${getServerApiUrl('api/rental-category')}`, {
       method: 'POST',
       body: data,
     });
@@ -48,8 +46,9 @@ export const rentalCategoryService = {
     return res.json();
   },
 
+  // UPDATE
   update: async (id: string, data: FormData) => {
-    const res = await fetch(`${BASE_URL}api/rental-category/${id}`, {
+    const res = await fetch(`${getServerApiUrl('api/rental-category/${id}')}`, {
       method: 'PUT',
       body: data,
     });
@@ -62,8 +61,9 @@ export const rentalCategoryService = {
     return res.json();
   },
 
+  // DELETE
   delete: async (id: string) => {
-    const res = await fetch(`${BASE_URL}api/rental-category/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${getServerApiUrl('api/rental-category/${id}')}`, { method: 'DELETE' });
 
     if (!res.ok) {
       const errText = await res.text();
