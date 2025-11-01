@@ -2,7 +2,6 @@ import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';
 
 export const rentalCategoryService = {
-  
   // GET ALL
   getAll: async (): Promise<IRentalCategory[]> => {
     try {
@@ -48,7 +47,7 @@ export const rentalCategoryService = {
 
   // UPDATE
   update: async (id: string, data: FormData) => {
-    const res = await fetch(`${getServerApiUrl('api/rental-category/${id}')}`, {
+    const res = await fetch(`${getServerApiUrl(`api/rental-category/${id}`)}`, {
       method: 'PUT',
       body: data,
     });
@@ -63,7 +62,7 @@ export const rentalCategoryService = {
 
   // DELETE
   delete: async (id: string) => {
-    const res = await fetch(`${getServerApiUrl('api/rental-category/${id}')}`, { method: 'DELETE' });
+    const res = await fetch(`${getServerApiUrl(`api/rental-category/${id}`)}`, { method: 'DELETE' });
 
     if (!res.ok) {
       const errText = await res.text();

@@ -48,7 +48,7 @@ export const rentalPostAdminService = {
   // GET BY ID
   getById: async (id: string): Promise<IRentalPostAdmin | null> => {
     try {
-      const res = await fetch(`${getServerApiUrl('api/rental-admin-post/${id}')}`, { cache: 'no-store' });
+      const res = await fetch(`${getServerApiUrl(`api/rental-admin-post/${id}`)}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
       const data = await res.json();
 
@@ -84,7 +84,7 @@ export const rentalPostAdminService = {
   // UPDATE
   update: async (id: string, data: FormData) => {
     try {
-      const res = await fetch(`${getServerApiUrl('api/rental-admin-post/${id}')}`, {
+      const res = await fetch(`${getServerApiUrl(`api/rental-admin-post/${id}`)}`, {
         method: 'PUT',
         body: data,
       });
@@ -100,7 +100,7 @@ export const rentalPostAdminService = {
   // DELETE
   delete: async (id: string) => {
     try {
-      const res = await fetch(`${getServerApiUrl('api/rental-admin-post/${id}')}`, { method: 'DELETE' });
+      const res = await fetch(`${getServerApiUrl(`api/rental-admin-post/${id}`)}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
       return await res.json();
     } catch (error) {

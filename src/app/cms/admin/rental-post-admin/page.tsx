@@ -1,29 +1,23 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Button, Table } from 'react-daisyui';
-import { rentalPostAdminService } from '@/services/rentalPostAdminService';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { rentalCategoryService } from '@/services/rentalCategoryService';
+import { Button } from 'react-daisyui';
+import { FaImages, FaPlus, FaPen, FaTrashAlt } from 'react-icons/fa';
 import Image from 'next/image';
+import { rentalPostAdminService } from '@/services/rentalPostAdminService';
+import { rentalCategoryService } from '@/services/rentalCategoryService';
+import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import RentalPostAdminModal from './RentalPostAdminModal';
 
 export default function RentalPostAdminPage() {
   const [posts, setPosts] = useState<IRentalPostAdmin[]>([]);
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [editingPost, setEditingPost] = useState<IRentalPostAdmin | null>(null);
-  const [images, setImages] = useState<FileList | null>(null);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
-  const { register, handleSubmit, reset } = useForm<IRentalPostAdmin>({
-    defaultValues: editingPost ?? undefined,
-  });
-
-  // 🧩 Load danh sách
   const loadData = async () => {
     try {
       const data = await rentalPostAdminService.getAll();
-      setPosts(data);
+      setPosts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Lỗi tải danh sách:', err);
       setPosts([]);
@@ -32,46 +26,9 @@ export default function RentalPostAdminPage() {
 
   useEffect(() => {
     loadData();
-    rentalCategoryService.getAll().then(setCategories);
+    rentalCategoryService.getAll().then((cats) => setCategories(cats || []));
   }, []);
 
-  // 🧩 Khi mở modal chỉnh sửa thì reset form
-  useEffect(() => {
-    if (editingPost) reset(editingPost);
-  }, [editingPost, reset]);
-
-  // 🧩 Preview ảnh local
-  useEffect(() => {
-    if (images) {
-      const urls = Array.from(images).map((file) => URL.createObjectURL(file));
-      setPreviewUrls(urls);
-      return () => urls.forEach((u) => URL.revokeObjectURL(u));
-    }
-  }, [images]);
-
-  // 🧩 Gửi form
-  const handleFormSubmit: SubmitHandler<IRentalPostAdmin> = async (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        formData.append(key, typeof value === 'object' ? JSON.stringify(value) : value.toString());
-      }
-    });
-    if (images) Array.from(images).forEach((f) => formData.append('images', f));
-
-    if (editingPost?._id) {
-      await rentalPostAdminService.update(editingPost._id, formData);
-    } else {
-      await rentalPostAdminService.create(formData);
-    }
-    setOpenModal(false);
-    setEditingPost(null);
-    setImages(null);
-    setPreviewUrls([]);
-    await loadData();
-  };
-
-  // 🧩 Xoá bài
   const handleDelete = async (id: string) => {
     if (confirm('Bạn có chắc muốn xoá bài đăng này?')) {
       await rentalPostAdminService.delete(id);
@@ -79,217 +36,116 @@ export default function RentalPostAdminPage() {
     }
   };
 
-  // 🧩 Giao diện
   return (
-    <div className="p-6">
-      <div className="mb-4 flex justify-between">
-        <h1 className="text-2xl font-semibold">Quản lý bài đăng cho thuê</h1>
+    <div className="min-h-screen bg-white p-2 text-black scrollbar-hide xl:p-4">
+      {/* HEADER */}
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="flex items-center gap-2 text-lg font-semibold xl:text-xl">
+          <FaImages className="text-primary" /> Quản lý bài đăng
+        </h1>
         <Button
+          size="sm"
           color="primary"
+          className="flex items-center gap-2 rounded-md px-3 py-1"
           onClick={() => {
             setEditingPost(null);
-            reset({});
             setOpenModal(true);
           }}
         >
-          + Thêm bài đăng
+          <FaPlus /> Thêm mới
         </Button>
       </div>
 
-      <Table className="w-full">
-        <Table.Head>
-          <span>Tiêu đề</span>
-          <span>Giá</span>
-          <span>Danh mục</span>
-          <span>Trạng thái</span>
-          <span>Thao tác</span>
-        </Table.Head>
-        <Table.Body>
-          {posts.map((post) => (
-            <Table.Row key={post._id}>
-              <span className="max-w-[200px] truncate">{post.title}</span>
-              <span>
-                {post.price.toLocaleString()} {post.priceUnit}
-              </span>
-              <span>{post.category?.name}</span>
-              <span className="capitalize">{post.status}</span>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  color="info"
-                  onClick={() => {
-                    setEditingPost(post);
-                    setOpenModal(true);
-                  }}
-                >
-                  Sửa
-                </Button>
-                <Button size="sm" color="error" onClick={() => handleDelete(post._id!)}>
-                  Xoá
-                </Button>
-              </div>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
-
-      {openModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={() => {
-            setOpenModal(false);
-            setEditingPost(null);
-          }}
-        >
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="mb-4 text-xl font-semibold">{editingPost ? 'Chỉnh sửa bài đăng' : 'Thêm bài đăng mới'}</h3>
-
-            <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
-              {/* --- TITLE --- */}
-              <input {...register('title', { required: true })} placeholder="Tiêu đề bài đăng" className="input input-bordered w-full rounded-lg" />
-
-              {/* --- DESCRIPTION --- */}
-              <textarea
-                {...register('description', { required: true })}
-                placeholder="Mô tả chi tiết"
-                rows={3}
-                className="textarea textarea-bordered w-full rounded-lg"
-              />
-
-              {/* --- PRICE / UNIT --- */}
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="number"
-                  {...register('price', { required: true, valueAsNumber: true })}
-                  placeholder="Giá (VNĐ)"
-                  className="input input-bordered rounded-lg"
+      {/* DANH SÁCH */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        {posts.map((post) => {
+          const thumbnail = post.images?.[0] || '/no-image.png';
+          return (
+            <div
+              key={post._id}
+              className="group relative flex flex-col overflow-hidden rounded-md border border-primary/20 bg-white shadow-sm transition hover:shadow-md"
+            >
+              {/* Ảnh */}
+              <div className="relative aspect-video overflow-hidden">
+                <Image
+                  src={thumbnail}
+                  alt={post.title}
+                  width={400}
+                  height={250}
+                  unoptimized
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-                <input
-                  {...register('priceUnit', { required: true })}
-                  placeholder="Đơn vị giá (VD: VNĐ/tháng)"
-                  className="input input-bordered rounded-lg"
-                />
-              </div>
-
-              {/* --- AREA / CATEGORY --- */}
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="number"
-                  {...register('area', { required: true, valueAsNumber: true })}
-                  placeholder="Diện tích (m²)"
-                  className="input input-bordered rounded-lg"
-                />
-                <select {...register('category', { required: true })} className="select select-bordered rounded-lg">
-                  <option value="">-- Chọn danh mục --</option>
-                  {categories.map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* --- LOCATION --- */}
-              <div className="grid grid-cols-2 gap-4">
-                <input {...register('province', { required: true })} placeholder="Tỉnh / Thành phố" className="input input-bordered rounded-lg" />
-                <input {...register('district', { required: true })} placeholder="Quận / Huyện" className="input input-bordered rounded-lg" />
-              </div>
-
-              <input {...register('address', { required: true })} placeholder="Địa chỉ cụ thể" className="input input-bordered rounded-lg" />
-
-              <input {...register('title', { required: true })} placeholder="Tiêu đề bài đăng" className="input input-bordered w-full rounded-lg" />
-              <textarea
-                {...register('description', { required: true })}
-                placeholder="Mô tả chi tiết"
-                rows={3}
-                className="textarea textarea-bordered w-full rounded-lg"
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="number"
-                  {...register('price', { required: true, valueAsNumber: true })}
-                  placeholder="Giá (VNĐ)"
-                  className="input input-bordered rounded-lg"
-                />
-                <input
-                  {...register('priceUnit', { required: true })}
-                  placeholder="Đơn vị giá (VD: VNĐ/tháng)"
-                  className="input input-bordered rounded-lg"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="number"
-                  {...register('area', { required: true, valueAsNumber: true })}
-                  placeholder="Diện tích (m²)"
-                  className="input input-bordered rounded-lg"
-                />
-                <select {...register('category', { required: true })} className="select select-bordered rounded-lg">
-                  <option value="">-- Chọn danh mục --</option>
-                  {categories.map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <input {...register('address', { required: true })} placeholder="Địa chỉ cụ thể" className="input input-bordered rounded-lg" />
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Ảnh minh họa</label>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => setImages(e.target.files)}
-                  className="file-input file-input-bordered w-full rounded-lg"
-                />
-                {previewUrls.length > 0 && (
-                  <div className="mt-2 grid grid-cols-4 gap-2">
-                    {previewUrls.map((url, idx) => (
-                      <div key={idx} className="relative aspect-square w-full overflow-hidden rounded-lg">
-                        <Image
-                          src={url}
-                          alt={`preview-${idx}`}
-                          width={200}
-                          height={200}
-                          unoptimized
-                          className="h-full w-full rounded-lg object-cover"
-                        />
-                      </div>
-                    ))}
+                {post.images?.length > 1 && (
+                  <div className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-primary/80 px-2 py-0.5 text-xs text-white">
+                    <FaImages />
+                    <span>{post.images.length}</span>
                   </div>
                 )}
               </div>
 
-              <select {...register('status')} className="select select-bordered rounded-lg">
-                <option value="active">Hoạt động</option>
-                <option value="pending">Chờ duyệt</option>
-                <option value="expired">Hết hạn</option>
-                <option value="hidden">Ẩn</option>
-              </select>
+              {/* Nội dung */}
+              <div className="flex flex-1 flex-col justify-between p-3">
+                <div className="space-y-0.5">
+                  <h2 className="line-clamp-2 text-sm font-semibold">{post.title}</h2>
+                  <p className="text-sm font-semibold text-primary">
+                    {post.price.toLocaleString()} {post.priceUnit}
+                  </p>
+                  <p className="text-xs text-black/70">
+                    {post.area} m² • {post.district}, {post.province}
+                  </p>
+                  <p className="text-xs italic text-black/50">{post.category?.name || '-'}</p>
+                </div>
 
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenModal(false);
-                    setEditingPost(null);
-                  }}
-                  className="rounded-lg bg-gray-200 px-4 py-2 hover:bg-gray-300"
-                >
-                  Hủy
-                </button>
-                <button type="submit" className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                  {editingPost ? 'Cập nhật' : 'Tạo mới'}
-                </button>
+                <div className="mt-3 flex items-center justify-between">
+                  <span
+                    className={`rounded-md px-2 py-0.5 text-xs font-medium capitalize ${
+                      post.status === 'active'
+                        ? 'bg-primary/10 text-primary'
+                        : post.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : post.status === 'expired'
+                            ? 'bg-red-100 text-red-600'
+                            : 'bg-black/10 text-black/70'
+                    }`}
+                  >
+                    {post.status}
+                  </span>
+
+                  <div className="flex gap-2">
+                    <Button
+                      size="xs"
+                      color="secondary"
+                      className="flex items-center gap-1 rounded-md text-white"
+                      onClick={() => {
+                        setEditingPost(post);
+                        setOpenModal(true);
+                      }}
+                    >
+                      <FaPen /> Sửa
+                    </Button>
+                    <Button size="xs" color="error" className="flex items-center gap-1 rounded-md text-white" onClick={() => handleDelete(post._id)}>
+                      <FaTrashAlt /> Xóa
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </form>
-          </div>
-        </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* MODAL */}
+      {openModal && (
+        <RentalPostAdminModal
+          open={openModal}
+          onClose={() => {
+            setOpenModal(false);
+            setEditingPost(null);
+          }}
+          editingPost={editingPost}
+          categories={categories}
+          reload={loadData}
+        />
       )}
     </div>
   );
