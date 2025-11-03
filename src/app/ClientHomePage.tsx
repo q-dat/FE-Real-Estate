@@ -5,6 +5,7 @@ import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import { FaImage, FaExpand } from 'react-icons/fa';
 import Link from 'next/link';
 import { formatCurrency } from '@/utils/formatCurrency';
+import { slugify } from '@/lib/slugify';
 
 interface Props {
   posts: IRentalPostAdmin[];
@@ -21,13 +22,13 @@ export default function ClientHomePage({ posts }: Props) {
         {posts.map((post) => {
           const thumbnail = post.images?.[0] || '/no-image.png';
           const totalImages = post.images?.length || 0;
-
+          const slug = slugify(post.title);
           return (
             <article
               key={post._id}
               className="group relative overflow-hidden rounded-md border border-gray-100 bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
             >
-              <Link href="#" className="block">
+              <Link key={post._id} href={`/${slug}/${post._id}`} className="block">
                 {/* Thumbnail */}
                 <figure className="relative aspect-video overflow-hidden rounded-t-md">
                   <Image

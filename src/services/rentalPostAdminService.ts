@@ -47,7 +47,7 @@ export const rentalPostAdminService = {
   },
 
   // GET BY ID
-  async getById(id: string): Promise<IRentalPostAdmin | null> {
+  getById: async (id: string): Promise<IRentalPostAdmin | null> => {
     try {
       const res = await fetch(`${getServerApiUrl(`api/rental-admin-post/${id}`)}`, {
         cache: 'no-store',
@@ -55,7 +55,7 @@ export const rentalPostAdminService = {
       if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
       const data = await res.json();
 
-      return data?.data || data?.post || null;
+      return data?.rentalPost || data?.data || data?.post || null;
     } catch (error) {
       console.error('Lỗi khi tải bài đăng:', error);
       return null;
