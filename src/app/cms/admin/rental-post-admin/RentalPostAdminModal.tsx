@@ -25,9 +25,9 @@ interface Props {
 export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload }: Props) {
   const [images, setImages] = useState<FileList | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm<IRentalPostAdmin>();
 
-  // Hook ESC
   useEscClose(open, onClose);
 
   useEffect(() => {
@@ -47,6 +47,8 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
   const handleFormSubmit: SubmitHandler<IRentalPostAdmin> = async (data) => {
     try {
+      setLoading(true); // 🔹 Bắt đầu loading
+
       const formData = new FormData();
       for (const [key, value] of Object.entries(data)) {
         if (key === 'images') continue;
@@ -54,18 +56,22 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
       }
 
       if (editingPost?.images?.length && !images) editingPost.images.forEach((u) => formData.append('oldImages', u));
+
       if (images) {
         Array.from(images).forEach((f) => formData.append('images', f));
         editingPost?.images?.forEach((u) => formData.append('oldImages', u));
       }
 
+      // 🔹 Gọi API
       if (editingPost?._id) await rentalPostAdminService.update(editingPost._id, formData);
       else await rentalPostAdminService.create(formData);
 
-      onClose();
       await reload();
+      onClose(); // 🔹 Đóng modal sau khi thành công
     } catch (err) {
       console.error('Lỗi gửi form:', err);
+    } finally {
+      setLoading(false); // 🔹 Dừng loading dù có lỗi
     }
   };
 
@@ -78,7 +84,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose} // bấm ngoài để đóng
+          onClick={onClose}
         >
           <motion.div
             key="modal"
@@ -228,16 +234,22 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     </div>
                   )}
                 </div>
-              </form>
-            </div>
 
-            {/* FOOTER */}
-            {/* Nút hành động */}
-            <div className="col-span-full mt-4 flex justify-end gap-3">
-              <CancelBtn value="Hủy" type="button" onClick={onClose} />
-              <Button color="primary" type="submit" size="sm" className="rounded-md px-3 py-1">
-                {editingPost ? 'Cập nhật' : 'Tạo mới'}
-              </Button>
+                {/* FOOTER */}
+                <div className="col-span-full mt-4 flex justify-end gap-3 pb-3">
+                  <CancelBtn value="Hủy" type="button" onClick={onClose} />
+                  <Button color="primary" type="submit" size="sm" disabled={loading} className="flex items-center gap-2 rounded-md px-3 py-1">
+                    {loading ? (
+                      <>
+                        <span className="loading loading-spinner loading-sm"></span>
+                        <span>Đang xử lý...</span>
+                      </>
+                    ) : (
+                      <>{editingPost ? 'Cập nhật' : 'Tạo mới'}</>
+                    )}
+                  </Button>
+                </div>
+              </form>
             </div>
           </motion.div>
         </motion.div>
