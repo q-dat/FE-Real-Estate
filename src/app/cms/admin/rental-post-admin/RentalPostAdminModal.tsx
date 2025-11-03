@@ -47,7 +47,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
   const handleFormSubmit: SubmitHandler<IRentalPostAdmin> = async (data) => {
     try {
-      setLoading(true); // 🔹 Bắt đầu loading
+      setLoading(true); // Bắt đầu loading
 
       const formData = new FormData();
       for (const [key, value] of Object.entries(data)) {
@@ -62,16 +62,16 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
         editingPost?.images?.forEach((u) => formData.append('oldImages', u));
       }
 
-      // 🔹 Gọi API
+      // Gọi API
       if (editingPost?._id) await rentalPostAdminService.update(editingPost._id, formData);
       else await rentalPostAdminService.create(formData);
 
       await reload();
-      onClose(); // 🔹 Đóng modal sau khi thành công
+      onClose(); // Đóng modal sau khi thành công
     } catch (err) {
       console.error('Lỗi gửi form:', err);
     } finally {
-      setLoading(false); // 🔹 Dừng loading dù có lỗi
+      setLoading(false); // Dừng loading dù có lỗi
     }
   };
 

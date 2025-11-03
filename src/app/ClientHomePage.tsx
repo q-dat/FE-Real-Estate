@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import { FaImage, FaExpand } from 'react-icons/fa';
 import Link from 'next/link';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 interface Props {
   posts: IRentalPostAdmin[];
@@ -50,7 +51,7 @@ export default function ClientHomePage({ posts }: Props) {
                   <h4 className="line-clamp-2 text-sm font-semibold text-gray-900 transition-colors group-hover:text-primary">{post.title}</h4>
 
                   <span className="block text-base font-bold text-primary">
-                    {post.price.toLocaleString()} {post.priceUnit}
+                    {formatCurrency(post.price)} {post.priceUnit}
                   </span>
 
                   <div className="flex items-center gap-2 text-sm text-gray-600">

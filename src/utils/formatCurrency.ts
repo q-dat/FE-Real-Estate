@@ -1,0 +1,1 @@
+export const formatCurrency = (value: number) => `${(value * 1).toLocaleString('vi-VN')}`;

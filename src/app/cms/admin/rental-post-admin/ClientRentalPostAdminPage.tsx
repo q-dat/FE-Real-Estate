@@ -7,6 +7,7 @@ import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import RentalPostAdminModal from './RentalPostAdminModal';
 import RentalPostDeleteModal from './RentalPostDeleteModal';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 interface Props {
   posts: IRentalPostAdmin[];
@@ -99,7 +100,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                   </p>
 
                   <p className="text-[15px] font-bold text-primary">
-                    {post.price.toLocaleString()} {post.priceUnit}
+                    {formatCurrency(post.price)} {post.priceUnit}
                   </p>
                 </div>
 
