@@ -27,9 +27,11 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   const [images, setImages] = useState<FileList | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
   const classNameLabel = 'bg-white px-2 font-medium';
   useEscClose(open, onClose);
 
+  // Load dữ liệu khi chỉnh sửa
   useEffect(() => {
     if (editingPost) {
       // Nếu đang chỉnh sửa
@@ -65,6 +67,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
       setLoading(true); // Bắt đầu loading
 
       const formData = new FormData();
+
       for (const [key, value] of Object.entries(data)) {
         if (key === 'images') continue;
         if (value !== undefined && value !== null) formData.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
@@ -126,7 +129,6 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   </span>
                 )}
               </div>
-
               <Button
                 onClick={onClose}
                 className="flex items-center justify-center rounded-md bg-red-700 px-2 py-1 text-sm font-semibold text-white transition hover:bg-red-800"
@@ -139,7 +141,14 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
             <div className="relative max-h-[80vh] overflow-y-auto border-2 border-white scrollbar-hide">
               <form id="rental-post-form" onSubmit={handleSubmit(handleFormSubmit)} className="mt-4 grid gap-x-1 gap-y-4 xl:grid-cols-2">
                 <div className="col-span-full">
-                  <InputForm classNameLabel={`${classNameLabel}`} {...register('title', { required: true })} label="Tiêu đề" bordered required />
+                  <InputForm
+                    classNameLabel={`${classNameLabel}`}
+                    {...register('title', { required: true })}
+                    label="Tiêu đề"
+                    placeholder="Nhập tiêu đề bài đăng"
+                    bordered
+                    required
+                  />
                 </div>
                 <div className="col-span-full">
                   <Select
@@ -154,12 +163,8 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     ))}
                   </Select>
                 </div>
-                <div className="col-span-full">
-                  <TextareaForm {...register('description', { required: true })} placeholder="Mô tả chi tiết" />
-                </div>
-                <div className="col-span-full">
-                  <TextareaForm {...register('amenities')} placeholder="Tiện ích (máy lạnh, chỗ để xe,…)" />
-                </div>
+                <TextareaForm {...register('description', { required: true })} placeholder="Mô tả chi tiết bài đăng..." />
+                <TextareaForm {...register('amenities')} placeholder="Tiện ích (máy lạnh, chỗ để xe, v.v...)" />
                 {/* Loại tin */}
                 <div className="col-span-full">
                   <LabelForm title="Loại tin" />
@@ -175,38 +180,79 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     <option value="highlight">Nổi bật</option>
                   </Select>
                 </div>
+
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
                   {...register('price', { required: true, valueAsNumber: true })}
                   type="number"
                   label="Giá (VNĐ)"
+                  placeholder="Nhập giá thuê"
                   bordered
                   required
                 />
-                <InputForm classNameLabel={`${classNameLabel}`} {...register('priceUnit', { required: true })} label="Đơn vị giá" bordered required />
-                <InputForm classNameLabel={`${classNameLabel}`} {...register('length')} label="Chiều dài (m²)" bordered />
-                <InputForm classNameLabel={`${classNameLabel}`} {...register('width')} label="Chiều rộng (m²)" bordered />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('priceUnit', { required: true })}
+                  label="Đơn vị giá"
+                  placeholder="vd: /tháng, /m²"
+                  bordered
+                  required
+                />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('length')}
+                  label="Chiều dài (m²)"
+                  placeholder="Nhập chiều dài"
+                  bordered
+                />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('width')}
+                  label="Chiều rộng (m²)"
+                  placeholder="Nhập chiều rộng"
+                  bordered
+                />
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
                   {...register('area', { required: true, valueAsNumber: true })}
                   type="number"
                   label="Diện tích (m²)"
+                  placeholder="Nhập diện tích"
                   bordered
                   required
                 />
-                <InputForm classNameLabel={`${classNameLabel}`} {...register('phoneNumbers')} label="Số điện thoại liên hệ" bordered />
-                <InputForm classNameLabel={`${classNameLabel}`} {...register('zaloLink')} label="Link Zalo" bordered />
-                <InputForm classNameLabel={`${classNameLabel}`} {...register('youtubeLink')} label="Link Youtube" bordered />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('phoneNumbers')}
+                  label="Số điện thoại liên hệ"
+                  placeholder="Nhập số điện thoại"
+                  bordered
+                />
+                <InputForm classNameLabel={`${classNameLabel}`} {...register('zaloLink')} label="Link Zalo" placeholder="Nhập link Zalo" bordered />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('youtubeLink')}
+                  label="Link Youtube"
+                  placeholder="Nhập link Youtube"
+                  bordered
+                />
                 <div className="col-span-full">
-                  <InputForm classNameLabel={`${classNameLabel}`} {...register('videoTitle')} label="Tiêu đề video" bordered />
+                  <InputForm
+                    classNameLabel={`${classNameLabel}`}
+                    {...register('videoTitle')}
+                    label="Tiêu đề video"
+                    placeholder="Nhập tiêu đề video"
+                    bordered
+                  />
                 </div>
                 <div className="col-span-full">
-                  <TextareaForm {...register('videoDescription')} placeholder="Mô tả video" />
+                  <TextareaForm {...register('videoDescription')} placeholder="Mô tả video..." />
                 </div>
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
                   {...register('province', { required: true })}
                   label="Tỉnh / Thành phố"
+                  placeholder="Nhập Tỉnh / Thành phố"
                   bordered
                   required
                 />
@@ -214,46 +260,33 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   classNameLabel={`${classNameLabel}`}
                   {...register('district', { required: true })}
                   label="Quận / Huyện"
+                  placeholder="Nhập Quận / Huyện"
                   bordered
                   required
                 />
-                <InputForm classNameLabel={`${classNameLabel}`} {...register('ward')} label="Phường / Xã" bordered />
+                <InputForm classNameLabel={`${classNameLabel}`} {...register('ward')} label="Phường / Xã" placeholder="Nhập Phường / Xã" bordered />
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
                   {...register('address', { required: true })}
                   label="Địa chỉ cụ thể"
+                  placeholder="Nhập địa chỉ cụ thể"
                   bordered
                   required
                 />
                 <div className="col-span-full">
-                  <TextareaForm {...register('adminNote')} placeholder="Ghi chú nội bộ cho admin" />
+                  <TextareaForm {...register('adminNote')} placeholder="Ghi chú nội bộ cho admin..." />
                 </div>
-                {/* Ngày đăng tin */}
-                <InputForm
-                  defaultValue={new Date().toISOString().split('T')[0]} // Định dạng yyyy-MM-dd
-                  classNameLabel={`${classNameLabel}`}
-                  {...register('postedAt')}
-                  label="Ngày đăng tin"
-                  type="date"
-                  bordered
-                  required
-                  min={new Date().toISOString().split('T')[0]} // Không cho chọn ngày trong quá khứ
-                />
-
-                {/* Ngày hết hạn tin */}
-                <InputForm
-                  defaultValue={new Date().toISOString().split('T')[0]} // Định dạng yyyy-MM-dd
-                  classNameLabel={`${classNameLabel}`}
-                  {...register('expiredAt')}
-                  label="Ngày hết hạn tin"
-                  type="date"
-                  bordered
-                  required
-                  min={new Date().toISOString().split('T')[0]} // Không cho chọn ngày trong quá khứ
-                />
-
+                <InputForm classNameLabel={`${classNameLabel}`} {...register('postedAt')} label="Ngày đăng tin" type="date" bordered required />
+                <InputForm classNameLabel={`${classNameLabel}`} {...register('expiredAt')} label="Ngày hết hạn tin" type="date" bordered required />
                 <div className="col-span-full">
-                  <InputForm classNameLabel={`${classNameLabel}`} defaultValue={'admin'} {...register('author')} label="Người đăng tin" bordered />
+                  <InputForm
+                    classNameLabel={`${classNameLabel}`}
+                    {...register('author')}
+                    label="Người đăng tin"
+                    placeholder="admin"
+                    defaultValue="admin"
+                    bordered
+                  />
                 </div>
                 {/* Ảnh */}
                 <div className="col-span-full mb-5">
@@ -273,7 +306,6 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                           className="group relative aspect-square overflow-hidden rounded-xl border border-gray-200 shadow-sm transition hover:shadow-md"
                         >
                           <Image src={url} alt={`preview-${i}`} width={100} height={100} unoptimized className="h-full w-full object-cover" />
-
                           <button
                             type="button"
                             onClick={() => removeImage(url)}
@@ -287,13 +319,14 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   )}
                 </div>
               </form>
-              {/* FOOTER (luôn cố định, vẫn submit được form) */}
+
+              {/* FOOTER */}
               <div className="sticky bottom-0 z-10 flex justify-end gap-3 border-t border-gray-200 bg-white p-3 shadow-inner">
                 <CancelBtn value="Hủy" type="button" onClick={onClose} />
                 <Button
                   color="primary"
                   type="submit"
-                  form="rental-post-form" // Gắn form id để submit
+                  form="rental-post-form"
                   size="sm"
                   disabled={loading}
                   className="flex items-center gap-2 rounded-md px-4 py-2"

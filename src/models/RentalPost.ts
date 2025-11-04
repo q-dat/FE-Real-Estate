@@ -14,10 +14,6 @@ const RentalPostSchema = new Schema(
     district: String,
     ward: String,
     address: String,
-    coordinates: {
-      lat: Number,
-      lng: Number,
-    },
 
     images: [String],
     amenities: [String],

@@ -22,7 +22,6 @@ export interface IRentalPost {
   district: string; // quận/huyện
   ward?: string; // phường/xã
   address: string; // địa chỉ cụ thể
-  coordinates?: { lat: number; lng: number }; // vị trí bản đồ
 
   /** -------------------- HÌNH ẢNH & VIDEO -------------------- */
   images: string[]; // danh sách ảnh

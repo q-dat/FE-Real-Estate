@@ -129,7 +129,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
           )}
 
           {/* --- GOOGLE MAP --- */}
-          {(post.coordinates || post.address) && (
+          {post.address && (
             <Card className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
               <h2 className="mb-4 text-2xl font-bold text-black">Vị trí trên bản đồ</h2>
               <div className="overflow-hidden rounded-xl shadow-md">
@@ -138,11 +138,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                   height="400"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  src={
-                    post.coordinates
-                      ? `https://www.google.com/maps?q=${post.coordinates.lat},${post.coordinates.lng}&output=embed`
-                      : `https://www.google.com/maps?q=${encodedAddress}&output=embed`
-                  }
+                  src={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}
                 ></iframe>
               </div>
             </Card>

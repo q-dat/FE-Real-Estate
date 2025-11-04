@@ -18,7 +18,6 @@ export interface IRentalPostAdmin {
   district: string; // quận/huyện
   ward?: string; // phường/xã
   address: string; // địa chỉ cụ thể
-  coordinates?: { lat: number; lng: number }; // vị trí bản đồ
   amenities?: string; // tiện ích đi kèm (vd: máy lạnh, chỗ để xe,...)
   youtubeLink?: string; // link video Youtube người đăng nhập
   videoTitle?: string; // tiêu đề video minh họa
