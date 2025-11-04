@@ -4,7 +4,10 @@ import { notFound, redirect } from 'next/navigation';
 import ClientRentalPostDetailPage from './ClientRentalPostDetailPage';
 
 interface PageProps {
-  params: { slug: string; id: string };
+  params: {
+    slug: string;
+    id: string;
+  };
 }
 
 export default async function RentalPostPage({ params }: PageProps) {

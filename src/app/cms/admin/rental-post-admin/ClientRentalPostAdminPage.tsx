@@ -5,9 +5,9 @@ import { FaImages, FaPlus, FaPen, FaTrashAlt } from 'react-icons/fa';
 import Image from 'next/image';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import RentalPostAdminModal from './RentalPostAdminModal';
-import RentalPostDeleteModal from './RentalPostDeleteModal';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { formatCurrency } from '@/utils/formatCurrency';
+import DeleteModal from '../DeleteModal';
 
 interface Props {
   posts: IRentalPostAdmin[];
@@ -18,8 +18,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   const [posts, setPosts] = useState<IRentalPostAdmin[]>(initialPosts);
   const [openModal, setOpenModal] = useState(false);
   const [editingPost, setEditingPost] = useState<IRentalPostAdmin | null>(null);
-
-  // Modal xoá
+  // Modal Xoá
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -43,7 +42,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
 
   return (
     <div className="min-h-screen bg-white p-2 text-black scrollbar-hide xl:p-4">
-      {/* HEADER */}
+      {/* Header */}
       <div className="mb-4 flex items-center justify-between gap-2">
         <h1 className="flex items-center gap-2 text-lg font-semibold xl:text-xl">
           <FaImages className="text-primary" /> Quản lý bài đăng
@@ -61,7 +60,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
         </Button>
       </div>
 
-      {/* DANH SÁCH */}
+      {/* Danh sách */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         {posts.map((post) => {
           const thumbnail = post.images?.[0] || '/no-image.png';
@@ -145,7 +144,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
         })}
       </div>
 
-      {/* MODAL thêm/sửa */}
+      {/* Modal Thêm / Sửa */}
       {openModal && (
         <RentalPostAdminModal
           open={openModal}
@@ -159,8 +158,8 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
         />
       )}
 
-      {/* MODAL xoá */}
-      <RentalPostDeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />
+      {/* Modal Xoá */}
+      <DeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />
     </div>
   );
 }

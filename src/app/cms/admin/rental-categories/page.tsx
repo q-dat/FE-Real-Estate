@@ -1,7 +1,8 @@
-import React from 'react'
+import { rentalCategoryService } from '@/services/rentalCategoryService';
+import ClientCategoryPage from './ClientRentalCategoryPage';
 
-export default function page() {
-  return (
-    <div>page</div>
-  )
+export default async function CategoryPage() {
+  const categories = await rentalCategoryService.getAll();
+
+  return <ClientCategoryPage categories={Array.isArray(categories) ? categories : []} />;
 }

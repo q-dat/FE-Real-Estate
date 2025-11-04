@@ -12,7 +12,7 @@ interface DeleteModalProps {
   onConfirm: () => Promise<void> | void;
 }
 
-export default function RentalPostDeleteModal({ open, onClose, onConfirm }: DeleteModalProps) {
+export default function DeleteModal({ open, onClose, onConfirm }: DeleteModalProps) {
   useEscClose(open, onClose); // Hook ESC dùng chung cho mọi modal
 
   return (

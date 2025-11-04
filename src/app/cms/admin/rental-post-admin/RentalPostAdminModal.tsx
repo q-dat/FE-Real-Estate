@@ -23,7 +23,7 @@ interface Props {
 }
 
 export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload }: Props) {
-  const { register, handleSubmit, reset, watch } = useForm<IRentalPostAdmin>();
+  const { register, handleSubmit, reset } = useForm<IRentalPostAdmin>();
   const [images, setImages] = useState<FileList | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -113,7 +113,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 180, damping: 18 }}
           >
-            {/* HEADER */}
+            {/* Header */}
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white p-2">
               <div className="flex flex-col text-base font-semibold xl:text-lg">
                 {/* Hàng trên: icon + tiêu đề */}
@@ -137,11 +137,12 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
               </Button>
             </div>
 
-            {/* FORM */}
+            {/* Form */}
             <div className="relative max-h-[80vh] overflow-y-auto border-2 border-white scrollbar-hide">
               <form id="rental-post-form" onSubmit={handleSubmit(handleFormSubmit)} className="mt-4 grid gap-x-1 gap-y-4 xl:grid-cols-2">
                 <div className="col-span-full">
                   <InputForm
+                    autoFocus
                     classNameLabel={`${classNameLabel}`}
                     {...register('title', { required: true })}
                     label="Tiêu đề"
@@ -165,7 +166,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 </div>
                 <TextareaForm {...register('description', { required: true })} placeholder="Mô tả chi tiết bài đăng..." />
                 <TextareaForm {...register('amenities')} placeholder="Tiện ích (máy lạnh, chỗ để xe, v.v...)" />
-                {/* Loại tin */}
+                {/* Loại Tin */}
                 <div className="col-span-full">
                   <LabelForm title="Loại tin" />
                   <Select
@@ -320,7 +321,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 </div>
               </form>
 
-              {/* FOOTER */}
+              {/* Footer */}
               <div className="sticky bottom-0 z-10 flex justify-end gap-3 border-t border-gray-200 bg-white p-3 shadow-inner">
                 <CancelBtn value="Hủy" type="button" onClick={onClose} />
                 <Button
