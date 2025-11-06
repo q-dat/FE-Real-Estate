@@ -1,17 +1,18 @@
+export const revalidate = 60;
+
+import { notFound, redirect } from 'next/navigation';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { slugify } from '@/lib/slugify';
-import { notFound, redirect } from 'next/navigation';
 import ClientRentalPostDetailPage from './ClientRentalPostDetailPage';
 
-interface PageProps {
-  params: {
-    slug: string;
-    id: string;
-  };
-}
+// Đúng kiểu cho Next 15
+type PageProps = {
+  params: Promise<{ slug: string; id: string }>;
+};
 
 export default async function RentalPostPage({ params }: PageProps) {
-  const { slug, id } = params;
+  // Await params vì nó là Promise
+  const { slug, id } = await params;
 
   const post = await rentalPostAdminService.getById(id);
   if (!post) notFound();

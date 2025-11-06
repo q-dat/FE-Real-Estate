@@ -26,7 +26,10 @@ export const rentalCategoryService = {
     }
 
     try {
-      const res = await fetch(apiUrl, { cache: 'no-store' });
+      const res = await fetch(apiUrl, {
+        cache: 'force-cache',
+        next: { revalidate: 60 },
+      });
       if (!res.ok) {
         throw new Error(`Không thể tải danh mục (${res.status} ${res.statusText})`);
       }

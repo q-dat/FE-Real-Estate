@@ -25,7 +25,10 @@ export const rentalPostAdminService = {
     }
 
     try {
-      const res = await fetch(apiUrl, { cache: 'no-store' });
+      const res = await fetch(apiUrl, {
+        cache: 'force-cache',
+        next: { revalidate: 60 },
+      });
       if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
 
       const data = await res.json();
@@ -49,9 +52,8 @@ export const rentalPostAdminService = {
   // GET BY ID
   getById: async (id: string): Promise<IRentalPostAdmin | null> => {
     try {
-      const res = await fetch(`${getServerApiUrl(`api/rental-admin-post/${id}`)}`, {
-        cache: 'no-store',
-      });
+      const apiUrl = getServerApiUrl(`api/rental-admin-post/${id}`);
+      const res = await fetch(apiUrl, { cache: 'no-store' });
       if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
       const data = await res.json();
 
