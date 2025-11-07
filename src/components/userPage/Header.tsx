@@ -7,7 +7,7 @@ import { Button } from 'react-daisyui';
 import { FiEdit } from 'react-icons/fi';
 import FilterBar from './filterBar/FilterBar';
 import HeaderResponsive from './HeaderResponsive';
-import { menuItems } from './menuItems';
+import { menuItems } from '@/constants/menuItems';
 
 export default function Header() {
   const pathname = usePathname();
