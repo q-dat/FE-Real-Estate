@@ -19,13 +19,13 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
   const encodedAddress = encodeURIComponent(`${post.address}, ${post.district}, ${post.province}`);
 
   return (
-    <main className="px-3 py-8 text-neutral xl:px-desktop-padding">
-      <div className="grid grid-cols-1 gap-10 xl:grid-cols-3">
+    <main className="bg-base-100 px-2 py-10 text-black xl:px-desktop-padding">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 xl:grid-cols-3">
         {/* === CỘT TRÁI === */}
         <div className="space-y-10 xl:col-span-2">
           {/* --- TIÊU ĐỀ --- */}
           <motion.h1
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
             className="text-3xl font-extrabold tracking-tight text-black xl:text-5xl"
@@ -45,18 +45,18 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                 {visibleImages.map((src, index) => (
                   <motion.div
                     key={index}
-                    whileHover={{ scale: 1.02 }}
-                    className="relative mb-2 cursor-pointer break-inside-avoid overflow-hidden rounded-2xl shadow-sm"
+                    whileHover={{ scale: 1.03 }}
+                    className="relative mb-2 cursor-pointer break-inside-avoid overflow-hidden rounded-2xl shadow-md"
                   >
                     <Image
                       src={src}
                       alt={`${post.title}-${index}`}
                       width={800}
                       height={600}
-                      className="h-auto w-full object-cover transition-transform duration-500 hover:scale-105"
+                      className="h-auto w-full object-cover transition-transform duration-500 hover:scale-110"
                     />
-                    <div className="absolute inset-0 hidden items-center justify-center bg-black/30 text-white opacity-0 transition-all hover:flex hover:opacity-100">
-                      <FaExpand className="text-xl" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+                      <FaExpand className="text-xl text-white" />
                     </div>
                   </motion.div>
                 ))}
@@ -64,7 +64,11 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
 
               {images.length > 5 && !showAll && (
                 <div className="mt-4 flex justify-center">
-                  <Button color="primary" variant="outline" className="rounded-full px-6 text-sm font-medium" onClick={() => setShowAll(true)}>
+                  <Button
+                    color="primary"
+                    className="rounded-full px-6 text-sm font-semibold text-white shadow-sm hover:brightness-110"
+                    onClick={() => setShowAll(true)}
+                  >
                     Xem tất cả {images.length} ảnh
                   </Button>
                 </div>
@@ -73,29 +77,29 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
           )}
 
           {/* --- THÔNG TIN TỔNG QUAN --- */}
-          <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm backdrop-blur-sm">
+          <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-md">
             <h2 className="mb-6 text-2xl font-bold text-black">Thông tin tổng quan</h2>
             <div className="grid gap-4 xl:grid-cols-2">
               <InfoLine icon={<FaTags />} label="Giá thuê" value={`${post.price} ${post.priceUnit}`} />
               <InfoLine icon={<FaRulerCombined />} label="Diện tích" value={`${post.area} m²`} />
-              <InfoLine icon={<FaMapMarkerAlt />} label="Địa chỉ" value={`${post.address}, ${post.district}, ${post.province}`} />
-              <InfoLine label="Danh mục" value={post.category?.name} />
+              <InfoLine icon={<FaMapMarkerAlt />} label="Địa chỉ" value={`${post.address}`} />
+              <InfoLine label="Danh mục" value={post.category?.name || 'Chưa phân loại'} />
               <InfoLine label="Trạng thái" value={getStatusLabel(post.status)} />
               <InfoLine icon={<FaPhone />} label="Liên hệ" value={post.phoneNumbers ?? 'Không có'} />
             </div>
           </Card>
 
           {/* --- MÔ TẢ --- */}
-          <Card className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-sm">
+          <Card className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-md">
             <h2 className="mb-6 text-2xl font-bold text-black">Mô tả chi tiết</h2>
             <p className="whitespace-pre-line text-base leading-relaxed text-neutral-700 xl:text-lg">{post.description || 'Chưa có mô tả'}</p>
           </Card>
 
           {/* --- TIỆN ÍCH --- */}
           {post.amenities && (
-            <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-md">
               <h2 className="mb-6 text-2xl font-bold text-black">Tiện ích</h2>
-              <ul className="grid grid-cols-1 gap-y-2 text-neutral-800 xl:grid-cols-2">
+              <ul className="grid grid-cols-1 gap-y-2 text-black xl:grid-cols-2">
                 {post.amenities
                   .split(/\r?\n/)
                   .filter((a) => a.trim())
@@ -130,9 +134,9 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
 
           {/* --- GOOGLE MAP --- */}
           {post.address && (
-            <Card className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+            <Card className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-md">
               <h2 className="mb-4 text-2xl font-bold text-black">Vị trí trên bản đồ</h2>
-              <div className="overflow-hidden rounded-xl shadow-md">
+              <div className="overflow-hidden rounded-xl shadow-sm">
                 <iframe
                   width="100%"
                   height="400"
@@ -147,14 +151,14 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
 
         {/* === CỘT PHẢI === */}
         <div className="space-y-6">
-          {/* Liên hệ */}
-          <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+          {/* Liên hệ nhanh */}
+          <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-md">
             <h2 className="mb-4 text-2xl font-bold text-black">Liên hệ nhanh</h2>
             {post.zaloLink ? (
               <Button
                 color="primary"
                 fullWidth
-                className="gap-2 font-medium text-white"
+                className="gap-2 rounded-xl font-medium text-white shadow-md hover:brightness-110"
                 onClick={() => window.open(`https://zalo.me/${post.zaloLink}`, '_blank')}
               >
                 Nhắn Zalo {post.zaloLink}
@@ -166,13 +170,13 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
           </Card>
 
           {/* Danh mục liên quan */}
-          <Card className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-sm">
+          <Card className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-md">
             <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold text-black">
               <FaListUl /> Danh mục liên quan
             </h2>
             <ul className="space-y-2 text-neutral-700">
               {['Nhà cho thuê', 'Phòng trọ', 'Căn hộ mini'].map((cat, i) => (
-                <motion.li key={i} whileHover={{ x: 4 }} className="cursor-pointer transition-colors hover:text-primary">
+                <motion.li key={i} whileHover={{ x: 5 }} className="cursor-pointer transition-colors hover:text-primary">
                   • {cat}
                 </motion.li>
               ))}
@@ -191,7 +195,7 @@ function InfoLine({ label, value, icon }: { label: string; value: string; icon?:
       {icon && <span className="mt-1 text-primary">{icon}</span>}
       <div>
         <span className="mr-2 inline-block rounded-md bg-primary/10 px-2 py-0.5 text-sm font-semibold text-primary">{label}</span>
-        <span className="text-neutral-800">{value}</span>
+        <span className="text-black">{value}</span>
       </div>
     </div>
   );
