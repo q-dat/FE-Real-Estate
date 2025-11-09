@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
-import { FaArrowRight, FaListUl, FaExpand, FaOrcid } from 'react-icons/fa';
+import { FaListUl, FaExpand, FaOrcid } from 'react-icons/fa';
 import { Button, Card } from 'react-daisyui';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import { IoPricetagsSharp } from 'react-icons/io5';
