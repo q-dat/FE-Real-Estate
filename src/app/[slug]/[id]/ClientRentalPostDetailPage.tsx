@@ -2,9 +2,11 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
-import { FaPhone, FaMapMarkerAlt, FaRulerCombined, FaTags, FaArrowRight, FaListUl, FaExpand } from 'react-icons/fa';
+import { FaArrowRight, FaListUl, FaExpand, FaOrcid } from 'react-icons/fa';
 import { Button, Card } from 'react-daisyui';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { IoPricetagsSharp } from 'react-icons/io5';
+import { MdOutlineUpdate } from 'react-icons/md';
 
 interface Props {
   post: IRentalPostAdmin;
@@ -19,35 +21,69 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
   const encodedAddress = encodeURIComponent(`${post.address}, ${post.district}, ${post.province}`);
 
   return (
-    <main className="bg-base-100 px-2 py-10 text-black xl:px-desktop-padding">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 xl:grid-cols-3">
-        {/* === CỘT TRÁI === */}
-        <div className="space-y-10 xl:col-span-2">
-          {/* --- TIÊU ĐỀ --- */}
+    <main className="bg-base-100 p-2 text-black xl:px-desktop-padding xl:py-10">
+      <div className="grid w-full grid-cols-1 gap-10 xl:grid-cols-3">
+        {/*  */}
+        <Card className="border border-neutral-200 p-3 shadow-sideBar xl:col-span-2">
+          {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="text-3xl font-extrabold tracking-tight text-black xl:text-5xl"
+            className="mb-4 text-2xl font-bold text-blue-800 xl:text-4xl"
           >
-            {post.title}
+            {post?.title}
           </motion.h1>
 
-          {/* --- GRID ẢNH --- */}
+          {/* Info */}
+          <div className="flex flex-col items-start justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-5 xl:gap-20">
+              {/* Price */}
+              <p className="inline-flex items-center gap-1">
+                <IoPricetagsSharp size={18} />
+                <span className="text-2xl font-bold text-price">
+                  {post?.price} {post?.priceUnit}
+                </span>
+              </p>
+              {/* Area */}
+              <p className="inline-flex items-center gap-1">
+                <FaExpand size={18} />
+                <strong className="text-xs xl:text-base">
+                  {post?.area} m<sup>2</sup>
+                </strong>
+              </p>
+              {/* iD */}
+              <p className="inline-flex items-center gap-1">
+                <FaOrcid size={18} />
+                <strong className="text-xs xl:text-base">
+                  <i>{post?.code}</i>
+                </strong>
+              </p>
+              {/* PostedAt */}
+              <p className="inline-flex items-center gap-1">
+                <MdOutlineUpdate size={18} />
+                <strong className="text-xs xl:text-base">{new Date(post.postedAt || post.createdAt).toLocaleDateString('vi-VN')}</strong>
+              </p>
+            </div>
+            {/* Address */}
+            <div className="flex items-center justify-start gap-0.5 text-lg">
+              <p className="text-black">
+                <b> Địa chỉ: </b>
+                <span className="font-medium text-gray-500">{post?.address}</span>
+              </p>
+            </div>
+          </div>
+          {/* Images */}
           {images.length > 0 && (
             <section>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4 }}
-                className="columns-2 gap-2 [column-fill:_balance] sm:columns-3 lg:columns-4"
+                className="my-10 columns-2 gap-2 [column-fill:_balance] sm:columns-3 lg:columns-4"
               >
                 {visibleImages.map((src, index) => (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.03 }}
-                    className="relative mb-2 cursor-pointer break-inside-avoid overflow-hidden rounded-2xl shadow-md"
-                  >
+                  <motion.div key={index} whileHover={{ scale: 1.03 }} className="relative mb-2 cursor-pointer break-inside-avoid overflow-hidden">
                     <Image
                       src={src}
                       alt={`${post.title}-${index}`}
@@ -76,28 +112,15 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
             </section>
           )}
 
-          {/* --- THÔNG TIN TỔNG QUAN --- */}
-          <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-md">
-            <h2 className="mb-6 text-2xl font-bold text-black">Thông tin tổng quan</h2>
-            <div className="grid gap-4 xl:grid-cols-2">
-              <InfoLine icon={<FaTags />} label="Giá thuê" value={`${post.price} ${post.priceUnit}`} />
-              <InfoLine icon={<FaRulerCombined />} label="Diện tích" value={`${post.area} m²`} />
-              <InfoLine icon={<FaMapMarkerAlt />} label="Địa chỉ" value={`${post.address}`} />
-              <InfoLine label="Danh mục" value={post.category?.name || 'Chưa phân loại'} />
-              <InfoLine label="Trạng thái" value={getStatusLabel(post.status)} />
-              <InfoLine icon={<FaPhone />} label="Liên hệ" value={post.phoneNumbers ?? 'Không có'} />
-            </div>
-          </Card>
-
-          {/* --- MÔ TẢ --- */}
-          <Card className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-md">
+          {/* Des */}
+          <div className="bg-neutral-50 p-6">
             <h2 className="mb-6 text-2xl font-bold text-black">Mô tả chi tiết</h2>
             <p className="whitespace-pre-line text-base leading-relaxed text-neutral-700 xl:text-lg">{post.description || 'Chưa có mô tả'}</p>
-          </Card>
+          </div>
 
-          {/* --- TIỆN ÍCH --- */}
+          {/*  Amenities */}
           {post.amenities && (
-            <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-md">
+            <div className="bg-white p-6 shadow-md">
               <h2 className="mb-6 text-2xl font-bold text-black">Tiện ích</h2>
               <ul className="grid grid-cols-1 gap-y-2 text-black xl:grid-cols-2">
                 {post.amenities
@@ -110,16 +133,16 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                     </li>
                   ))}
               </ul>
-            </Card>
+            </div>
           )}
 
-          {/* --- VIDEO --- */}
+          {/* Video */}
           {youtubeId && (
             <motion.section
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.4 }}
-              className="overflow-hidden rounded-2xl bg-black shadow-md"
+              className="overflow-hidden bg-black shadow-md"
             >
               <div className="aspect-video">
                 <iframe
@@ -132,9 +155,9 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
             </motion.section>
           )}
 
-          {/* --- GOOGLE MAP --- */}
+          {/* Gg Map */}
           {post.address && (
-            <Card className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-md">
+            <div className="bg-white p-4 shadow-md">
               <h2 className="mb-4 text-2xl font-bold text-black">Vị trí trên bản đồ</h2>
               <div className="overflow-hidden rounded-xl shadow-sm">
                 <iframe
@@ -145,14 +168,13 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                   src={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}
                 ></iframe>
               </div>
-            </Card>
+            </div>
           )}
-        </div>
-
-        {/* === CỘT PHẢI === */}
+        </Card>
+        {/*  */}
         <div className="space-y-6">
-          {/* Liên hệ nhanh */}
-          <Card className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-md">
+          {/* Contact */}
+          <div className="bg-white p-6 shadow-md">
             <h2 className="mb-4 text-2xl font-bold text-black">Liên hệ nhanh</h2>
             {post.zaloLink ? (
               <Button
@@ -167,10 +189,10 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
             ) : (
               <p className="text-neutral-600">Chưa có thông tin liên hệ</p>
             )}
-          </Card>
+          </div>
 
-          {/* Danh mục liên quan */}
-          <Card className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-md">
+          {/* Catalog */}
+          <div className="bg-neutral-50 p-6 shadow-md">
             <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold text-black">
               <FaListUl /> Danh mục liên quan
             </h2>
@@ -181,37 +203,29 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                 </motion.li>
               ))}
             </ul>
-          </Card>
+          </div>
         </div>
       </div>
     </main>
   );
 }
 
-/* === COMPONENT PHỤ === */
-function InfoLine({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) {
-  return (
-    <div className="flex items-start gap-3">
-      {icon && <span className="mt-1 text-primary">{icon}</span>}
-      <div>
-        <span className="mr-2 inline-block rounded-md bg-primary/10 px-2 py-0.5 text-sm font-semibold text-primary">{label}</span>
-        <span className="text-black">{value}</span>
-      </div>
-    </div>
-  );
-}
-
-function getStatusLabel(status: IRentalPostAdmin['status']): string {
+function getStatusLabel(status: IRentalPostAdmin['postType']): string {
   switch (status) {
-    case 'active':
-      return 'Đang hiển thị';
-    case 'pending':
-      return 'Chờ duyệt';
-    case 'expired':
-      return 'Hết hạn';
-    case 'hidden':
-      return 'Đã ẩn';
+    case 'basic':
+      return 'Tin thường';
+    case 'vip1':
+      return 'Vip 1';
+    case 'vip2':
+      return 'Vip 2';
+    case 'vip3':
+      return 'Vip 3';
+    case 'highlight':
+      return 'Nổi bật';
     default:
       return 'Không xác định';
   }
+}
+{
+  /* <p>Loại Tin: {getStatusLabel(post.postType)}</p> */
 }
