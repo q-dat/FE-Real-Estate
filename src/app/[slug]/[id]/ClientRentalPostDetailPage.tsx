@@ -2,12 +2,13 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
-import { FaListUl, FaExpand, FaOrcid } from 'react-icons/fa';
+import { FaListUl, FaExpand, FaOrcid, FaRulerCombined, FaPhone } from 'react-icons/fa';
 import { Button, Card } from 'react-daisyui';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import { IoPricetagsSharp } from 'react-icons/io5';
 import { MdOutlineUpdate } from 'react-icons/md';
 import { SiGooglemaps } from 'react-icons/si';
+import { GiCutDiamond } from 'react-icons/gi';
 import Link from 'next/link';
 import { Space } from '@/components/userPage/ui/space/Space';
 import { images } from '../../../../public/images';
@@ -34,60 +35,74 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mb-4 text-2xl font-bold text-blue-800 xl:text-4xl"
+            className="mb-4 text-3xl font-bold text-blue-800 xl:text-4xl"
           >
             {post?.title}
           </motion.h1>
 
-          {/* Info */}
-          <div className="flex flex-col items-start justify-center gap-4 px-2">
-            <div className="flex flex-wrap items-end justify-between gap-5 xl:gap-20">
-              {/* Price */}
-              <p className="inline-flex items-center gap-1">
-                <IoPricetagsSharp size={22} className="pt-1 text-primary" />
-                <span className="text-3xl font-bold text-price">
-                  {post?.price} {post?.priceUnit}
-                </span>
-              </p>
-              {/* Area */}
-              <p className="inline-flex items-center gap-1">
-                <FaExpand size={18} className="text-primary" />
-                <strong className="text-sm xl:text-sm">
-                  {post?.area} m<sup>2</sup>
-                </strong>
-              </p>
-              {/* iD */}
-              <p className="inline-flex items-center gap-1">
-                <FaOrcid size={18} className="text-primary" />
-                <strong className="text-sm xl:text-sm">
-                  <i>{post?.code}</i>
-                </strong>
-              </p>
-              {/* PostedAt */}
-              <p className="inline-flex items-center gap-1">
-                <MdOutlineUpdate size={18} className="text-primary" />
-                <span className="text-sm text-blue-700 xl:text-sm">{new Date(post?.postedAt || post?.createdAt).toLocaleDateString('vi-VN')}</span>
-              </p>
+          {/* Info chips */}
+          <div className="grid grid-cols-2 items-center justify-center gap-4 md:grid-cols-4">
+            {/*  */}
+            <div className="col-span-full">
+              <InfoChip
+                className="text-2xl font-bold italic text-price xl:text-xl"
+                icon={<IoPricetagsSharp size={16} className="text-primary" />}
+                label={`${post?.price} ${post?.priceUnit}`}
+                full={true}
+              />
             </div>
-            {/* Address */}
-            <div className="flex w-full flex-wrap items-center justify-between gap-2 text-sm xl:text-base">
-              <p>
-                <b className="mr-2 text-black">Địa chỉ:</b>
-                <span className="font-normal">{post?.address}</span>
-              </p>
-              <Link
-                href="#map"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector('#map')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="inline-flex items-center gap-1 text-sm text-black underline-offset-2 transition-all duration-200 hover:text-blue-600 hover:underline"
-              >
-                <SiGooglemaps className="text-green-700" size={18} />
-                Xem trên bản đồ!
-              </Link>
-            </div>
+            {/*  */}
+            <InfoChip
+              className="text-sm font-medium text-default"
+              icon={<FaExpand size={16} className="text-primary" />}
+              label={`${post?.area}m²`}
+              full={false}
+            />
+            {/*  */}
+            <InfoChip
+              className="text-sm font-medium text-default"
+              icon={<FaOrcid size={16} className="text-primary" />}
+              label={`${post?.code}`}
+              full={false}
+            />
+            {/*  */}
+            <InfoChip
+              className="text-sm font-medium text-default"
+              icon={<MdOutlineUpdate size={16} className="text-primary" />}
+              label={new Date(post?.postedAt || post?.createdAt).toLocaleDateString('vi-VN')}
+              full={false}
+            />
+            <InfoChip
+              className="text-sm font-medium text-default"
+              icon={<GiCutDiamond size={16} className="text-primary" />}
+              label={getStatusLabel(post?.postType)}
+              full={false}
+            />
           </div>
+          {/* Address */}
+          <div className="mt-5 flex w-full flex-wrap items-start justify-between gap-3 text-sm xl:text-base">
+            {/*  */}
+            <p className="flex-1 break-words text-gray-700">
+              <b className="mr-2 text-gray-800">Địa chỉ:</b>
+              {post?.address}
+            </p>
+
+            {/*  */}
+            <Link
+              href="#map"
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#map')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-primary-lighter bg-white px-1 py-0.5 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary/10 hover:text-primary"
+            >
+              <SiGooglemaps className="text-green-700" size={16} />
+              Xem bản đồ
+            </Link>
+          </div>
+
+          {/* Space */}
+          <Space />
 
           {/* Images */}
           {imagesRental.length > 0 && (
@@ -130,14 +145,27 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
 
           {/* Des */}
           <div className="bg-neutral-50 p-2 leading-10">
-            <h2 className="text-xl font-bold text-black">Thông tin mô tả</h2>
-            <p>
+            <h2 className="mb-3 text-xl font-bold text-black">Thông tin mô tả</h2>
+            {/* Size */}
+            {post?.length && post?.width && (
+              <div className="inline-flex items-center">
+                <FaRulerCombined className="mr-2 text-primary" size={16} />
+                <p className="text-sm sm:text-base">
+                  (Dài: {post?.length}m x Rộng: {post?.width}m) = <span className="font-semibold">{post?.area} m²</span>
+                </p>
+              </div>
+            )}
+            {/* Adress */}
+            <div>
               <b>Khu vực:&nbsp;</b>
               <span className="font-normal text-blue-700">
                 {post?.category.name}&nbsp;{post?.district}
               </span>
+            </div>
+            {/* Des */}
+            <p className="whitespace-pre-line border-t border-gray-100 pt-3 text-sm leading-relaxed text-gray-800 sm:text-base">
+              {post?.description || 'Chưa có mô tả'}
             </p>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-black xl:text-base">{post?.description || 'Chưa có mô tả'}</p>
           </div>
 
           {/*  Amenities */}
@@ -177,6 +205,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
               </div>
             </motion.section>
           )}
+
           {/* Space */}
           <Space />
 
@@ -260,19 +289,30 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
         {/* Right */}
         <div>
           {/* Contact */}
-          <div className="bg-white p-2">
+          <div className="rounded-2xl bg-white p-4 shadow-lg">
             <h2 className="mb-4 text-xl font-bold text-black">Liên hệ nhanh</h2>
+
+            {/* ZaloLink */}
             {post?.zaloLink ? (
               <Button
-                color="primary"
                 fullWidth
-                className="gap-2 rounded-xl font-medium text-white shadow-md hover:brightness-110"
+                className="gap-2 rounded-xl bg-white font-medium text-black shadow-md transition-all hover:scale-95 hover:brightness-105"
                 onClick={() => window.open(`https://zalo.me/${post?.zaloLink}`, '_blank')}
               >
-                <Image src={images.LogoZalo} width={25} height={25} alt={''} /> Nhắn Zalo
+                <Image src={images.LogoZalo} width={25} height={25} alt="" /> Nhắn Zalo
               </Button>
             ) : (
-              <p className="text-neutral-600">Chưa có thông tin liên hệ</p>
+              <p className="text-neutral-500">Chưa có thông tin liên hệ</p>
+            )}
+
+            {/* PhoneNumbers */}
+            {post?.phoneNumbers && (
+              <a
+                href={`tel:${post?.phoneNumbers}`}
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-2xl font-medium text-white shadow-md transition-all hover:scale-95"
+              >
+                <FaPhone /> {post?.phoneNumbers}
+              </a>
             )}
           </div>
 
@@ -294,7 +334,21 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
     </main>
   );
 }
+function InfoChip({ icon, label, full, className }: { icon: React.ReactNode; label: string; full?: boolean; className?: React.ReactNode }) {
+  return (
+    <motion.div
+      whileHover={{ scale: 0.95 }}
+      whileTap={{ scale: 0.98 }}
+      className={`relative flex items-center justify-center gap-1 rounded-full bg-primary-lighter/30 px-5 py-2 text-primary shadow-inner shadow-primary/30 backdrop-blur-sm transition-all duration-300 xl:hover:from-primary/20 xl:hover:to-primary/10 xl:hover:shadow-md ${full ? 'w-full xl:w-auto' : 'w-auto'}`}
+    >
+      <span className="flex-shrink-0">{icon}</span>
+      <span className={`tracking-wide ${className}`}>{label}</span>
 
+      {/* Light glow effect */}
+      <span className="absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-transparent via-primary/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    </motion.div>
+  );
+}
 function getStatusLabel(status: IRentalPostAdmin['postType']): string {
   switch (status) {
     case 'basic':
