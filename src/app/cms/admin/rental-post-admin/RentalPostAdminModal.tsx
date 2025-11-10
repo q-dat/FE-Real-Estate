@@ -23,42 +23,88 @@ interface Props {
 }
 
 export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload }: Props) {
-  const { register, handleSubmit, reset } = useForm<IRentalPostAdmin>();
+  const { register, handleSubmit, reset, getValues } = useForm<IRentalPostAdmin>();
   const [images, setImages] = useState<FileList | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
+  const [wards, setWards] = useState<any[]>([]);
+
+  const [selectedProvince, setSelectedProvince] = useState<string>('');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+  const [selectedWard, setSelectedWard] = useState<string>('');
+  useEffect(() => {
+    fetch('https://provinces.open-api.vn/api/p/')
+      .then((res) => res.json())
+      .then(setProvinces)
+      .catch(console.error);
+  }, []);
+  useEffect(() => {
+    if (!selectedProvince) return;
+    fetch(`https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`)
+      .then((res) => res.json())
+      .then((data) => setDistricts(data.districts || []))
+      .catch(console.error);
+  }, [selectedProvince]);
+  useEffect(() => {
+    if (!selectedDistrict) return;
+    fetch(`https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`)
+      .then((res) => res.json())
+      .then((data) => setWards(data.wards || []))
+      .catch(console.error);
+  }, [selectedDistrict]);
 
   const classNameLabel = 'bg-white px-2 font-medium';
   useEscClose(open, onClose);
 
   // Load dữ liệu khi chỉnh sửa
+  // --- Khi editingPost thay đổi ---
   useEffect(() => {
-    if (editingPost) {
-      // Nếu đang chỉnh sửa
-      reset({
-        ...editingPost,
-        category: typeof editingPost.category === 'object' ? editingPost.category._id : editingPost.category,
-        postedAt: editingPost.postedAt ? new Date(editingPost.postedAt).toISOString().split('T')[0] : '',
-        expiredAt: editingPost.expiredAt ? new Date(editingPost.expiredAt).toISOString().split('T')[0] : '',
-      } as unknown as IRentalPostAdmin);
+    if (!editingPost) return;
 
-      // Giữ nguyên hình ảnh preview cũ
-      setPreviewUrls(editingPost.images || []);
-    } else {
-      // Nếu là tạo mới
-      const today = new Date();
-      const future = new Date();
-      future.setDate(today.getDate() + 1); // +1 ngày hết hạn
+    // Reset form cơ bản
+    reset({
+      ...editingPost,
+      category: typeof editingPost.category === 'object' ? editingPost.category._id : editingPost.category,
+      postedAt: editingPost.postedAt ? new Date(editingPost.postedAt).toISOString().split('T')[0] : '',
+      expiredAt: editingPost.expiredAt ? new Date(editingPost.expiredAt).toISOString().split('T')[0] : '',
+    } as unknown as IRentalPostAdmin);
 
-      reset({
-        postedAt: today.toISOString().split('T')[0],
-        expiredAt: future.toISOString().split('T')[0],
-      } as unknown as IRentalPostAdmin);
-
-      // Xóa preview cũ (reset state)
-      setPreviewUrls([]);
-    }
+    // Giữ hình ảnh
+    setPreviewUrls(editingPost.images || []);
   }, [editingPost, reset]);
+
+  // --- Khi provinces đã load và có editingPost ---
+  useEffect(() => {
+    if (!editingPost || provinces.length === 0) return;
+
+    const province = provinces.find((p) => p.name === editingPost.province);
+    if (province) {
+      setSelectedProvince(String(province.code));
+    }
+  }, [editingPost, provinces]);
+
+  // --- Khi districts đã load và có editingPost ---
+  useEffect(() => {
+    if (!editingPost || districts.length === 0) return;
+
+    const district = districts.find((d) => d.name === editingPost.district);
+    if (district) {
+      setSelectedDistrict(String(district.code));
+    }
+  }, [editingPost, districts]);
+
+  // --- Khi wards đã load và có editingPost ---
+  useEffect(() => {
+    if (!editingPost || wards.length === 0) return;
+
+    const ward = wards.find((w) => w.name === editingPost.ward);
+    if (ward) {
+      setSelectedWard(String(ward.code));
+    }
+  }, [editingPost, wards]);
 
   const removeImage = (url: string) => setPreviewUrls((prev) => prev.filter((u) => u !== url));
 
@@ -249,7 +295,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 <div className="col-span-full">
                   <TextareaForm {...register('videoDescription')} placeholder="Mô tả video..." />
                 </div>
-                <InputForm
+                {/* <InputForm
                   classNameLabel={`${classNameLabel}`}
                   {...register('province', { required: true })}
                   label="Tỉnh / Thành phố"
@@ -265,7 +311,82 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   bordered
                   required
                 />
-                <InputForm classNameLabel={`${classNameLabel}`} {...register('ward')} label="Phường / Xã" placeholder="Nhập Phường / Xã" bordered />
+                <InputForm classNameLabel={`${classNameLabel}`} {...register('ward')} label="Phường / Xã" placeholder="Nhập Phường / Xã" bordered /> */}
+                {/* Tỉnh / Thành phố */}
+                <div>
+                  <LabelForm title="Tỉnh / Thành phố" />
+                  <Select
+                    value={selectedProvince}
+                    onChange={(e) => {
+                      const code = e.target.value;
+                      const province = provinces.find((p) => p.code === +code);
+                      setSelectedProvince(code);
+                      setSelectedDistrict('');
+                      setSelectedWard('');
+                      setDistricts([]);
+                      setWards([]);
+                      // Lưu tên tỉnh vào react-hook-form
+                      if (province) reset({ ...getValues(), province: province.name });
+                    }}
+                    className="select select-bordered w-full focus:outline-none"
+                  >
+                    <option value="">-- Chọn Tỉnh / Thành phố --</option>
+                    {provinces.map((p) => (
+                      <option key={p.code} value={p.code}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                {/* Quận / Huyện */}
+                <div>
+                  <LabelForm title="Quận / Huyện" />
+                  <Select
+                    value={selectedDistrict}
+                    onChange={(e) => {
+                      const code = e.target.value;
+                      const district = districts.find((d) => d.code === +code);
+                      setSelectedDistrict(code);
+                      setSelectedWard('');
+                      setWards([]);
+                      if (district) reset({ ...getValues(), district: district.name });
+                    }}
+                    disabled={!districts.length}
+                    className="select select-bordered w-full focus:outline-none"
+                  >
+                    <option value="">-- Chọn Quận / Huyện --</option>
+                    {districts.map((d) => (
+                      <option key={d.code} value={d.code}>
+                        {d.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                {/* Phường / Xã */}
+                <div>
+                  <LabelForm title="Phường / Xã" />
+                  <Select
+                    value={selectedWard}
+                    onChange={(e) => {
+                      const code = e.target.value;
+                      const ward = wards.find((w) => w.code === +code);
+                      setSelectedWard(code);
+                      if (ward) reset({ ...getValues(), ward: ward.name });
+                    }}
+                    disabled={!wards.length}
+                    className="select select-bordered w-full focus:outline-none"
+                  >
+                    <option value="">-- Chọn Phường / Xã --</option>
+                    {wards.map((w) => (
+                      <option key={w.code} value={w.code}>
+                        {w.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                {/*  */}
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
                   {...register('address', { required: true })}
