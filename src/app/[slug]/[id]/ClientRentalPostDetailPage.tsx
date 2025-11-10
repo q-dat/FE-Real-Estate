@@ -306,14 +306,27 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
             )}
 
             {/* PhoneNumbers */}
-            {post?.phoneNumbers && (
-              <a
-                href={`tel:${post?.phoneNumbers}`}
-                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-2xl font-medium text-white shadow-md transition-all hover:scale-95"
-              >
-                <FaPhone /> {post?.phoneNumbers}
-              </a>
-            )}
+            {post?.phoneNumbers &&
+              (() => {
+                const formatPhone = (phone?: string) => {
+                  if (!phone) return '';
+                  // 4 số đầu + . + các nhóm 3 số tiếp theo
+                  return phone.replace(/^(\d{4})(\d+)/, (_, first, rest) => {
+                    return `${first}.${rest.match(/.{1,3}/g)?.join('.')}`;
+                  });
+                };
+
+                const formatted = formatPhone(post.phoneNumbers);
+
+                return (
+                  <a
+                    href={`tel:${post.phoneNumbers}`}
+                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-2xl font-bold text-white shadow-md transition-all hover:scale-95"
+                  >
+                    <FaPhone /> {formatted}
+                  </a>
+                );
+              })()}
           </div>
 
           {/* Catalog */}
@@ -339,7 +352,7 @@ function InfoChip({ icon, label, full, className }: { icon: React.ReactNode; lab
     <motion.div
       whileHover={{ scale: 0.95 }}
       whileTap={{ scale: 0.98 }}
-      className={`relative flex items-center justify-center gap-1 rounded-full bg-primary-lighter/30 px-5 py-2 text-primary shadow-inner shadow-primary/30 backdrop-blur-sm transition-all duration-300 xl:hover:from-primary/20 xl:hover:to-primary/10 xl:hover:shadow-md ${full ? 'w-full xl:w-auto' : 'w-auto'}`}
+      className={`relative flex items-center justify-center gap-1 rounded-md bg-primary-lighter/30 p-1 text-primary shadow-inner shadow-primary/10 backdrop-blur-sm transition-all duration-300 xl:hover:from-primary/20 xl:hover:to-primary/10 xl:hover:shadow-md ${full ? 'w-full xl:w-auto' : 'w-auto'}`}
     >
       <span className="flex-shrink-0">{icon}</span>
       <span className={`tracking-wide ${className}`}>{label}</span>
