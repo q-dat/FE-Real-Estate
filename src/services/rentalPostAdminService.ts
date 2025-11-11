@@ -15,10 +15,17 @@ export const rentalPostAdminService = {
   },
 
   // GET ALL
-  async getAll(): Promise<IRentalPostAdmin[]> {
-    const apiUrl = `${getServerApiUrl('api/rental-admin-posts')}`;
-    const now = Date.now();
+  async getAll(params?: Record<string, string | number>): Promise<IRentalPostAdmin[]> {
+    // Base API
+    let apiUrl = `${getServerApiUrl('api/rental-admin-posts')}`;
 
+    // Gắn query params nếu có
+    if (params && Object.keys(params).length > 0) {
+      const query = new URLSearchParams(params as Record<string, string>).toString();
+      apiUrl += `?${query}`;
+    }
+
+    const now = Date.now();
     const cached = cache[apiUrl];
     if (cached && now - cached.timestamp < CACHE_TTL) {
       return cached.data;
@@ -34,12 +41,9 @@ export const rentalPostAdminService = {
       const data = await res.json();
 
       let posts: IRentalPostAdmin[] = [];
-      if (Array.isArray(data)) posts = data;
-      else if (Array.isArray(data.rentalPosts)) posts = data.rentalPosts;
+      if (Array.isArray(data.rentalPosts)) posts = data.rentalPosts;
       else if (Array.isArray(data.data)) posts = data.data;
-      else {
-        console.warn('Dữ liệu rental-admin-posts không hợp lệ:', data);
-      }
+      else if (Array.isArray(data)) posts = data;
 
       cache[apiUrl] = { data: posts, timestamp: now };
       return posts;
@@ -48,7 +52,6 @@ export const rentalPostAdminService = {
       return cache[apiUrl]?.data || [];
     }
   },
-
   // GET BY ID
   getById: async (id: string): Promise<IRentalPostAdmin | null> => {
     try {

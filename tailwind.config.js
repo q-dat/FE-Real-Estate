@@ -22,7 +22,7 @@ export default {
     extend: {
       //p-desktop-padding
       spacing: {
-        'desktop-padding': '50px',
+        'desktop-padding': '10rem',
       },
       fontSize: {
         // mobile-font-size
