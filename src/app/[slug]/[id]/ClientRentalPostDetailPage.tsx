@@ -35,50 +35,37 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mb-4 text-3xl font-bold text-blue-800 xl:text-4xl"
+            className="mb-4 text-xl font-bold text-blue-800 xl:text-2xl"
           >
             {post?.title}
           </motion.h1>
 
-          {/* Info chips */}
-          <div className="grid grid-cols-2 items-center justify-center gap-4 md:grid-cols-4">
-            {/*  */}
+          <div className="grid w-full grid-cols-2 items-center justify-center gap-4 md:grid-cols-4">
+            {/* --- Giá --- */}
             <div className="col-span-full">
               <InfoChip
-                className="text-2xl font-bold italic text-price xl:text-xl"
+                className="text-2xl font-black text-price xl:text-xl"
                 icon={<IoPricetagsSharp size={16} className="text-primary" />}
                 label={`${post?.price} ${post?.priceUnit}`}
-                full={true}
               />
             </div>
-            {/*  */}
-            <InfoChip
-              className="text-sm font-medium text-default"
-              icon={<FaExpand size={16} className="text-primary" />}
-              label={`${post?.area}m²`}
-              full={false}
-            />
-            {/*  */}
-            <InfoChip
-              className="text-sm font-medium text-default"
-              icon={<FaOrcid size={16} className="text-primary" />}
-              label={`${post?.code}`}
-              full={false}
-            />
-            {/*  */}
-            <InfoChip
-              className="text-sm font-medium text-default"
-              icon={<MdOutlineUpdate size={16} className="text-primary" />}
-              label={new Date(post?.postedAt || post?.createdAt).toLocaleDateString('vi-VN')}
-              full={false}
-            />
-            <InfoChip
-              className="text-sm font-medium text-default"
-              icon={<GiCutDiamond size={16} className="text-primary" />}
-              label={getStatusLabel(post?.postType)}
-              full={false}
-            />
+
+            {/* --- Các InfoChip còn lại --- */}
+            {[
+              { icon: <FaExpand size={16} className="text-primary" />, label: `${post?.area}m²` },
+              { icon: <FaOrcid size={16} className="text-primary" />, label: `${post?.code}` },
+              {
+                icon: <MdOutlineUpdate size={18} className="text-primary" />,
+                label: new Date(post?.postedAt || post?.createdAt).toLocaleDateString('vi-VN'),
+              },
+              { icon: <GiCutDiamond size={18} className="text-primary" />, label: getStatusLabel(post?.postType) },
+            ].map((info, i) => (
+              <div key={i} className={`flex w-full ${i % 2 === 0 ? 'justify-start xl:justify-center' : 'justify-end xl:justify-center'}`}>
+                <InfoChip className="text-sm font-bold text-default" icon={info.icon} label={info.label} />
+              </div>
+            ))}
           </div>
+
           {/* Address */}
           <div className="mt-5 flex w-full flex-wrap items-start justify-between gap-3 text-sm xl:text-base">
             {/*  */}
@@ -106,25 +93,31 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
 
           {/* Images */}
           {imagesRental.length > 0 && (
-            <section>
+            <section className="my-10">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4 }}
-                className="my-10 columns-2 gap-2 [column-fill:_balance] sm:columns-3 lg:columns-4"
+                className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
               >
-                {visibleImages.map((src, index) => (
-                  <motion.div key={index} whileHover={{ scale: 1.03 }} className="relative mb-2 cursor-pointer break-inside-avoid overflow-hidden">
+                {visibleImages.slice(0, 25).map((src, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ scale: 1 }}
+                    className={`relative cursor-pointer overflow-hidden rounded-lg ${
+                      index === 0 ? 'col-span-1 row-span-2 xl:col-span-3 xl:row-span-2' : ''
+                    }`}
+                  >
                     <Image
                       src={src}
                       alt={`${post?.title}-${index}`}
                       width={800}
                       height={600}
-                      className="h-auto w-full object-cover transition-transform duration-500 hover:scale-110"
+                      className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+                    {/* <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity hover:opacity-100">
                       <FaExpand className="text-xl text-white" />
-                    </div>
+                    </div> */}
                   </motion.div>
                 ))}
               </motion.div>
@@ -133,10 +126,11 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                 <div className="mt-4 flex justify-center">
                   <Button
                     color="primary"
-                    className="rounded-full px-6 text-sm font-semibold text-white shadow-sm hover:brightness-110"
+                    size="sm"
+                    className="rounded-full text-sm font-semibold text-white shadow-sm hover:brightness-110"
                     onClick={() => setShowAll(true)}
                   >
-                    Xem tất cả {imagesRental.length} ảnh
+                    Xem tất cả {Math.min(imagesRental.length, 25)} ảnh
                   </Button>
                 </div>
               )}
@@ -347,13 +341,9 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
     </main>
   );
 }
-function InfoChip({ icon, label, full, className }: { icon: React.ReactNode; label: string; full?: boolean; className?: React.ReactNode }) {
+function InfoChip({ icon, label, className }: { icon: React.ReactNode; label: string; className?: React.ReactNode }) {
   return (
-    <motion.div
-      whileHover={{ scale: 0.95 }}
-      whileTap={{ scale: 0.98 }}
-      className={`relative flex items-center justify-center gap-1 rounded-md bg-primary-lighter/30 p-1 text-primary shadow-inner shadow-primary/10 backdrop-blur-sm transition-all duration-300 xl:hover:from-primary/20 xl:hover:to-primary/10 xl:hover:shadow-md ${full ? 'w-full xl:w-auto' : 'w-auto'}`}
-    >
+    <motion.div whileHover={{ scale: 0.95 }} whileTap={{ scale: 0.98 }} className="relative flex items-center gap-1 text-primary">
       <span className="flex-shrink-0">{icon}</span>
       <span className={`tracking-wide ${className}`}>{label}</span>
 
