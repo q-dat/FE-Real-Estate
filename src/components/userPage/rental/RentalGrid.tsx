@@ -16,7 +16,7 @@ interface RentalGridProps {
   slogan?: string;
 }
 
-export default function RentalGrid({ posts, title, basePath, slogan }: RentalGridProps) {
+export default function RentalGrid({ posts, title, basePath }: RentalGridProps) {
   return (
     <div className="px-2 py-8 xl:px-desktop-padding">
       {/* Breadcrumbs */}
