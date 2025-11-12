@@ -12,15 +12,18 @@ interface FavoriteButtonProps {
 
 export default function FavoriteBtn({ post, className = '', size = 22 }: FavoriteButtonProps) {
   const { favorites, toggleFavorite } = useRentalFavorite();
-
   const isFavorite = favorites.some((fav) => fav._id === post._id);
 
   return (
     <motion.button
       whileTap={{ scale: 0.9 }}
-      onClick={() => toggleFavorite(post)}
+      onClick={(e) => {
+        e.stopPropagation(); // 🔥 Ngăn lan ra Link cha
+        e.preventDefault(); // 🔥 Ngăn hành vi chuyển trang
+        toggleFavorite(post);
+      }}
       aria-label="Thêm vào yêu thích"
-      className={`flex items-center justify-center rounded-full p-1 transition z-[99999] hover:bg-red-100 ${className}`}
+      className={`flex items-center justify-center rounded-full p-1 transition hover:bg-red-100 ${className}`}
     >
       {isFavorite ? (
         <AiFillHeart size={size} className="text-red-500 drop-shadow-sm" />

@@ -31,3 +31,15 @@ export interface IRentalPostAdmin {
   createdAt: string; // ngày tạo tin
   updatedAt: string; // ngày cập nhật gần nhất
 }
+// types/type/rentalAdmin/rentalFavoriteLite.ts
+export interface IRentalFavoriteLite {
+  _id: string;
+  title: string;
+  price: number;
+  priceUnit: string;
+  area: number;
+  district: string;
+  province: string;
+  image?: string; 
+}
+

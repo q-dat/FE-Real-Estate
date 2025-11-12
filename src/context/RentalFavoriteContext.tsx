@@ -1,10 +1,10 @@
 'use client';
-import { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Toastify } from '@/helper/Toastify';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { IRentalFavoriteLite, IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 
 interface RentalFavoriteContextType {
-  favorites: IRentalPostAdmin[];
+  favorites: IRentalFavoriteLite[];
   favoriteCount: number;
   toggleFavorite: (item: IRentalPostAdmin) => void;
   handleRemove: (id: string) => void;
@@ -13,31 +13,45 @@ interface RentalFavoriteContextType {
 const RentalFavoriteContext = createContext<RentalFavoriteContextType | undefined>(undefined);
 
 export function RentalFavoriteProvider({ children }: { children: React.ReactNode }) {
-  const [favorites, setFavorites] = useState<IRentalPostAdmin[]>([]);
+  const [favorites, setFavorites] = useState<IRentalFavoriteLite[]>([]);
   const toastRef = useRef<string | null>(null);
 
-  // Load từ localStorage khi client mount
   useEffect(() => {
-    if (typeof window === 'undefined') return;
     const saved = localStorage.getItem('rentalFavorites');
-    if (saved) setFavorites(JSON.parse(saved));
+    if (saved) {
+      try {
+        setFavorites(JSON.parse(saved));
+      } catch {
+        localStorage.removeItem('rentalFavorites');
+      }
+    }
   }, []);
 
-  // Đếm số lượng yêu thích
   const favoriteCount = useMemo(() => favorites.length, [favorites]);
 
-  // Thêm / xóa khỏi danh sách yêu thích
-  const toggleFavorite = useCallback((item: IRentalPostAdmin) => {
+  const toggleFavorite = useCallback((post: IRentalPostAdmin) => {
     setFavorites((prev) => {
-      const exists = prev.some((fav) => fav._id === item._id);
-      let updated: IRentalPostAdmin[];
+      const exists = prev.some((f) => f._id === post._id);
+      let updated: IRentalFavoriteLite[];
+
       if (exists) {
-        updated = prev.filter((fav) => fav._id !== item._id);
+        updated = prev.filter((f) => f._id !== post._id);
         toastRef.current = 'Đã xóa khỏi danh sách yêu thích.';
       } else {
-        updated = [...prev, item];
+        const compact: IRentalFavoriteLite = {
+          _id: post._id,
+          title: post.title,
+          price: post.price,
+          priceUnit: post.priceUnit,
+          area: post.area,
+          district: post.district,
+          province: post.province,
+          image: Array.isArray(post.images) ? post.images[0] : undefined,
+        };
+        updated = [...prev, compact];
         toastRef.current = 'Đã thêm vào danh sách yêu thích.';
       }
+
       localStorage.setItem('rentalFavorites', JSON.stringify(updated));
       return updated;
     });
@@ -48,13 +62,14 @@ export function RentalFavoriteProvider({ children }: { children: React.ReactNode
     }
   }, []);
 
-  const handleRemove = useCallback(
-    (id: string) => {
-      const found = favorites.find((f) => f._id === id);
-      if (found) toggleFavorite(found);
-    },
-    [favorites, toggleFavorite]
-  );
+  const handleRemove = useCallback((id: string) => {
+    setFavorites((prev) => {
+      const updated = prev.filter((f) => f._id !== id);
+      localStorage.setItem('rentalFavorites', JSON.stringify(updated));
+      Toastify('Đã xóa khỏi danh sách yêu thích.', 200);
+      return updated;
+    });
+  }, []);
 
   return (
     <RentalFavoriteContext.Provider value={{ favorites, favoriteCount, toggleFavorite, handleRemove }}>{children}</RentalFavoriteContext.Provider>

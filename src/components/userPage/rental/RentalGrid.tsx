@@ -48,7 +48,7 @@ export default function RentalGrid({ posts, title, basePath }: RentalGridProps) 
             <Link
               key={post._id}
               href={`/${slug}/${post._id}`}
-              className="group card relative overflow-hidden rounded-md bg-base-100 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              className="group card relative overflow-hidden rounded-md bg-base-100 shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
             >
               {/* Thumbnail */}
               <figure className="relative aspect-[4/3] overflow-hidden">
