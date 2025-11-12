@@ -19,5 +19,5 @@ export default async function Page() {
   // Fetch bài đăng theo categoryId động
   const posts = await rentalPostAdminService.getAll({ catalogID: categoryId });
 
-  return <RentalGrid posts={posts} title="Mua bán nhà đất" slogan="" />;
+  return <RentalGrid posts={posts} title="Mua Bán Nhà Đất" slogan="" />;
 }

@@ -12,23 +12,31 @@ import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 interface RentalGridProps {
   posts: IRentalPostAdmin[];
   title?: string;
+  basePath?: string;
   slogan?: string;
 }
 
-export default function RentalGrid({ posts, title, slogan }: RentalGridProps) {
+export default function RentalGrid({ posts, title, basePath, slogan }: RentalGridProps) {
   return (
     <div className="px-2 py-8 xl:px-desktop-padding">
+      {/* Breadcrumbs */}
+      <div className="breadcrumbs py-2 text-sm text-primary">
+        <ul className="font-medium">
+          <li>
+            <Link href="/">Trang Chủ</Link>
+          </li>
+          <li>
+            <Link href={`/${basePath}`}>{title}</Link>
+          </li>
+        </ul>
+      </div>
       {/* Optional: Tiêu đề + slogan */}
-      {(title || slogan) && (
+      {/* {(title || slogan) && (
         <div className="mb-4 text-left">
-          {title && <h1 className="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">{title}</h1>}
-
+          {title && <h1 className="text-2xl font-bold tracking-tight text-black">{title}</h1>}
           {slogan && <p className="mt-1 text-sm font-medium text-gray-500 md:text-base">{slogan}</p>}
-
-          <div className="mt-2 h-1 w-20 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 transition-all duration-300 hover:scale-x-110"></div>
         </div>
-      )}
-
+      )} */}
       {/* Grid danh sách bài đăng */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {posts.map((post) => {
