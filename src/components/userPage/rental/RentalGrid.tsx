@@ -71,7 +71,7 @@ export default function RentalGrid({ posts, title, basePath }: RentalGridProps) 
               <div className="card-body p-3">
                 <h4 className="line-clamp-2 text-sm font-semibold text-gray-900 transition-colors group-hover:text-primary">{post.title}</h4>
 
-                <div className="mt-1 flex flex-row items-center justify-between gap-1">
+                <div className="mt-1 flex flex-col items-start justify-between gap-1 xl:flex-row xl:items-center">
                   <div className="text-base font-bold text-primary">
                     {formatCurrency(post.price)} {post.priceUnit}
                   </div>
