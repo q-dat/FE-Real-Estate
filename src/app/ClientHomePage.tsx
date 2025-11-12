@@ -23,7 +23,7 @@ export default function ClientHomePage({ posts }: Props) {
 
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-xl font-semibold text-gray-900">Tin mới đăng</h3>
-        <Link href="/tin-noi-bat" className="link link-primary text-sm">
+        <Link href="/cho-thue-phong-tro" className="link link-primary text-sm">
           Xem tất cả →
         </Link>
       </div>

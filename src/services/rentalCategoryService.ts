@@ -15,8 +15,16 @@ export const rentalCategoryService = {
   },
 
   // GET ALL
-  async getAll(): Promise<IRentalCategory[]> {
-    const apiUrl = `${getServerApiUrl('api/rental-categories')}`;
+  async getAll(params?: Record<string, string | number>): Promise<IRentalCategory[]> {
+    // Base API
+    let apiUrl = `${getServerApiUrl('api/rental-categories')}`;
+
+    // Gắn query params nếu có
+    if (params && Object.keys(params).length > 0) {
+      const query = new URLSearchParams(params as Record<string, string>).toString();
+      apiUrl += `?${query}`;
+    }
+
     const now = Date.now();
 
     // Dùng cache nếu còn hạn
