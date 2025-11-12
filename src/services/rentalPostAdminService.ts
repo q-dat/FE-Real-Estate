@@ -1,55 +1,46 @@
+import makeCacheKey from '@/helper/makeCacheKey';
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 
 // Bộ nhớ cache tạm thời trong runtime server
-type CacheEntry = { data: IRentalPostAdmin[]; timestamp: number };
-const cache: Record<string, CacheEntry> = {};
-const CACHE_TTL = 60_000; // 1 phút
+type PostCacheEntry = { data: IRentalPostAdmin[]; timestamp: number };
+const postCache: Record<string, PostCacheEntry> = {};
+const POST_CACHE_TTL = 60_000; // 1 phút
 
 export const rentalPostAdminService = {
-  // Helper: Invalidate cache khi có thay đổi dữ liệu
   invalidateCache() {
-    for (const key in cache) {
-      delete cache[key];
-    }
+    for (const key in postCache) delete postCache[key];
   },
 
-  // GET ALL
   async getAll(params?: Record<string, string | number>): Promise<IRentalPostAdmin[]> {
-    // Base API
-    let apiUrl = `${getServerApiUrl('api/rental-admin-posts')}`;
-
-    // Gắn query params nếu có
-    if (params && Object.keys(params).length > 0) {
-      const query = new URLSearchParams(params as Record<string, string>).toString();
-      apiUrl += `?${query}`;
-    }
+    const baseUrl = getServerApiUrl('api/rental-admin-posts');
+    const cacheKey = makeCacheKey(baseUrl, params);
 
     const now = Date.now();
-    const cached = cache[apiUrl];
-    if (cached && now - cached.timestamp < CACHE_TTL) {
+    const cached = postCache[cacheKey];
+    if (cached && now - cached.timestamp < POST_CACHE_TTL) {
       return cached.data;
     }
 
+    let apiUrl = baseUrl;
+    if (params && Object.keys(params).length > 0) {
+      apiUrl += '?' + new URLSearchParams(params as Record<string, string>).toString();
+    }
+
+    // console.log('➡️ Fetch bài đăng:', apiUrl);
+
     try {
-      const res = await fetch(apiUrl, {
-        cache: 'force-cache',
-        next: { revalidate: 60 },
-      });
-      if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
+      const res = await fetch(apiUrl, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`Fetch bài đăng lỗi: ${res.status}`);
 
       const data = await res.json();
+      const posts = data?.rentalPosts ?? data?.data ?? (Array.isArray(data) ? data : []);
 
-      let posts: IRentalPostAdmin[] = [];
-      if (Array.isArray(data.rentalPosts)) posts = data.rentalPosts;
-      else if (Array.isArray(data.data)) posts = data.data;
-      else if (Array.isArray(data)) posts = data;
-
-      cache[apiUrl] = { data: posts, timestamp: now };
+      postCache[cacheKey] = { data: posts, timestamp: now };
       return posts;
-    } catch (error) {
-      console.error('Lỗi khi tải danh sách bài đăng:', error);
-      return cache[apiUrl]?.data || [];
+    } catch (err) {
+      console.error('Lỗi tải bài đăng:', err);
+      return cached?.data ?? [];
     }
   },
   // GET BY ID

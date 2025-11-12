@@ -1,67 +1,52 @@
+import makeCacheKey from '@/helper/makeCacheKey';
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';
 
 // Bộ nhớ cache tạm runtime (server hoặc client)
-type CacheEntry = { data: IRentalCategory[]; timestamp: number };
-const cache: Record<string, CacheEntry> = {};
-const CACHE_TTL = 60_000; // 1 phút
+type CategoryCacheEntry = { data: IRentalCategory[]; timestamp: number };
+const categoryCache: Record<string, CategoryCacheEntry> = {};
+const CATEGORY_CACHE_TTL = 60_000; // 1 phút
 
 export const rentalCategoryService = {
-  // Xóa cache khi có thay đổi dữ liệu
   invalidateCache() {
-    for (const key in cache) {
-      delete cache[key];
-    }
+    for (const key in categoryCache) delete categoryCache[key];
   },
 
-  // GET ALL
   async getAll(params?: Record<string, string | number>): Promise<IRentalCategory[]> {
-    // Base API
-    let apiUrl = `${getServerApiUrl('api/rental-categories')}`;
-
-    // Gắn query params nếu có
-    if (params && Object.keys(params).length > 0) {
-      const query = new URLSearchParams(params as Record<string, string>).toString();
-      apiUrl += `?${query}`;
-    }
-
+    const baseUrl = getServerApiUrl('api/rental-categories');
+    const cacheKey = makeCacheKey(baseUrl, params);
     const now = Date.now();
 
-    // Dùng cache nếu còn hạn
-    const cached = cache[apiUrl];
-    if (cached && now - cached.timestamp < CACHE_TTL) {
+    const cached = categoryCache[cacheKey];
+    if (cached && now - cached.timestamp < CATEGORY_CACHE_TTL) {
       return cached.data;
     }
 
+    // Build query đúng cách
+    let apiUrl = baseUrl;
+    if (params && Object.keys(params).length > 0) {
+      const query = Object.entries(params)
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+        .join('&');
+      apiUrl += `?${query}`;
+    }
+
+    // console.log('➡️ Fetch danh mục:', apiUrl);
+
     try {
-      const res = await fetch(apiUrl, {
-        cache: 'force-cache',
-        next: { revalidate: 60 },
-      });
-      if (!res.ok) {
-        throw new Error(`Không thể tải danh mục (${res.status} ${res.statusText})`);
-      }
+      const res = await fetch(apiUrl, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`Fetch danh mục lỗi: ${res.status}`);
 
       const data = await res.json();
+      const categories = Array.isArray(data) ? data : (data?.rentalCategories ?? []);
 
-      let categories: IRentalCategory[] = [];
-      if (Array.isArray(data)) {
-        categories = data;
-      } else if (data && Array.isArray(data.rentalCategories)) {
-        categories = data.rentalCategories;
-      } else {
-        console.warn('Dữ liệu danh mục không hợp lệ:', data);
-      }
-
-      // Lưu cache mới
-      cache[apiUrl] = { data: categories, timestamp: now };
+      categoryCache[cacheKey] = { data: categories, timestamp: now };
       return categories;
-    } catch (error) {
-      console.error('Lỗi khi tải danh mục:', error);
-      return cache[apiUrl]?.data || []; // fallback cache nếu có
+    } catch (err) {
+      console.error('Lỗi tải danh mục:', err);
+      return cached?.data ?? [];
     }
   },
-
   // CREATE
   async create(data: FormData) {
     try {
