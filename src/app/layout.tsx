@@ -8,6 +8,7 @@ import { Inter, Roboto_Mono } from 'next/font/google';
 import CustomCursor from '@/components/userPage/CustomCursor';
 import FooterFC from '@/components/userPage/FooterFC';
 import Header from '@/components/userPage/Header';
+import { RentalFavoriteProvider } from '@/context/RentalFavoriteContext';
 
 const geistSans = Inter({
   variable: '--font-geist-sans',
@@ -59,17 +60,19 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ErrorBoundary>
-          <CustomCursor />
-          <ToastContainer style={{ marginTop: '50px' }} />
-          <div className="flex min-h-screen flex-col bg-primary-white">
-            <Header />
-            <div className="flex-1 bg-primary-white selection:bg-primary selection:text-white xl:pt-0">{children}</div>
-            {/* <NotificationPopup /> */}
-            <ScrollToTopButton />
-            {/* <NavBottom /> */}
-            <ContactForm />
-            <FooterFC />
-          </div>
+          <RentalFavoriteProvider>
+            <CustomCursor />
+            <ToastContainer style={{ marginTop: '50px' }} />
+            <div className="flex min-h-screen flex-col bg-primary-white">
+              <Header />
+              <div className="flex-1 bg-primary-white selection:bg-primary selection:text-white xl:pt-0">{children}</div>
+              {/* <NotificationPopup /> */}
+              <ScrollToTopButton />
+              {/* <NavBottom /> */}
+              <ContactForm />
+              <FooterFC />
+            </div>
+          </RentalFavoriteProvider>
         </ErrorBoundary>
       </body>
     </html>

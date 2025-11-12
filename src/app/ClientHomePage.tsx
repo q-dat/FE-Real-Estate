@@ -8,6 +8,7 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import { slugify } from '@/lib/slugify';
 import { IoMdExpand } from 'react-icons/io';
 import { MdLocationPin } from 'react-icons/md';
+import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 
 interface Props {
   posts: IRentalPostAdmin[];
@@ -55,6 +56,10 @@ export default function ClientHomePage({ posts }: Props) {
                     <FaImage size={12} /> {totalImages}
                   </div>
                 )}
+                {/* FavoriteBtn */}
+                <div className="absolute right-0 top-0">
+                  <FavoriteBtn post={post} />
+                </div>
               </figure>
 
               {/* Nội dung */}
