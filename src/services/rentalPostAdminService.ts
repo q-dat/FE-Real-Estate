@@ -2,14 +2,30 @@ import makeCacheKey from '@/helper/makeCacheKey';
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 
-// Bộ nhớ cache tạm thời trong runtime server
 type PostCacheEntry = { data: IRentalPostAdmin[]; timestamp: number };
 const postCache: Record<string, PostCacheEntry> = {};
+
+type PostDetailCacheEntry = { data: IRentalPostAdmin; timestamp: number };
+const postDetailCache: Record<string, PostDetailCacheEntry> = {};
+
 const POST_CACHE_TTL = 60_000; // 1 phút
+const DETAIL_CACHE_TTL = 300_000; // 5 phút
 
 export const rentalPostAdminService = {
   invalidateCache() {
     for (const key in postCache) delete postCache[key];
+    for (const key in postDetailCache) delete postDetailCache[key];
+  },
+
+  logCache() {
+    console.log('[RentalPost Cache Snapshot]:', postCache);
+
+    // Nếu bạn muốn log chi tiết từng key
+    Object.entries(postCache).forEach(([key, entry]) => {
+      console.log(`➡️ Cache Key: ${key}`);
+      console.log(`   Timestamp: ${new Date(entry.timestamp).toLocaleTimeString()}`);
+      console.log(`   Cached items: ${entry.data.length}`);
+    });
   },
 
   async getAll(params?: Record<string, string | number>): Promise<IRentalPostAdmin[]> {
@@ -35,7 +51,6 @@ export const rentalPostAdminService = {
 
       const data = await res.json();
       const posts = data?.rentalPosts ?? data?.data ?? (Array.isArray(data) ? data : []);
-
       postCache[cacheKey] = { data: posts, timestamp: now };
       return posts;
     } catch (err) {
@@ -43,15 +58,28 @@ export const rentalPostAdminService = {
       return cached?.data ?? [];
     }
   },
+
   // GET BY ID
   getById: async (id: string): Promise<IRentalPostAdmin | null> => {
     try {
       const apiUrl = getServerApiUrl(`api/rental-admin-post/${id}`);
+      console.log('Fetching post detail:', apiUrl);
+
       const res = await fetch(apiUrl, { cache: 'no-store' });
       if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
-      const data = await res.json();
 
-      return data?.rentalPost || data?.data || data?.post || null;
+      const data = await res.json();
+      console.log('➡️ API Response (getById):', data);
+
+      const post = data?.rentalPost || data?.data || data?.post || data || null;
+
+      if (post) {
+        postCache[apiUrl] = { data: [post], timestamp: Date.now() };
+      } else {
+        console.warn('⚠️ API không trả dữ liệu hợp lệ:', data);
+      }
+
+      return post;
     } catch (error) {
       console.error('Lỗi khi tải bài đăng:', error);
       return null;

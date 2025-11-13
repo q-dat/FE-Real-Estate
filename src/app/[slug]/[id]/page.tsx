@@ -15,6 +15,7 @@ export default async function RentalPostPage({ params }: PageProps) {
   const { slug, id } = await params;
 
   const post = await rentalPostAdminService.getById(id);
+  rentalPostAdminService.logCache();
   if (!post) notFound();
 
   const correctSlug = slugify(post.title || '');
