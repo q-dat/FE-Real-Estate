@@ -9,7 +9,6 @@ type PostDetailCacheEntry = { data: IRentalPostAdmin; timestamp: number };
 const postDetailCache: Record<string, PostDetailCacheEntry> = {};
 
 const POST_CACHE_TTL = 60_000; // 1 phút
-const DETAIL_CACHE_TTL = 300_000; // 5 phút
 
 export const rentalPostAdminService = {
   invalidateCache() {
