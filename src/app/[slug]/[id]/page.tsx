@@ -1,8 +1,6 @@
-export const revalidate = 60;
-
-import { notFound, redirect } from 'next/navigation';
-import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { slugify } from '@/lib/slugify';
+import { rentalPostAdminService } from '@/services/rentalPostAdminService';
+import { notFound, redirect } from 'next/navigation';
 import ClientRentalPostDetailPage from './ClientRentalPostDetailPage';
 
 // Đúng kiểu cho Next 15
