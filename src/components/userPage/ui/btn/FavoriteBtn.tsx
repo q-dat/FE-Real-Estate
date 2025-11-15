@@ -23,12 +23,12 @@ export default function FavoriteBtn({ post, className = '', size = 22 }: Favorit
         toggleFavorite(post);
       }}
       aria-label="Thêm vào yêu thích"
-      className={`flex items-center justify-center rounded-full p-1 transition hover:bg-red-100 ${className}`}
+      className={`group flex items-center justify-center rounded-full bg-white/30 p-1 transition group-hover:bg-red-100 ${className}`}
     >
       {isFavorite ? (
         <AiFillHeart size={size} className="text-red-500 drop-shadow-sm" />
       ) : (
-        <AiOutlineHeart size={size} className="text-gray-500 hover:text-red-500" />
+        <AiOutlineHeart size={size} className="text-white group-hover:text-red-500" />
       )}
     </motion.button>
   );

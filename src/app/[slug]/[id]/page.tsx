@@ -1,3 +1,5 @@
+export const revalidate = 18000; // 5 giờ 3600x5
+
 import { slugify } from '@/lib/slugify';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { notFound, redirect } from 'next/navigation';
