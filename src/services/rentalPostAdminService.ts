@@ -1,29 +1,8 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-
-type PostCacheEntry = { data: IRentalPostAdmin[]; timestamp: number };
-const postCache: Record<string, PostCacheEntry> = {};
-
-type PostDetailCacheEntry = { data: IRentalPostAdmin; timestamp: number };
-const postDetailCache: Record<string, PostDetailCacheEntry> = {};
+import { getWithFallback } from './shared/getWithFallback';
 
 export const rentalPostAdminService = {
-  invalidateCache() {
-    for (const key in postCache) delete postCache[key];
-    for (const key in postDetailCache) delete postDetailCache[key];
-  },
-
-  logCache() {
-    console.log('[RentalPost Cache Snapshot]:', postCache);
-
-    // Nếu bạn muốn log chi tiết từng key
-    Object.entries(postCache).forEach(([key, entry]) => {
-      console.log(`➡️ Cache Key: ${key}`);
-      console.log(`   Timestamp: ${new Date(entry.timestamp).toLocaleTimeString()}`);
-      console.log(`   Cached items: ${entry.data.length}`);
-    });
-  },
-
   async getAll(params?: Record<string, string | number>): Promise<IRentalPostAdmin[]> {
     const baseUrl = getServerApiUrl('api/rental-admin-posts');
 
@@ -33,30 +12,35 @@ export const rentalPostAdminService = {
     }
 
     const res = await fetch(apiUrl, {
-      // Nếu bạn muốn theo revalidate của page thì bỏ next:
-      // next: { revalidate: 300 },  // tuỳ chỉnh nếu muốn
+      cache: 'force-cache',
+      next: { revalidate: 60 },
     });
 
-    if (!res.ok) throw new Error(`Fetch bài đăng lỗi: ${res.status}`);
+    if (!res.ok) throw new Error(`Fetch lỗi: ${res.status}`);
 
     const data = await res.json();
     return data?.rentalPosts ?? data?.data ?? (Array.isArray(data) ? data : []);
   },
 
-  // DETAIL – để Next quản lý cache (Cách A)
   async getById(id: string): Promise<IRentalPostAdmin | null> {
     const apiUrl = getServerApiUrl(`api/rental-admin-post/${id}`);
 
     const res = await fetch(apiUrl, {
-      // Không dùng no-store
-      // Next sẽ cache theo revalidate của page hoặc bạn có thể set riêng:
-      // next: { revalidate: 3600 },
+      // Không dùng no-store → cho phép Next.js cache
     });
 
     if (!res.ok) return null;
 
     const data = await res.json();
-    return data?.rentalPost || data?.data || null;
+    return data?.rentalPost ?? data?.data ?? null;
+  },
+
+  async getFallback(id: string): Promise<IRentalPostAdmin | null> {
+    return getWithFallback<IRentalPostAdmin>(
+      id,
+      () => this.getAll(),
+      (postId) => this.getById(postId)
+    );
   },
 
   async create(data: FormData) {
@@ -64,7 +48,9 @@ export const rentalPostAdminService = {
       method: 'POST',
       body: data,
     });
+
     if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
+
     return res.json();
   },
 
@@ -73,7 +59,9 @@ export const rentalPostAdminService = {
       method: 'PUT',
       body: data,
     });
+
     if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
+
     return res.json();
   },
 
@@ -81,7 +69,9 @@ export const rentalPostAdminService = {
     const res = await fetch(getServerApiUrl(`api/rental-admin-post/${id}`), {
       method: 'DELETE',
     });
+
     if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
+
     return res.json();
   },
 };

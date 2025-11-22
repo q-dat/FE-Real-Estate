@@ -14,8 +14,8 @@ export default async function RentalPostPage({ params }: PageProps) {
   // Await params vì nó là Promise
   const { slug, id } = await params;
 
-  const post = await rentalPostAdminService.getById(id);
-  rentalPostAdminService.logCache();
+  const post = await rentalPostAdminService.getFallback(id);
+
   if (!post) notFound();
 
   const correctSlug = slugify(post.title || '');
