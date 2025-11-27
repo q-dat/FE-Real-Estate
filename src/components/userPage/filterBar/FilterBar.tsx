@@ -27,7 +27,7 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
 
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterValues>({
-    type: 'Tất cả',
+    type: 'Bất động sản thuê',
     location: 'Toàn quốc',
     price: 'Tất cả',
     area: 'Tất cả',
@@ -35,7 +35,7 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
 
   // tự động cập nhật "type" khi pathname thay đổi
   useEffect(() => {
-    let typeLabel = 'Tất cả';
+    let typeLabel = 'Bất động sản thuê';
     switch (pathname) {
       // case '/cho-thue-phong-tro':
       //   typeLabel = 'Cho thuê phòng trọ';
@@ -81,13 +81,13 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
   // 🔁 reset toàn bộ bộ lọc
   const resetFilters = () => {
     const reset = {
-      type: 'Tất cả',
+      type: 'Bất động sản thuê',
       location: 'Toàn quốc',
       price: 'Tất cả',
       area: 'Tất cả',
     };
     setFilters(reset);
-    router.push('/');
+    router.push('/bat-dong-san-thue');
   };
 
   return (

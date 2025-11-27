@@ -8,6 +8,7 @@ import { FaImage } from 'react-icons/fa6';
 import { slugify } from '@/lib/slugify';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import FilterBar from '../filterBar/FilterBar';
 
 interface RentalGridProps {
   posts: IRentalPostAdmin[];
@@ -30,6 +31,8 @@ export default function RentalGrid({ posts, title, basePath }: RentalGridProps) 
           </li>
         </ul>
       </div>
+      {/* FilterBar */}
+      <FilterBar />
       {/* Optional: Tiêu đề + slogan */}
       {/* {(title || slogan) && (
         <div className="mb-4 text-left">
