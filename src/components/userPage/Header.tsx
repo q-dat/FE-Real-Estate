@@ -9,11 +9,11 @@ import { AiFillHeart } from 'react-icons/ai';
 import FilterBar from './filterBar/FilterBar';
 import HeaderResponsive from './HeaderResponsive';
 import { menuItems } from '@/constants/menuItems';
-import { useRentalFavorite } from '@/context/RentalFavoriteContext'; // 👈 thêm dòng này
+import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 
 export default function Header() {
   const pathname = usePathname();
-  const { favoriteCount } = useRentalFavorite(); // 👈 lấy số lượng yêu thích
+  const { favoriteCount } = useRentalFavorite();
 
   return (
     <header>
@@ -22,15 +22,15 @@ export default function Header() {
 
       {/* Header Desktop */}
       <nav className="hidden xl:block">
-        <div className="flex w-full flex-row items-center justify-between border-b bg-white px-desktop-padding py-[10px] shadow-sm">
-          <div className="inline-flex items-center text-sm font-bold">
-            {/* Logo */}
-            <div className="pr-5">
-              <p className="text-2xl font-black italic text-blue-600">LoGo</p>
-            </div>
+        <div className="flex h-[15vh] w-full flex-row items-center justify-between border-b bg-white px-desktop-padding py-[10px] shadow-sm">
+          {/* Logo */}
+          <div className="pr-5">
+            <p className="text-2xl font-black italic text-blue-600">LoGo</p>
+          </div>
 
+          <div className="flex flex-col items-center justify-center">
             {/* Navigation */}
-            <div className="flex flex-row items-center">
+            <div className="flex flex-row items-center gap-8">
               {menuItems.map((item) => {
                 const isActive = pathname === item.link;
                 return (
@@ -38,8 +38,8 @@ export default function Header() {
                     key={item.link}
                     href={item.link}
                     className={clsx(
-                      'rounded-lg px-3 py-[6px] text-sm transition-all duration-200',
-                      isActive ? 'bg-red-600 font-semibold text-white shadow-sm hover:bg-red-600 hover:text-white' : 'text-black hover:bg-blue-100'
+                      'rounded-sm px-3 py-[6px] text-xl font-semibold transition-all duration-200',
+                      isActive ? 'bg-primary text-white shadow-sm hover:bg-primary hover:text-white' : 'text-black hover:bg-blue-100'
                     )}
                   >
                     {item.title}
@@ -47,6 +47,7 @@ export default function Header() {
                 );
               })}
             </div>
+            <div>213</div>
           </div>
 
           {/* Actions */}

@@ -329,7 +329,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
               <FaListUl /> Danh mục liên quan
             </h2>
             <ul className="space-y-2 text-neutral-700">
-              {['Nhà cho thuê', 'Phòng trọ', 'Căn hộ mini'].map((cat, i) => (
+              {['Nhà cho thuê', 'Căn hộ mini'].map((cat, i) => (
                 <motion.li key={i} whileHover={{ x: 5 }} className="cursor-pointer transition-colors hover:text-primary">
                   • {cat}
                 </motion.li>

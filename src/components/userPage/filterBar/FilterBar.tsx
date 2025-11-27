@@ -37,9 +37,9 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
   useEffect(() => {
     let typeLabel = 'Tất cả';
     switch (pathname) {
-      case '/cho-thue-phong-tro':
-        typeLabel = 'Cho thuê phòng trọ';
-        break;
+      // case '/cho-thue-phong-tro':
+      //   typeLabel = 'Cho thuê phòng trọ';
+      //   break;
       case '/cho-thue-nha-nguyen-can':
         typeLabel = 'Nhà nguyên căn';
         break;
