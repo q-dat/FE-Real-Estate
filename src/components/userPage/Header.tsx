@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx'; // tiện cho xử lý class động
@@ -9,26 +9,52 @@ import { TbHomeSearch } from 'react-icons/tb';
 import HeaderResponsive from './HeaderResponsive';
 import { menuItems, menuItems2 } from '@/constants/menuItems';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
+import { motion, useAnimation } from 'framer-motion';
 
 export default function Header() {
   const pathname = usePathname();
   const { favoriteCount } = useRentalFavorite();
 
+  const controls = useAnimation();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 90) {
+        setScrolled(true);
+        controls.start({ height: 70, transition: { duration: 0.25 } });
+      } else {
+        setScrolled(false);
+        controls.start({ height: 110, transition: { duration: 0.25 } });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [controls]);
+
   return (
     <header>
-      {/* Header Responsive */}
       <HeaderResponsive />
 
-      {/* Header Desktop */}
-      <nav className="hidden xl:block">
-        <div className="flex h-[15vh] w-full flex-row items-center justify-between border-b bg-white px-desktop-padding py-[10px] shadow-sm">
+      {/* Desktop Header */}
+      <motion.nav
+        className={clsx('fixed left-0 top-0 z-50 hidden w-full border-b shadow-sm xl:block', scrolled ? 'bg-primary' : 'bg-white')}
+        animate={controls}
+      >
+        <div
+          className={clsx(
+            'flex w-full flex-row items-center justify-between px-desktop-padding transition-all duration-300',
+            scrolled ? 'h-full' : 'h-[100px]'
+          )}
+        >
           {/* Logo */}
-          <div className="w-auto">
-            <p className="text-2xl font-black text-primary">Nguonnhagiare.vn</p>
-          </div>
+          <p className={clsx('font-black text-primary transition-all duration-300', scrolled ? 'text-2xl text-white' : 'text-2xl')}>
+            Nguonnhagiare.vn
+          </p>
 
+          {/* Middle Navigation */}
           <div className="flex flex-col items-center justify-center gap-1">
-            {/* Navigation */}
             <div className="flex flex-row items-center gap-10">
               {menuItems.map((item) => {
                 const isActive = pathname === item.link;
@@ -37,8 +63,9 @@ export default function Header() {
                     key={item.link}
                     href={item.link}
                     className={clsx(
-                      'rounded-sm px-3 py-1 text-lg font-bold transition-all duration-200 hover:scale-105',
-                      isActive ? 'text-primary shadow-sm' : 'text-black'
+                      'rounded-sm px-3 py-1 font-bold transition-all duration-200 hover:scale-105',
+                      scrolled ? 'text-xl text-white' : 'text-lg',
+                      isActive ? 'text-primary' : 'text-black'
                     )}
                   >
                     {item.title}
@@ -46,42 +73,74 @@ export default function Header() {
                 );
               })}
             </div>
-            <p className="h-px w-full bg-primary"></p>
-            {/* Navigation */}
-            <div className="flex flex-row items-center gap-10">
-              {menuItems2.map((item) => {
-                return (
+
+            {/* Middle line + menu2 hidden when scrolled */}
+            {!scrolled && <p className="h-px w-full bg-primary" />}
+
+            {!scrolled && (
+              <div className="flex flex-row items-center gap-10">
+                {menuItems2.map((item) => (
                   <Link key={item.link} href={item.link} className="rounded-sm px-3 py-1 text-base font-normal transition-all duration-200">
                     {item.title}
                   </Link>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <Link
-              href="/tu-van-tim-nha"
-              className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-primary bg-white p-2 text-black"
-            >
-              <TbHomeSearch size={30} />
-              <div className="flex flex-col">
-                <p className="text-xs">Tư vấn</p>
-                <p className="text-sm font-bold uppercase">Tìm nhà</p>
-              </div>
-            </Link>
+            {/* ======================  
+                LOGIC HIỂN THỊ BUTTON  
+                ====================== */}
 
-            <Link
-              href="/tu-van-tim-nha"
-              className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-primary bg-primary p-2 text-white"
-            >
-              <LuHandshake size={30} />
-              <div className="flex flex-col">
-                <p className="text-xs">Liên hệ</p>
-                <p className="text-sm font-bold uppercase">Kí gửi</p>
-              </div>
-            </Link>
+            {/* Khi scroll xuống → HIỆN nút lớn KHÔNG có chữ nhỏ */}
+            {scrolled && (
+              <>
+                <Link
+                  href="/tu-van-tim-nha"
+                  className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-primary bg-white p-1 text-black transition-all duration-200 hover:scale-105"
+                >
+                  <TbHomeSearch size={30} />
+                  <p className="text-sm font-bold uppercase">Tìm nhà</p>
+                </Link>
+
+                <Link
+                  href="/tu-van-tim-nha"
+                  className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-white bg-primary p-1 text-white transition-all duration-200 hover:scale-105"
+                >
+                  <LuHandshake size={30} />
+                  <p className="text-sm font-bold uppercase">Kí gửi</p>
+                </Link>
+              </>
+            )}
+
+            {/* Khi chưa scroll → HIỆN version đầy đủ (có chữ nhỏ) */}
+            {!scrolled && (
+              <>
+                <Link
+                  href="/tu-van-tim-nha"
+                  className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-primary bg-white p-2 text-black"
+                >
+                  <TbHomeSearch size={30} />
+                  <div className="flex flex-col">
+                    <p className="text-xs">Tư vấn</p>
+                    <p className="text-sm font-bold uppercase">Tìm nhà</p>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/tu-van-tim-nha"
+                  className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-primary bg-primary p-2 text-white"
+                >
+                  <LuHandshake size={30} />
+                  <div className="flex flex-col">
+                    <p className="text-xs">Liên hệ</p>
+                    <p className="text-sm font-bold uppercase">Kí gửi</p>
+                  </div>
+                </Link>
+              </>
+            )}
 
             {/* Favorites */}
             <Link
@@ -101,7 +160,7 @@ export default function Header() {
             </Link>
           </div>
         </div>
-      </nav>
+      </motion.nav>
     </header>
   );
 }

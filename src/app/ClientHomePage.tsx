@@ -19,15 +19,15 @@ export default function ClientHomePage({ posts }: Props) {
   const { prefetchById } = usePrefetchRentalPost();
 
   return (
-    <div className="px-2 py-8 xl:px-desktop-padding">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-gray-900">Mới nhất</h3>
-        <Link href="/cho-thue-phong-tro" className="link link-primary text-sm">
+    <div className="px-2 xl:px-desktop-padding xl:pt-[140px]">
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-xl font-semibold text-black">Mới nhất</h3>
+        <Link href="/cho-thue-phong-tro" className="link link-primary text-sm font-bold">
           Xem tất cả →
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {posts.map((post) => {
           const thumbnail = post.images?.[0] || '/no-image.png';
           const totalImages = post.images?.length || 0;
@@ -63,7 +63,7 @@ export default function ClientHomePage({ posts }: Props) {
 
               {/* Nội dung */}
               <div className="card-body p-3">
-                <h4 className="line-clamp-2 text-xl font-bold text-gray-900 transition-colors group-hover:text-primary">{post.title}</h4>
+                <h4 className="line-clamp-3 text-lg font-bold text-gray-900 transition-colors group-hover:text-primary">{post.title}</h4>
                 <p className="h-px w-full bg-primary"></p>
                 <div className="mt-1 flex flex-col items-start justify-between gap-1 xl:flex-row xl:items-center">
                   <div className="text-2xl font-bold text-primary">

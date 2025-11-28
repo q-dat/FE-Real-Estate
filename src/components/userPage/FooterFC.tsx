@@ -35,7 +35,7 @@ const footerSections = [
 
 export default function FooterFC() {
   return (
-    <footer className="bg-neutral-900 text-white">
+    <footer className="bg-neutral-900 text-white mt-[40px]">
       <div className="px-2 py-14 xl:px-desktop-padding">
         {/* Top */}
         <div className="flex flex-col gap-12 border-b border-white/10 pb-12 xl:flex-row xl:items-start xl:justify-between">
