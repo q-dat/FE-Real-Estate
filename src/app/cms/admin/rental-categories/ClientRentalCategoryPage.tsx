@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Button} from 'react-daisyui';
+import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import { FaLayerGroup, FaPlus, FaPen, FaTrashAlt } from 'react-icons/fa';
 import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';

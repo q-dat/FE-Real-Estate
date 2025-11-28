@@ -20,19 +20,14 @@ export default function ClientHomePage({ posts }: Props) {
 
   return (
     <div className="px-2 py-8 xl:px-desktop-padding">
-      <section className="mb-10 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 md:text-4xl">Tìm kiếm chỗ thuê giá tốt</h1>
-        <p className="mt-2 text-gray-500">Khám phá phòng trọ, căn hộ, nhà nguyên căn với công cụ tìm kiếm nhanh, thông minh và hiện đại.</p>
-      </section>
-
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-gray-900">Tin mới đăng</h3>
+        <h3 className="text-xl font-semibold text-gray-900">Mới nhất</h3>
         <Link href="/cho-thue-phong-tro" className="link link-primary text-sm">
           Xem tất cả →
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {posts.map((post) => {
           const thumbnail = post.images?.[0] || '/no-image.png';
           const totalImages = post.images?.length || 0;
@@ -68,10 +63,10 @@ export default function ClientHomePage({ posts }: Props) {
 
               {/* Nội dung */}
               <div className="card-body p-3">
-                <h4 className="line-clamp-2 text-sm font-semibold text-gray-900 transition-colors group-hover:text-primary">{post.title}</h4>
-
+                <h4 className="line-clamp-2 text-xl font-bold text-gray-900 transition-colors group-hover:text-primary">{post.title}</h4>
+                <p className="h-px w-full bg-primary"></p>
                 <div className="mt-1 flex flex-col items-start justify-between gap-1 xl:flex-row xl:items-center">
-                  <div className="text-base font-bold text-primary">
+                  <div className="text-2xl font-bold text-primary">
                     {formatCurrency(post.price)} {post.priceUnit}
                   </div>
 

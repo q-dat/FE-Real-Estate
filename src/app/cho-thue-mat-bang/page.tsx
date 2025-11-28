@@ -14,11 +14,5 @@ export default async function Page() {
 
   const posts = await rentalPostAdminService.getAll({ catalogID: categoryId });
 
-  return (
-    <RentalGrid
-      posts={posts}
-      title={CATEGORY_NAME}
-      slogan=""
-    />
-  );
+  return <RentalGrid posts={posts} title={CATEGORY_NAME} slogan="" />;
 }

@@ -36,7 +36,7 @@ export default function HeaderResponsive() {
     <header className="relative block xl:hidden">
       {/* Top Header */}
       <div className="flex h-[60px] items-center justify-between bg-white px-4 shadow-sm">
-        <div className="select-none text-lg font-bold text-blue-600">LoGo</div>
+        <div className="select-none text-lg font-bold text-blue-600">nguonnhagiare.vn</div>
 
         <div className="flex items-center gap-3">
           <FaRegHeart size="20px" className="text-gray-700" />

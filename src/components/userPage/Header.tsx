@@ -23,8 +23,8 @@ export default function Header() {
       <nav className="hidden xl:block">
         <div className="flex h-[15vh] w-full flex-row items-center justify-between border-b bg-white px-desktop-padding py-[10px] shadow-sm">
           {/* Logo */}
-          <div className="w-[150px]">
-            <p className="text-2xl font-black italic text-blue-600">LoGo</p>
+          <div className="w-auto">
+            <p className="text-2xl font-black text-primary">Nguonnhagiare.vn</p>
           </div>
 
           <div className="flex flex-col items-center justify-center gap-1">
@@ -37,8 +37,8 @@ export default function Header() {
                     key={item.link}
                     href={item.link}
                     className={clsx(
-                      'rounded-sm px-3 py-1 text-lg font-bold transition-all duration-200',
-                      isActive ? 'bg-primary text-white shadow-sm hover:bg-primary hover:text-white' : 'text-black hover:bg-blue-100'
+                      'rounded-sm px-3 py-1 text-lg font-bold transition-all duration-200 hover:scale-105',
+                      isActive ? 'text-primary shadow-sm' : 'text-black'
                     )}
                   >
                     {item.title}
@@ -50,7 +50,6 @@ export default function Header() {
             {/* Navigation */}
             <div className="flex flex-row items-center gap-10">
               {menuItems2.map((item) => {
-                const isActive = pathname === item.link;
                 return (
                   <Link key={item.link} href={item.link} className="rounded-sm px-3 py-1 text-base font-normal transition-all duration-200">
                     {item.title}
@@ -87,15 +86,15 @@ export default function Header() {
             {/* Favorites */}
             <Link
               href="/yeu-thich"
-              className="relative flex h-[50px] w-[50px] items-center justify-center rounded-full border border-red-300 bg-white transition-all duration-200 hover:scale-105 hover:shadow-md"
+              className="relative flex h-[30px] w-[30px] items-center justify-center rounded-full border border-red-300 bg-white transition-all duration-200 hover:scale-105 hover:shadow-md"
             >
               <AiFillHeart
-                size={30}
+                size={20}
                 className={clsx('transition-colors duration-200', favoriteCount > 0 ? 'text-red-600' : 'text-gray-400 hover:text-red-500')}
               />
 
               {favoriteCount > 0 && (
-                <span className="absolute -right-1 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-semibold text-white shadow-md">
+                <span className="absolute -right-2 -top-1 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-red-600 text-xs font-semibold text-white shadow-md">
                   {favoriteCount}
                 </span>
               )}

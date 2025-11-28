@@ -19,9 +19,12 @@ interface RentalGridProps {
 
 export default function RentalGrid({ posts, title, basePath }: RentalGridProps) {
   return (
-    <div className="px-2 py-8 xl:px-desktop-padding">
+    <div className="">
+      {/* FilterBar */}
+      <FilterBar />
+
       {/* Breadcrumbs */}
-      <div className="breadcrumbs py-2 text-sm text-primary">
+      <div className="breadcrumbs px-2 py-2 text-sm text-primary xl:px-desktop-padding">
         <ul className="font-medium">
           <li>
             <Link href="/">Trang Chủ</Link>
@@ -31,8 +34,7 @@ export default function RentalGrid({ posts, title, basePath }: RentalGridProps) 
           </li>
         </ul>
       </div>
-      {/* FilterBar */}
-      <FilterBar />
+
       {/* Optional: Tiêu đề + slogan */}
       {/* {(title || slogan) && (
         <div className="mb-4 text-left">
@@ -41,7 +43,7 @@ export default function RentalGrid({ posts, title, basePath }: RentalGridProps) 
         </div>
       )} */}
       {/* Grid danh sách bài đăng */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 px-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:px-desktop-padding">
         {posts.map((post) => {
           const thumbnail = post.images?.[0] || '/no-image.png';
           const totalImages = post.images?.length || 0;
