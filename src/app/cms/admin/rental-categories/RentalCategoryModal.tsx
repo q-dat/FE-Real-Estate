@@ -13,10 +13,15 @@ interface CategoryFormModalProps {
   onClose: () => void;
   loading: boolean;
   editing: IRentalCategory | null;
+
   name: string;
   description: string;
+  categoryCode: number | '';
+
   onChangeName: (v: string) => void;
   onChangeDescription: (v: string) => void;
+  onChangeCategoryCode: (v: number | '') => void;
+
   onSave: () => Promise<void> | void;
 }
 
@@ -27,11 +32,12 @@ export default function RentalCategoryModal({
   editing,
   name,
   description,
+  categoryCode,
   onChangeName,
   onChangeDescription,
+  onChangeCategoryCode,
   onSave,
 }: CategoryFormModalProps) {
-  // Hàm xử lý submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSave();
@@ -43,7 +49,7 @@ export default function RentalCategoryModal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/30 px-2 backdrop-blur-sm"
+          className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/30 px-2 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -55,7 +61,7 @@ export default function RentalCategoryModal({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 180, damping: 18 }}
-            className="relative w-full max-w-md rounded-2xl border border-gray-100 bg-white p-5 shadow-xl"
+            className="relative w-full max-w-md rounded-2xl border border-gray-100 bg-white p-2 shadow-xl"
           >
             <button onClick={onClose} className="absolute right-3 top-3 rounded-full bg-primary p-1 text-white hover:bg-gray-200">
               <FaTimes size={14} />
@@ -66,7 +72,6 @@ export default function RentalCategoryModal({
               {editing?._id ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}
             </h3>
 
-            {/* Form */}
             <form id="rental-category-form" onSubmit={handleSubmit} className="space-y-3">
               <InputForm
                 autoFocus
@@ -76,9 +81,19 @@ export default function RentalCategoryModal({
                 classNameLabel="bg-white px-2 font-medium"
               />
 
+              <InputForm
+                type="number"
+                value={categoryCode}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  onChangeCategoryCode(raw === '' ? '' : Number(raw));
+                }}
+                placeholder="Mã danh mục (số)"
+                classNameLabel="bg-white px-2 font-medium"
+              />
+
               <TextareaForm value={description} onChange={(e) => onChangeDescription(e.target.value)} placeholder="Mô tả (tuỳ chọn)" rows={3} />
 
-              {/* Btn */}
               <div className="mt-5 flex justify-end gap-2">
                 <CancelBtn value="Hủy" type="button" onClick={onClose} />
                 <Button color="primary" type="submit" size="sm" disabled={loading} className="flex items-center gap-2 rounded-md px-4 py-2">

@@ -41,7 +41,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   };
 
   return (
-    <div className="min-h-screen bg-white p-2 text-black scrollbar-hide xl:p-4">
+    <div className="min-h-screen bg-white px-2 pt-[70px] text-black scrollbar-hide xl:px-4 xl:pt-[140px]">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between gap-2">
         <h1 className="flex items-center gap-2 text-lg font-semibold xl:text-xl">
@@ -66,8 +66,12 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
           const thumbnail = post.images?.[0] || '/no-image.png';
           return (
             <div
+              onClick={() => {
+                setEditingPost(post);
+                setOpenModal(true);
+              }}
               key={post._id}
-              className="group relative flex flex-col overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group relative flex cursor-pointer flex-col overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
               {/* Ảnh */}
               <div className="relative aspect-[4/3] overflow-hidden">
@@ -121,7 +125,9 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                   <div className="flex gap-1.5">
                     {/* Update */}
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation(); // chặn mở modal edit từ card
+
                         setEditingPost(post);
                         setOpenModal(true);
                       }}
@@ -131,7 +137,10 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                     </button>
                     {/* Delete */}
                     <button
-                      onClick={() => handleDelete(post._id)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // chặn mở edit khi nhấn delete
+                        handleDelete(post._id);
+                      }}
                       className="rounded-full bg-rose-500 p-2 text-white shadow-md transition-all hover:bg-rose-600 hover:shadow-lg"
                     >
                       <FaTrashAlt size={12} />
