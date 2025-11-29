@@ -8,8 +8,13 @@ export const rentalPostAdminService = {
 
     let apiUrl = baseUrl;
     if (params && Object.keys(params).length > 0) {
-      apiUrl += '?' + new URLSearchParams(params as Record<string, string>).toString();
+      const queryString = Object.entries(params)
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+        .join('&');
+      apiUrl += '?' + queryString;
     }
+
+    // console.log('Final API URL:', apiUrl);
 
     const res = await fetch(apiUrl, {
       cache: 'force-cache',

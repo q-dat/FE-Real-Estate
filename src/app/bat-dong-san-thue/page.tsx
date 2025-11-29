@@ -1,18 +1,17 @@
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { RentalGrid } from '@/components/userPage/rental';
-import { rentalCategoryService } from '@/services/rentalCategoryService';
 
-const CATEGORY_NAME = 'Cho thuê căn hộ';
+// 0. Bất động sản thuê
+// 1. Căn hộ cho thuê
+// 2. Nhà nguyên căn
+// 3. Cho thuê mặt bằng
+// 4. Mua bán nhà đất
+
+const CATEGORY_CODE = 0;
+const CATEGORY_NAME = 'Bất động sản thuê';
 
 export default async function Page() {
-  const categories = await rentalCategoryService.getAll({ name: CATEGORY_NAME });
-  const categoryId = categories?.[0]?._id;
-
-  if (!categoryId) {
-    return <div>Không tìm thấy danh mục phù hợp.</div>;
-  }
-
-  const posts = await rentalPostAdminService.getAll({ catalogID: categoryId });
+  const posts = await rentalPostAdminService.getAll({ categoryCode: CATEGORY_CODE });
 
   return <RentalGrid posts={posts} title={CATEGORY_NAME} slogan="" />;
 }
