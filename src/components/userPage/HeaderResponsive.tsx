@@ -4,6 +4,7 @@ import { FiMenu, FiX } from 'react-icons/fi';
 import { FaRegHeart } from 'react-icons/fa6';
 import Link from 'next/link';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
+import { menuItems } from '@/constants/menuItems';
 
 // 🧩 Biến variants cho chữ (menu items)
 const textVariants: Variants = {
@@ -35,7 +36,7 @@ export default function HeaderResponsive() {
   return (
     <header className="relative block xl:hidden">
       {/* Top Header */}
-      <div className="flex h-[60px] items-center justify-between bg-white px-4 shadow-sm">
+      <div className="fixed z-[99999] flex h-[60px] w-full items-center justify-between bg-white px-4 shadow-sm">
         <div className="select-none text-lg font-bold text-blue-600">nguonnhagiare.vn</div>
 
         <div className="flex items-center gap-3">
@@ -87,40 +88,29 @@ export default function HeaderResponsive() {
               </div>
 
               {/* Navigation Links */}
-              <motion.nav
-                className="flex flex-col gap-3 p-4 text-base text-gray-700"
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-              >
-                {[
-                  { label: 'Home', href: '/' },
-                  { label: 'Profile', href: '/profile' },
-                  { label: 'Settings', href: '/settings' },
-                  { label: 'Logout', href: '/logout', danger: true },
-                ].map((item, i) => (
-                  <motion.div key={item.href} custom={i} variants={textVariants}>
+              <motion.nav className="flex flex-col gap-3 px-0 py-4 text-base text-gray-700" initial="hidden" animate="visible" exit="hidden">
+                {menuItems.map((item, i) => (
+                  <motion.div key={item.link} custom={i} variants={textVariants}>
                     <Link
-                      href={item.href}
+                      href={item.link}
                       onClick={toggleMenu}
                       className={`group relative block rounded-lg px-2 py-2 transition ${
-                        item.danger
-                          ? 'text-red-600 hover:bg-red-50'
-                          : 'hover:bg-blue-50 hover:text-blue-600'
-                      }`}
+                        ''
+                        // item.danger
+                        //   ? 'text-red-600 hover:bg-red-50'
+                        //   : 'hover:bg-blue-50 hover:text-blue-600'
+                      } `}
                     >
-                      {item.label}
+                      {item.title}
                       {/* Hiệu ứng underline trượt */}
-                      <span className="absolute bottom-0 left-2 h-[2px] w-0 bg-blue-500 transition-all duration-300 group-hover:w-[calc(100%-1rem)]"></span>
+                      <span className="absolute bottom-0 left-2 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-[calc(100%-1rem)]"></span>
                     </Link>
                   </motion.div>
                 ))}
               </motion.nav>
 
               {/* Optional Footer */}
-              <div className="mt-auto border-t p-4 text-sm text-gray-500">
-                © 2025 MyWebsite
-              </div>
+              <div className="mt-auto border-t p-4 text-sm text-gray-500">© 2025 MyWebsite</div>
             </motion.div>
           </>
         )}

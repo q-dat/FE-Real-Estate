@@ -19,7 +19,7 @@ interface RentalGridProps {
 
 export default function RentalGrid({ posts, title, basePath }: RentalGridProps) {
   return (
-    <div className="xl:pt-[110px]">
+    <div className="pt-[70px] xl:pt-[110px]">
       {/* FilterBar */}
       <FilterBar />
 

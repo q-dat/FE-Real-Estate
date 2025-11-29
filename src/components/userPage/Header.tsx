@@ -39,7 +39,7 @@ export default function Header() {
 
       {/* Desktop Header */}
       <motion.nav
-        className={clsx('fixed left-0 top-0 z-50 hidden w-full border-b shadow-sm xl:block', scrolled ? 'bg-primary' : 'bg-white')}
+        className={clsx('fixed left-0 top-0 z-[99999] hidden w-full border-b shadow-sm xl:block', scrolled ? 'bg-primary' : 'bg-white')}
         animate={controls}
       >
         <div
@@ -55,7 +55,7 @@ export default function Header() {
 
           {/* Middle Navigation */}
           <div className="flex flex-col items-center justify-center gap-1">
-            <div className="flex flex-row items-center gap-10">
+            <div className={clsx('flex flex-row items-center', scrolled ? 'gap-4' : 'gap-10')}>
               {menuItems.map((item) => {
                 const isActive = pathname === item.link;
                 return (
@@ -63,7 +63,7 @@ export default function Header() {
                     key={item.link}
                     href={item.link}
                     className={clsx(
-                      'rounded-sm px-3 py-1 font-bold transition-all duration-200 hover:scale-105',
+                      'rounded-sm p-1 font-bold transition-all duration-200 hover:scale-105',
                       scrolled ? 'text-xl text-white' : 'text-lg',
                       isActive ? 'text-primary' : 'text-black'
                     )}
@@ -102,7 +102,7 @@ export default function Header() {
                   className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-primary bg-white p-1 text-black transition-all duration-200 hover:scale-105"
                 >
                   <TbHomeSearch size={30} />
-                  <p className="text-sm font-bold uppercase">Tìm nhà</p>
+                  <p className="text-base font-bold uppercase">Tìm nhà</p>
                 </Link>
 
                 <Link
@@ -110,7 +110,7 @@ export default function Header() {
                   className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-white bg-primary p-1 text-white transition-all duration-200 hover:scale-105"
                 >
                   <LuHandshake size={30} />
-                  <p className="text-sm font-bold uppercase">Kí gửi</p>
+                  <p className="text-base font-bold uppercase">Kí gửi</p>
                 </Link>
               </>
             )}

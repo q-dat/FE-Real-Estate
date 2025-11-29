@@ -19,7 +19,7 @@ export default function ClientHomePage({ posts }: Props) {
   const { prefetchById } = usePrefetchRentalPost();
 
   return (
-    <div className="px-2 xl:px-desktop-padding xl:pt-[140px]">
+    <div className="px-2 pt-[70px] xl:px-desktop-padding xl:pt-[140px]">
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-xl font-semibold text-black">Mới nhất</h3>
         <Link href="/cho-thue-phong-tro" className="link link-primary text-sm font-bold">
