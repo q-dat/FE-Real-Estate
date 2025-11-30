@@ -10,7 +10,7 @@ export default function RentalFavoritesPage() {
 
   if (favorites.length === 0)
     return (
-      <div className="p-6 text-center">
+      <div className="h-screen px-2 pt-[70px] text-center text-black xl:px-desktop-padding xl:pt-[140px]">
         <h1 className="mb-4 text-2xl font-semibold">Bài đăng yêu thích</h1>
         <p className="text-gray-500">Bạn chưa có bài đăng nào trong danh sách yêu thích.</p>
         <Link href="/" className="btn btn-primary mt-4">
@@ -20,7 +20,7 @@ export default function RentalFavoritesPage() {
     );
 
   return (
-    <div className="px-2 xl:px-desktop-padding">
+    <div className="h-screen px-2 pt-[70px] text-black xl:px-desktop-padding xl:pt-[140px]">
       <h1 className="my-3 text-2xl font-semibold">Bài đăng yêu thích</h1>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
