@@ -26,7 +26,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
   const encodedAddress = encodeURIComponent(`${post?.address}, ${post?.district}, ${post?.province}`);
 
   return (
-    <main className="bg-base-100 p-2 text-black xl:px-desktop-padding xl:py-10">
+    <main className="bg-white px-2 pt-[70px] text-black xl:px-desktop-padding xl:pt-[140px]">
       <div className="grid w-full grid-cols-1 gap-10 xl:grid-cols-3">
         {/* Left */}
         <Card className="rounded-lg border border-neutral-200 p-3 shadow-sideBar xl:col-span-2">
