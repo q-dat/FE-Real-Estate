@@ -8,7 +8,6 @@ import { FaImage } from 'react-icons/fa6';
 import { slugify } from '@/lib/slugify';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-import FilterBar from '../filterBar/FilterBar';
 
 interface RentalGridProps {
   posts: IRentalPostAdmin[];
