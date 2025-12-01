@@ -12,8 +12,8 @@ export default function PropertyTypeModal({ onClose, onSelect }: BasePropertyTyp
 
   const menuItems = [
     { title: 'Tất cả', link: '/' },
-    { title: 'Nhà nguyên căn', link: '/nha-nguyen-can' },
     { title: 'Căn hộ', link: '/can-ho' },
+    { title: 'Nhà nguyên căn', link: '/nha-nguyen-can' },
     { title: 'Mặt bằng', link: '/mat-bang' },
   ];
 

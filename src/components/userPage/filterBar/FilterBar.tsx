@@ -37,11 +37,11 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
   useEffect(() => {
     let typeLabel = 'Bất động sản thuê';
     switch (pathname) {
-      case '/nha-nguyen-can':
-        typeLabel = 'Nhà nguyên căn';
-        break;
       case '/can-ho':
         typeLabel = 'Căn hộ';
+        break;
+      case '/nha-nguyen-can':
+        typeLabel = 'Nhà nguyên căn';
         break;
       case '/mat-bang':
         typeLabel = 'Mặt bằng';
@@ -81,7 +81,7 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
       area: 'Tất cả',
     };
     setFilters(reset);
-    router.push('/bat-dong-san-thue');
+    router.push('/can-ho');
   };
 
   return (
