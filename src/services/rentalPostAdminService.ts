@@ -3,7 +3,7 @@ import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import { getWithFallback } from './shared/getWithFallback';
 
 export const rentalPostAdminService = {
-  async getAll(params?: Record<string, string | number>): Promise<IRentalPostAdmin[]> {
+  async getAll(params?: Record<string, string | number>) {
     const baseUrl = getServerApiUrl('api/rental-admin-posts');
 
     let apiUrl = baseUrl;
@@ -17,29 +17,30 @@ export const rentalPostAdminService = {
     // console.log('Final API URL:', apiUrl);
 
     const res = await fetch(apiUrl, {
-      cache: 'force-cache',
-      next: { revalidate: 60 },
+      next: {
+        tags: ['rental-admin-posts'],
+      },
     });
 
     if (!res.ok) throw new Error(`Fetch lỗi: ${res.status}`);
 
     const data = await res.json();
-    return data?.rentalPosts ?? data?.data ?? (Array.isArray(data) ? data : []);
+    return data?.rentalPosts ?? [];
   },
-
-  async getById(id: string): Promise<IRentalPostAdmin | null> {
+  async getById(id: string) {
     const apiUrl = getServerApiUrl(`api/rental-admin-post/${id}`);
 
     const res = await fetch(apiUrl, {
-      // Không dùng no-store → cho phép Next.js cache
+      next: {
+        tags: [`rental-admin-post-${id}`, 'rental-admin-posts'],
+      },
     });
 
     if (!res.ok) return null;
 
     const data = await res.json();
-    return data?.rentalPost ?? data?.data ?? null;
+    return data?.rentalPost ?? null;
   },
-
   async getFallback(id: string): Promise<IRentalPostAdmin | null> {
     return getWithFallback<IRentalPostAdmin>(
       id,
@@ -54,18 +55,21 @@ export const rentalPostAdminService = {
       body: data,
     });
 
-    if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
+    if (!res.ok) throw new Error(`Lỗi API: ${res.status}`);
+
+    await fetch('/api/revalidate/rental-admin-posts', { method: 'POST' });
 
     return res.json();
   },
-
   async update(id: string, data: FormData) {
     const res = await fetch(getServerApiUrl(`api/rental-admin-post/${id}`), {
       method: 'PUT',
       body: data,
     });
 
-    if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
+    if (!res.ok) throw new Error(`Lỗi API: ${res.status}`);
+
+    await fetch('/api/revalidate/rental-admin-posts', { method: 'POST' });
 
     return res.json();
   },
@@ -75,7 +79,9 @@ export const rentalPostAdminService = {
       method: 'DELETE',
     });
 
-    if (!res.ok) throw new Error(`Lỗi API: ${res.status} ${res.statusText}`);
+    if (!res.ok) throw new Error(`Lỗi API: ${res.status}`);
+
+    await fetch('/api/revalidate/rental-admin-posts', { method: 'POST' });
 
     return res.json();
   },
