@@ -38,7 +38,7 @@ export default function HeaderResponsive() {
   return (
     <header className="relative block xl:hidden">
       {/* Top Header */}
-      <div className="fixed z-[99999] flex h-[60px] w-full items-center justify-between bg-white px-4 shadow-sm">
+      <div className="fixed z-[99999] flex h-[60px] w-full items-center justify-between bg-primary px-4 shadow-sm">
         {/* <div className="select-none text-lg font-bold text-blue-600">nguonnhagiare.vn</div> */}
         <div>
           <Link href={'/'}>
@@ -52,9 +52,9 @@ export default function HeaderResponsive() {
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <FaRegHeart size="20px" className="text-gray-700" />
+          <FaRegHeart size="20px" className="text-white" />
           <button onClick={toggleMenu}>
-            <FiMenu size="24px" className="text-gray-800" />
+            <FiMenu size="24px" className="text-white" />
           </button>
         </div>
       </div>
