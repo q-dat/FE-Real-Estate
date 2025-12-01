@@ -304,14 +304,16 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   placeholder="Sổ hồng, Sổ đỏ, ..."
                   bordered
                 />
-                <InputForm
-                  classNameLabel={`${classNameLabel}`}
-                  {...register('furnitureStatus')}
-                  label="Nội thất"
-                  placeholder="Đầy đủ, Chưa có, ..."
-                  bordered
-                />
-
+                <div>
+                  <LabelForm title="Nội thất" />
+                  <Select {...register('furnitureStatus')} defaultValue="" className="select select-bordered w-full focus:outline-none">
+                    <option value="">Nội thất</option>
+                    <option value="Đầy đủ nội thất">Đầy đủ nội thất</option>
+                    <option value="Chưa có nội thất">Chưa có nội thất</option>
+                    <option value="Nhà cũ cần cải tạo">Nhà cũ cần cải tạo</option>
+                    <option value="Đất trống/ Nhà nát">Đất trống/ Nhà nát</option>
+                  </Select>
+                </div>
                 <TextareaForm {...register('amenities')} placeholder="Tiện ích (máy lạnh, chỗ để xe, v.v...)" />
                 {/* Loại Tin */}
                 <div className="col-span-full">
