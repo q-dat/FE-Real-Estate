@@ -17,24 +17,9 @@ interface RentalGridProps {
   slogan?: string;
 }
 
-export default function RentalGrid({ posts, title, basePath }: RentalGridProps) {
+export default function RentalGrid({ posts }: RentalGridProps) {
   return (
-    <div className="pt-[70px] xl:pt-[110px]">
-      {/* FilterBar */}
-      <FilterBar />
-
-      {/* Breadcrumbs */}
-      <div className="breadcrumbs px-2 py-2 text-sm text-primary xl:px-desktop-padding">
-        <ul className="font-medium">
-          <li>
-            <Link href="/">Trang Chủ</Link>
-          </li>
-          <li>
-            <Link href={`/${basePath}`}>{title}</Link>
-          </li>
-        </ul>
-      </div>
-
+    <div className="w-full">
       {/* Optional: Tiêu đề + slogan */}
       {/* {(title || slogan) && (
         <div className="mb-4 text-left">

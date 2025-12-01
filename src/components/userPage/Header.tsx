@@ -27,7 +27,7 @@ export default function Header() {
         controls.start({ height: 70, transition: { duration: 0.25 } });
       } else {
         setScrolled(false);
-        controls.start({ height: 110, transition: { duration: 0.25 } });
+        controls.start({ height: 100, transition: { duration: 0.25 } });
       }
     };
 
@@ -47,7 +47,7 @@ export default function Header() {
         <div
           className={clsx(
             'flex w-full flex-row items-center justify-between px-desktop-padding transition-all duration-300',
-            scrolled ? 'h-full' : 'h-[100px]'
+            scrolled ? 'h-[70px]' : 'h-[100px]'
           )}
         >
           {/* Logo */}
@@ -73,7 +73,7 @@ export default function Header() {
                     key={item.link}
                     href={item.link}
                     className={clsx(
-                      'rounded-sm py-1 px-2 font-bold transition-all duration-200 hover:scale-105',
+                      'rounded-sm px-2 py-1 font-bold transition-all duration-200 hover:scale-105',
                       scrolled ? 'text-sm' : 'text-sm',
                       isActive ? 'bg-primary-lighter text-primary' : 'text-white'
                     )}

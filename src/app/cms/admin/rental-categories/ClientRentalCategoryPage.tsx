@@ -77,7 +77,7 @@ export default function ClientCategoryAdminPage({ categories: initialCategories 
   };
 
   return (
-    <div className="min-h-screen bg-white px-2 pt-[70px] text-black scrollbar-hide xl:px-4 xl:pt-[140px]">
+    <div className="pt-mobile-padding-top xl:pt-desktop-padding-top min-h-screen bg-white px-2 text-black scrollbar-hide xl:px-4">
       <div className="mb-5 flex items-center justify-between border-b border-gray-200 pb-3">
         <h1 className="flex items-center gap-2 text-lg font-semibold text-black xl:text-xl">
           <FaLayerGroup className="text-primary" /> Quản lý danh mục

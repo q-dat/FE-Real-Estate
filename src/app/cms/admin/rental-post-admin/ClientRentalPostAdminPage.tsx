@@ -41,7 +41,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   };
 
   return (
-    <div className="min-h-screen bg-white px-2 pt-[70px] text-black scrollbar-hide xl:px-4 xl:pt-[140px]">
+    <div className="pt-mobile-padding-top xl:pt-desktop-padding-top min-h-screen bg-white px-2 text-black scrollbar-hide xl:px-4">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between gap-2">
         <h1 className="flex items-center gap-2 text-lg font-semibold xl:text-xl">
