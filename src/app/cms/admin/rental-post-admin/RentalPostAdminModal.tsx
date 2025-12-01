@@ -13,6 +13,7 @@ import LabelForm from '@/components/userPage/ui/form/LabelForm';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { useEscClose } from '@/hooks/useEscClose';
+import Zoom from '@/lib/Zoom';
 
 interface Props {
   open: boolean;
@@ -41,6 +42,9 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   const { register, handleSubmit, reset, getValues } = useForm<IRentalPostAdmin>();
   const [images, setImages] = useState<FileList | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [adminImages, setAdminImages] = useState<FileList | null>(null);
+  const [adminPreviewUrls, setAdminPreviewUrls] = useState<string[]>([]);
+
   const [loading, setLoading] = useState(false);
 
   const [provinces, setProvinces] = useState<Province[]>([]);
@@ -90,6 +94,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
     // Giữ hình ảnh
     setPreviewUrls(editingPost.images || []);
+    setAdminPreviewUrls(editingPost.adminImages || []);
   }, [editingPost, reset]);
 
   // --- Khi provinces đã load và có editingPost ---
@@ -135,11 +140,21 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
         if (value !== undefined && value !== null) formData.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
       }
 
+      for (const [key, value] of Object.entries(data)) {
+        if (key === 'adminImages') continue;
+        if (value !== undefined && value !== null) formData.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+      }
+
       if (editingPost?.images?.length && !images) editingPost.images.forEach((u) => formData.append('oldImages', u));
+      if (editingPost?.adminImages?.length && !adminImages) editingPost.adminImages.forEach((u) => formData.append('oldAdminImages', u));
 
       if (images) {
         Array.from(images).forEach((f) => formData.append('images', f));
         editingPost?.images?.forEach((u) => formData.append('oldImages', u));
+      }
+      if (adminImages) {
+        Array.from(adminImages).forEach((f) => formData.append('adminImages', f));
+        editingPost?.adminImages?.forEach((u) => formData.append('oldAdminImages', u));
       }
 
       // Gọi API
@@ -256,13 +271,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   placeholder="Nhập giá theo m²"
                   bordered
                 /> */}
-                <InputForm
-                  classNameLabel={`${classNameLabel}`}
-                  {...register('backSize')}
-                  label="Mặt hậu (m²)"
-                  placeholder="Nhập mặt hậu"
-                  bordered
-                />
+                <InputForm classNameLabel={`${classNameLabel}`} {...register('backSize')} label="Mặt hậu (m²)" placeholder="Nhập mặt hậu" bordered />
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
                   {...register('floorNumber', { valueAsNumber: true })}
@@ -493,6 +502,39 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 <div className="col-span-full">
                   <TextareaForm {...register('adminNote')} placeholder="Ghi chú nội bộ cho admin..." />
                 </div>
+                {/* Ảnh Admin */}
+                <div className="col-span-full mb-5">
+                  <LabelForm title="Ảnh admin" />
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => setAdminImages(e.target.files)}
+                    className="file-input file-input-ghost file-input-secondary w-full rounded-md focus:outline-none"
+                  />
+                  {adminPreviewUrls.length > 0 && (
+                    <div className="mt-3 grid grid-cols-3 gap-3 md:grid-cols-4 xl:grid-cols-10">
+                      {adminPreviewUrls.map((url, i) => (
+                        <div
+                          key={i}
+                          className="group relative aspect-square overflow-hidden rounded-xl border border-gray-200 shadow-sm transition hover:shadow-md"
+                        >
+                          <Zoom>
+                            <Image src={url} alt={`preview-${i}`} width={100} height={100} unoptimized className="h-full w-full object-cover" />
+                          </Zoom>
+                          <button
+                            type="button"
+                            onClick={() => removeImage(url)}
+                            className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-red-600"
+                          >
+                            <MdClose size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <InputForm classNameLabel={`${classNameLabel}`} {...register('postedAt')} label="Ngày đăng tin" type="date" bordered required />
                 <InputForm classNameLabel={`${classNameLabel}`} {...register('expiredAt')} label="Ngày hết hạn tin" type="date" bordered required />
                 <div className="col-span-full">
@@ -522,7 +564,9 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                           key={i}
                           className="group relative aspect-square overflow-hidden rounded-xl border border-gray-200 shadow-sm transition hover:shadow-md"
                         >
-                          <Image src={url} alt={`preview-${i}`} width={100} height={100} unoptimized className="h-full w-full object-cover" />
+                          <Zoom>
+                            <Image src={url} alt={`preview-${i}`} width={100} height={100} unoptimized className="h-full w-full object-cover" />
+                          </Zoom>
                           <button
                             type="button"
                             onClick={() => removeImage(url)}

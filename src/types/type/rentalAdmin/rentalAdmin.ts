@@ -36,6 +36,7 @@ export interface IRentalPostAdmin {
   status: 'active' | 'pending' | 'expired' | 'hidden'; // trạng thái tin
   author?: string; // người đăng tin
   adminNote?: string; // ghi chú nội bộ cho admin
+  adminImages?: string[]; // hình ảnh dành cho quản trị viên
   postedAt?: Date; // ngày đăng tin
   expiredAt?: Date; // ngày hết hạn tin
   createdAt: string; // ngày tạo tin
