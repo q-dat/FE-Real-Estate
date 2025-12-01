@@ -136,12 +136,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
       const formData = new FormData();
 
       for (const [key, value] of Object.entries(data)) {
-        if (key === 'images') continue;
-        if (value !== undefined && value !== null) formData.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
-      }
-
-      for (const [key, value] of Object.entries(data)) {
-        if (key === 'adminImages') continue;
+        if (key === 'images' || key === 'adminImages') continue;
         if (value !== undefined && value !== null) formData.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
       }
 
