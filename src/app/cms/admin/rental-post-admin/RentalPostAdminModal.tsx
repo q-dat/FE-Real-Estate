@@ -184,7 +184,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          // onClick={onClose}
         >
           <motion.div
             key="modal"

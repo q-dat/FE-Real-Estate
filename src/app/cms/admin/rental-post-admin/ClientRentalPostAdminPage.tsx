@@ -43,14 +43,13 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   return (
     <div className="pt-mobile-padding-top xl:pt-desktop-padding-top min-h-screen bg-white px-2 text-black scrollbar-hide xl:px-4">
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <h1 className="flex items-center gap-2 text-lg font-semibold xl:text-xl">
+      <div className="mb-5 mt-10 flex items-center justify-between border-b border-gray-200 pb-3">
+        <h1 className="flex items-center gap-2 text-lg font-semibold text-black xl:text-xl">
           <FaImages className="text-primary" /> Quản lý bài đăng
         </h1>
         <Button
-          size="xs"
-          color="success"
-          className="flex items-center gap-1 rounded-md px-2 text-white"
+          size="sm"
+          className="flex items-center gap-2 rounded-md bg-primary text-white"
           onClick={() => {
             setEditingPost(null);
             setOpenModal(true);
@@ -94,7 +93,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
               {/* Nội dung */}
               <div className="flex flex-1 flex-col justify-between p-3 sm:p-4">
                 <div className="space-y-1">
-                  <h2 className="line-clamp-2 text-[15px] font-semibold text-gray-900 transition-colors duration-200 group-hover:text-primary">
+                  <h2 className="line-clamp-5 text-[15px] font-semibold text-gray-900 transition-colors duration-200 group-hover:text-primary">
                     {post.title}
                   </h2>
 

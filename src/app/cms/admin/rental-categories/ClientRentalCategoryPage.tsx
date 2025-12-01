@@ -78,21 +78,21 @@ export default function ClientCategoryAdminPage({ categories: initialCategories 
 
   return (
     <div className="pt-mobile-padding-top xl:pt-desktop-padding-top min-h-screen bg-white px-2 text-black scrollbar-hide xl:px-4">
-      <div className="mb-5 flex items-center justify-between border-b border-gray-200 pb-3">
+      {/* Header */}
+      <div className="mb-5 mt-10 flex items-center justify-between border-b border-gray-200 pb-3">
         <h1 className="flex items-center gap-2 text-lg font-semibold text-black xl:text-xl">
           <FaLayerGroup className="text-primary" /> Quản lý danh mục
         </h1>
 
         <Button
           size="sm"
-          color="primary"
           onClick={() => {
             setEditing({ _id: '', name: '', createdAt: '', updatedAt: '', categoryCode: 0 });
             setForm({ name: '', description: '', categoryCode: '' });
           }}
-          className="flex items-center gap-2 rounded-md text-white"
+          className="flex items-center gap-2 rounded-md bg-primary text-white"
         >
-          <FaPlus /> Thêm mới
+          <FaPlus /> Thêm
         </Button>
       </div>
 
