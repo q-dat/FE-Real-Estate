@@ -60,10 +60,21 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   // Tự động tính pricePerM2 = (price * multiplier) / area và cập nhật vào input pricePerM2
   useEffect(() => {
     const { price, area } = getValues();
-    if (!price || !area) return;
-    const perM2 = (Number(price) * priceMultiplier) / Number(area);
-    reset({ ...getValues(), pricePerM2: Math.round(perM2) });
-  }, [priceMultiplier, getValues, reset]);
+
+    const priceNum = Number(price);
+    const areaNum = Number(area);
+
+    if (!priceNum || !areaNum || priceNum <= 0 || areaNum <= 0) {
+      reset({ ...getValues(), pricePerM2: 0 });
+      return;
+    }
+
+    const perM2 = (priceNum * priceMultiplier) / areaNum;
+
+    if (!isNaN(perM2) && isFinite(perM2)) {
+      reset({ ...getValues(), pricePerM2: Math.round(perM2) });
+    }
+  }, [priceMultiplier]);
 
   useEffect(() => {
     fetch('https://provinces.open-api.vn/api/p/')
@@ -272,7 +283,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 <InputForm classNameLabel={`${classNameLabel}`} {...register('backSize')} label="Mặt hậu (m²)" placeholder="Nhập mặt hậu" bordered />
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
-                  {...register('floorNumber', { valueAsNumber: true })}
+                  {...register('floorNumber', {})}
                   type="number"
                   label="Số tầng"
                   min="0"
@@ -281,7 +292,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 />
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
-                  {...register('bedroomNumber', { valueAsNumber: true })}
+                  {...register('bedroomNumber', {})}
                   type="number"
                   label="Số phòng ngủ"
                   min="0"
@@ -290,7 +301,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 />
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
-                  {...register('toiletNumber', { valueAsNumber: true })}
+                  {...register('toiletNumber', {})}
                   type="number"
                   label="Số toilet"
                   min="0"
@@ -333,7 +344,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 <div className="col-span-full flex items-end gap-2">
                   <InputForm
                     classNameLabel={`${classNameLabel}`}
-                    {...register('price', { required: true, valueAsNumber: true })}
+                    {...register('price', { required: true })}
                     type="number"
                     step="0.01"
                     label="Giá"
@@ -354,7 +365,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
                 <InputForm
                   classNameLabel={classNameLabel}
-                  {...register('pricePerM2', { valueAsNumber: true })}
+                  {...register('pricePerM2')}
                   step={0.1}
                   type="number"
                   label="Giá/m² (Tự động)"
@@ -386,7 +397,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 />
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
-                  {...register('area', { required: true, valueAsNumber: true })}
+                  {...register('area', { required: true })}
                   type="number"
                   label="Diện tích (m²)"
                   placeholder="Nhập diện tích"
