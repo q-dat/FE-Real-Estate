@@ -63,8 +63,9 @@ export default function ClientHomePage({ posts }: Props) {
 
               {/* Nội dung */}
               <div className="card-body p-3">
-                <h4 className="line-clamp-3 text-lg font-bold text-gray-900 transition-colors group-hover:text-primary">{post.title}</h4>
-                <p className="h-px w-full bg-primary"></p>
+                <h4 className="line-clamp-3 border-b border-primary pb-1 text-lg font-bold text-gray-900 transition-colors group-hover:text-primary">
+                  {post.title}
+                </h4>
                 <div className="mt-1 flex flex-col items-start justify-between gap-1 xl:flex-row xl:items-center">
                   <div className="text-2xl font-bold text-primary">
                     {formatCurrency(post.price)} {post.priceUnit}

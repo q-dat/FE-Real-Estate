@@ -248,6 +248,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   classNameLabel={`${classNameLabel}`}
                   {...register('price', { required: true, valueAsNumber: true })}
                   type="number"
+                  step="0.01"
                   label="Giá (VNĐ)"
                   placeholder="Nhập giá thuê"
                   bordered

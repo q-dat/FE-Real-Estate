@@ -38,9 +38,9 @@ export default {
         sub: ['Roboto', 'sans-serif'], //secondary
       },
       colors: {
-        primary: '#a92d30',
-        'primary-lighter': '#fee2e2',
-        secondary: '#009485',
+        primary: '#0556b1',
+        'primary-lighter': '#cce0f6',
+        secondary: '#007f70',
         info: '#312e91',
         success: '#009485',
         warning: '#ff9900',
