@@ -5,8 +5,6 @@ import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { notFound, redirect } from 'next/navigation';
 import ClientRentalPostDetailPage from './ClientRentalPostDetailPage';
 import { generateRentalPostMetadata } from '@/metadata/id/rentalPostAdminData';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-import { Metadata } from 'next';
 import { StructuredData } from '@/metadata/structuredData';
 
 // Đúng kiểu cho Next 15
