@@ -55,6 +55,16 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedWard, setSelectedWard] = useState<string>('');
 
+  const [priceMultiplier, setPriceMultiplier] = useState<number>(1);
+
+  // Tự động tính pricePerM2 = (price * multiplier) / area và cập nhật vào input pricePerM2
+  useEffect(() => {
+    const { price, area } = getValues();
+    if (!price || !area) return;
+    const perM2 = (Number(price) * priceMultiplier) / Number(area);
+    reset({ ...getValues(), pricePerM2: Math.round(perM2) });
+  }, [priceMultiplier, getValues, reset]);
+
   useEffect(() => {
     fetch('https://provinces.open-api.vn/api/p/')
       .then((res) => res.json())
@@ -258,14 +268,6 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   placeholder="Đông, Tây, Nam, Bắc"
                   bordered
                 />
-                {/* <InputForm
-                  classNameLabel={`${classNameLabel}`}
-                  {...register('pricePerM2', { valueAsNumber: true })}
-                  type="number"
-                  label="Giá/m²"
-                  placeholder="Nhập giá theo m²"
-                  bordered
-                /> */}
                 <InputForm classNameLabel={`${classNameLabel}`} {...register('backSize')} label="Mặt hậu (m²)" placeholder="Nhập mặt hậu" bordered />
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
@@ -325,16 +327,37 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     <option value="highlight">Nổi bật</option>
                   </Select>
                 </div>
+                <div className="col-span-full flex items-end gap-2">
+                  <InputForm
+                    classNameLabel={`${classNameLabel}`}
+                    {...register('price', { required: true, valueAsNumber: true })}
+                    type="number"
+                    step="0.01"
+                    label="Giá"
+                    placeholder="Nhập giá"
+                    bordered
+                    required
+                  />
+                  <Select
+                    value={priceMultiplier}
+                    onChange={(e) => setPriceMultiplier(Number(e.target.value))}
+                    className="select select-bordered w-1/2 bg-primary focus:outline-none text-white"
+                  >
+                    <option value={1}>Nghìn</option>
+                    <option value={1_000}>Triệu</option>
+                    <option value={1_000_000}>Tỷ</option>
+                  </Select>
+                </div>
 
                 <InputForm
-                  classNameLabel={`${classNameLabel}`}
-                  {...register('price', { required: true, valueAsNumber: true })}
+                  classNameLabel={classNameLabel}
+                  {...register('pricePerM2', { valueAsNumber: true })}
+                  step={0.1}
                   type="number"
-                  step="0.01"
-                  label="Giá (VNĐ)"
-                  placeholder="Nhập giá thuê"
+                  label="Giá/m² (Tự động)"
+                  placeholder="Tự động tính"
                   bordered
-                  required
+                  readOnly
                 />
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
