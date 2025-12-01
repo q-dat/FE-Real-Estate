@@ -4,12 +4,24 @@ import { slugify } from '@/lib/slugify';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { notFound, redirect } from 'next/navigation';
 import ClientRentalPostDetailPage from './ClientRentalPostDetailPage';
+import { generateRentalPostMetadata } from '@/metadata/id/rentalPostAdminData';
+import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { Metadata } from 'next';
 
 // Đúng kiểu cho Next 15
 type PageProps = {
   params: Promise<{ slug: string; id: string }>;
 };
 
+// Metadata động cho bài đăng
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const post: IRentalPostAdmin | null = await rentalPostAdminService.getFallback(id);
+
+  if (!post) return { title: 'Bài đăng không tồn tại' };
+
+  return generateRentalPostMetadata(post);
+}
 export default async function RentalPostPage({ params }: PageProps) {
   // Await params vì nó là Promise
   const { slug, id } = await params;
