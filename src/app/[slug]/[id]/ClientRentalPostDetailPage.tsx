@@ -145,7 +145,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
               <div className="inline-flex items-center">
                 <FaRulerCombined className="mr-2 text-primary" size={16} />
                 <p className="text-sm sm:text-base">
-                  (Dài: {post?.length}m x Rộng: {post?.width}m) = <span className="font-semibold">{post?.area} m²</span>
+                  ( {post?.length}m x {post?.width}m) = <span className="font-semibold">{post?.area} m²</span>
                 </p>
               </div>
             )}

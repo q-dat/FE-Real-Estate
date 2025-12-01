@@ -265,8 +265,8 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 <InputForm
                   classNameLabel={`${classNameLabel}`}
                   {...register('length')}
-                  label="Chiều dài (m²)"
-                  placeholder="Nhập chiều dài"
+                  label="Chiều ngang (m²)"
+                  placeholder="Nhập chiều ngang"
                   bordered
                 />
                 <InputForm
