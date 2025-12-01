@@ -9,11 +9,21 @@ export interface IRentalPostAdmin {
   title: string; // tiêu đề bài đăng
   description: string; // mô tả chi tiết nội dung bài đăng
   category: IRentalCategory; // danh mục (liên kết đến bảng danh mục)
-  price: number; // giá cho thuê (VNĐ)
-  priceUnit: string; // đơn vị giá (vd: "VNĐ/tháng")
+  propertyType?: string; // loại hình bất động sản (vd: "Căn hộ", "Nhà phố",...)
+  locationType?: string; // loại hình vị trí (vd: "đường lớn", "hẻm",...)
+  direction?: string; // hướng nhà (vd: "Đông", "Tây",...)
+  price: number; // Giá bán hoặc giá thuê
+  priceUnit: string; // VD: "Tỷ", "Triệu/m²", "/tháng", "/m²"...
+  pricePerM2?: number; // giá theo m2 (VNĐ/m2)
   area: number; // diện tích (m2)
-  length?: string; // chiều dài
+  length?: string; // chiều ngang
   width?: string; // chiều rộng
+  backSize?: string; // mặt hậu
+  floorNumber?: number; // số tầng
+  bedroomNumber?: number; // số phòng ngủ
+  toiletNumber?: number; // số toilet
+  legalStatus?: string; // tình trạng pháp lý (vd: "sổ hồng", "sổ đỏ",...)
+  furnitureStatus?: string; // tình trạng nội thất (vd: "đầy đủ", "chưa có",...)
   province: string; // tỉnh/thành phố
   district: string; // quận/huyện
   ward?: string; // phường/xã
@@ -31,7 +41,7 @@ export interface IRentalPostAdmin {
   createdAt: string; // ngày tạo tin
   updatedAt: string; // ngày cập nhật gần nhất
 }
-// types/type/rentalAdmin/rentalFavoriteLite.ts
+
 export interface IRentalFavoriteLite {
   _id: string;
   title: string;
@@ -40,6 +50,5 @@ export interface IRentalFavoriteLite {
   area: number;
   district: string;
   province: string;
-  image?: string; 
+  image?: string;
 }
-

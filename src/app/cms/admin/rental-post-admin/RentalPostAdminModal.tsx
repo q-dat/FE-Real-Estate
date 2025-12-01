@@ -227,6 +227,84 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   </Select>
                 </div>
                 <TextareaForm {...register('description', { required: true })} placeholder="Mô tả chi tiết bài đăng..." />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('propertyType')}
+                  label="Loại hình BĐS"
+                  placeholder="Nhà phố, Căn hộ, ..."
+                  bordered
+                />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('locationType')}
+                  label="Loại vị trí"
+                  placeholder="Mặt tiền, Hẻm, ..."
+                  bordered
+                />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('direction')}
+                  label="Hướng nhà"
+                  placeholder="Đông, Tây, Nam, Bắc"
+                  bordered
+                />
+                {/* <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('pricePerM2', { valueAsNumber: true })}
+                  type="number"
+                  label="Giá/m²"
+                  placeholder="Nhập giá theo m²"
+                  bordered
+                /> */}
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('backSize')}
+                  label="Mặt hậu (m²)"
+                  placeholder="Nhập mặt hậu"
+                  bordered
+                />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('floorNumber', { valueAsNumber: true })}
+                  type="number"
+                  label="Số tầng"
+                  min="0"
+                  placeholder="Nhập số tầng"
+                  bordered
+                />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('bedroomNumber', { valueAsNumber: true })}
+                  type="number"
+                  label="Số phòng ngủ"
+                  min="0"
+                  placeholder="Nhập số phòng ngủ"
+                  bordered
+                />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('toiletNumber', { valueAsNumber: true })}
+                  type="number"
+                  label="Số toilet"
+                  min="0"
+                  placeholder="Nhập số toilet"
+                  bordered
+                />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('legalStatus')}
+                  label="Pháp lý"
+                  placeholder="Sổ hồng, Sổ đỏ, ..."
+                  bordered
+                />
+                <InputForm
+                  classNameLabel={`${classNameLabel}`}
+                  {...register('furnitureStatus')}
+                  label="Nội thất"
+                  placeholder="Đầy đủ, Chưa có, ..."
+                  bordered
+                />
+
                 <TextareaForm {...register('amenities')} placeholder="Tiện ích (máy lạnh, chỗ để xe, v.v...)" />
                 {/* Loại Tin */}
                 <div className="col-span-full">
