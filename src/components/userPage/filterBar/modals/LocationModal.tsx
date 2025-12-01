@@ -16,13 +16,63 @@ interface District {
 }
 
 export default function LocationModal({ onClose, onSelect }: BaseLocationModalProps) {
+  // Full Vietnam version
+  // const modalRef = useRef<HTMLDivElement>(null);
+  // const [provinces, setProvinces] = useState<Province[]>([]);
+  // const [districts, setDistricts] = useState<District[]>([]);
+  // const [selectedProvince, setSelectedProvince] = useState<Province | null>(null);
+  // const [filter, setFilter] = useState('');
+
+  // // Normalize text: remove accent + lowercase
+  // const normalizeText = (text: string) =>
+  //   text
+  //     .normalize('NFD')
+  //     .replace(/[\u0300-\u036f]/g, '')
+  //     .toLowerCase();
+
+  // useEffect(() => {
+  //   fetch('https://provinces.open-api.vn/api/?depth=1')
+  //     .then((res) => res.json())
+  //     .then((data) => setProvinces(data))
+  //     .catch((err) => console.error('Error fetching provinces:', err));
+  // }, []);
+
+  // useEffect(() => {
+  //   const handleEsc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+  //   window.addEventListener('keydown', handleEsc);
+  //   return () => window.removeEventListener('keydown', handleEsc);
+  // }, [onClose]);
+
+  // const handleClickOutside = (e: React.MouseEvent) => {
+  //   if (modalRef.current && !modalRef.current.contains(e.target as Node)) onClose();
+  // };
+
+  // const filteredProvinces = provinces.filter((p) => normalizeText(p.name).includes(normalizeText(filter)));
+  // const filteredDistricts = districts.filter((d) => normalizeText(d.name).includes(normalizeText(filter)));
+
+  // const handleSelectProvince = (province: Province) => {
+  //   setSelectedProvince(province);
+  //   setFilter('');
+  //   fetch(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`)
+  //     .then((res) => res.json())
+  //     .then((data) => setDistricts(data.districts))
+  //     .catch((err) => console.error('Error fetching districts:', err));
+  // };
+
+  // const handleSelectDistrict = (district: District) => {
+  //   onSelect?.({
+  //     province: selectedProvince!.name,
+  //     district: district.name,
+  //   });
+  //   onClose();
+  // };
+
+  // Ho Chi Minh City only version
   const modalRef = useRef<HTMLDivElement>(null);
-  const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [selectedProvince, setSelectedProvince] = useState<Province | null>(null);
   const [filter, setFilter] = useState('');
 
-  // Normalize text: remove accent + lowercase
   const normalizeText = (text: string) =>
     text
       .normalize('NFD')
@@ -30,10 +80,13 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
       .toLowerCase();
 
   useEffect(() => {
-    fetch('https://provinces.open-api.vn/api/?depth=1')
+    fetch('https://provinces.open-api.vn/api/p/79?depth=2')
       .then((res) => res.json())
-      .then((data) => setProvinces(data))
-      .catch((err) => console.error('Error fetching provinces:', err));
+      .then((data) => {
+        setSelectedProvince({ code: 79, name: 'Thành phố Hồ Chí Minh' });
+        setDistricts(data.districts);
+      })
+      .catch((err) => console.error('Error fetching districts:', err));
   }, []);
 
   useEffect(() => {
@@ -46,21 +99,11 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) onClose();
   };
 
-  const filteredProvinces = provinces.filter((p) => normalizeText(p.name).includes(normalizeText(filter)));
   const filteredDistricts = districts.filter((d) => normalizeText(d.name).includes(normalizeText(filter)));
-
-  const handleSelectProvince = (province: Province) => {
-    setSelectedProvince(province);
-    setFilter('');
-    fetch(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`)
-      .then((res) => res.json())
-      .then((data) => setDistricts(data.districts))
-      .catch((err) => console.error('Error fetching districts:', err));
-  };
 
   const handleSelectDistrict = (district: District) => {
     onSelect?.({
-      province: selectedProvince!.name,
+      province: 'Thành phố Hồ Chí Minh',
       district: district.name,
     });
     onClose();
@@ -88,8 +131,8 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
 
           {!selectedProvince ? (
             <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto pr-1">
-              {filteredProvinces.map((item) => (
-                <Button key={item.code} size="sm" className="justify-center text-xs" onClick={() => handleSelectProvince(item)}>
+              {filteredDistricts.map((item) => (
+                <Button key={item.code} size="sm" className="justify-center text-xs" onClick={() => handleSelectDistrict(item)}>
                   {item.name}
                 </Button>
               ))}
