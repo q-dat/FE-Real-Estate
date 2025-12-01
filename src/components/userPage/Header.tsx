@@ -7,7 +7,7 @@ import { LuHandshake } from 'react-icons/lu';
 import { AiFillHeart } from 'react-icons/ai';
 import { TbHomeSearch } from 'react-icons/tb';
 import HeaderResponsive from './HeaderResponsive';
-import { menuItems, menuItems2 } from '@/constants/menuItems';
+import { menuItems } from '@/constants/menuItems';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { motion, useAnimation } from 'framer-motion';
 import Image from 'next/image';
@@ -41,7 +41,7 @@ export default function Header() {
 
       {/* Desktop Header */}
       <motion.nav
-        className={clsx('fixed left-0 top-0 z-[99999] hidden w-full border-b shadow-sm xl:block', scrolled ? 'bg-primary' : 'bg-white')}
+        className={clsx('fixed left-0 top-0 z-[99999] hidden w-full border-b shadow-sm xl:block', scrolled ? 'bg-primary' : 'bg-primary')}
         animate={controls}
       >
         <div
@@ -65,7 +65,7 @@ export default function Header() {
           </Link>
           {/* Middle Navigation */}
           <div className="flex flex-col items-center justify-center gap-1">
-            <div className={clsx('flex flex-row items-center', scrolled ? 'gap-4' : 'gap-10')}>
+            <div className={clsx('flex flex-row items-center', scrolled ? 'gap-5' : 'gap-2')}>
               {menuItems.map((item) => {
                 const isActive = pathname === item.link;
                 return (
@@ -73,9 +73,9 @@ export default function Header() {
                     key={item.link}
                     href={item.link}
                     className={clsx(
-                      'rounded-sm p-1 font-bold transition-all duration-200 hover:scale-105',
-                      scrolled ? 'text-xl text-white' : 'text-lg',
-                      isActive ? 'text-primary' : 'text-black'
+                      'rounded-sm py-1 px-2 font-bold transition-all duration-200 hover:scale-105',
+                      scrolled ? 'text-sm' : 'text-sm',
+                      isActive ? 'bg-primary-lighter text-primary' : 'text-white'
                     )}
                   >
                     {item.title}
@@ -85,7 +85,7 @@ export default function Header() {
             </div>
 
             {/* Middle line + menu2 hidden when scrolled */}
-            {!scrolled && <p className="h-px w-full bg-primary" />}
+            {/* {!scrolled && <p className="h-px w-full bg-primary" />}
 
             {!scrolled && (
               <div className="flex flex-row items-center gap-10">
@@ -95,11 +95,11 @@ export default function Header() {
                   </Link>
                 ))}
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {/* ======================  
                 LOGIC HIỂN THỊ BUTTON  
                 ====================== */}
@@ -135,7 +135,7 @@ export default function Header() {
                   <TbHomeSearch size={30} />
                   <div className="flex flex-col">
                     <p className="text-xs">Tư vấn</p>
-                    <p className="text-sm font-bold uppercase">Tìm nhà</p>
+                    <p className="text-xs font-bold uppercase">Tìm nhà</p>
                   </div>
                 </Link>
 
@@ -146,7 +146,7 @@ export default function Header() {
                   <LuHandshake size={30} />
                   <div className="flex flex-col">
                     <p className="text-xs">Liên hệ</p>
-                    <p className="text-sm font-bold uppercase">Kí gửi</p>
+                    <p className="text-xs font-bold uppercase">Kí gửi</p>
                   </div>
                 </Link>
               </>
