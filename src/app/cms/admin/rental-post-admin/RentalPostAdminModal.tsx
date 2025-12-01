@@ -138,6 +138,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   }, [editingPost, wards]);
 
   const removeImage = (url: string) => setPreviewUrls((prev) => prev.filter((u) => u !== url));
+  const removeAdminImage = (url: string) => setAdminPreviewUrls((prev) => prev.filter((u) => u !== url));
 
   const handleFormSubmit: SubmitHandler<IRentalPostAdmin> = async (data) => {
     try {
@@ -341,7 +342,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   <Select
                     value={priceMultiplier}
                     onChange={(e) => setPriceMultiplier(Number(e.target.value))}
-                    className="select select-bordered w-1/2 bg-primary focus:outline-none text-white"
+                    className="select select-bordered w-1/2 bg-primary text-white focus:outline-none"
                   >
                     <option value={1}>Nghìn</option>
                     <option value={1_000}>Triệu</option>
@@ -542,7 +543,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                           </Zoom>
                           <button
                             type="button"
-                            onClick={() => removeImage(url)}
+                            onClick={() => removeAdminImage(url)}
                             className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-red-600"
                           >
                             <MdClose size={14} />
