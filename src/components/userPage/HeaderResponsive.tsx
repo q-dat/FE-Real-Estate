@@ -5,6 +5,8 @@ import { FaRegHeart } from 'react-icons/fa6';
 import Link from 'next/link';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { menuItems } from '@/constants/menuItems';
+import Image from 'next/image';
+import { images } from '../../../public/images';
 
 // 🧩 Biến variants cho chữ (menu items)
 const textVariants: Variants = {
@@ -37,8 +39,18 @@ export default function HeaderResponsive() {
     <header className="relative block xl:hidden">
       {/* Top Header */}
       <div className="fixed z-[99999] flex h-[60px] w-full items-center justify-between bg-white px-4 shadow-sm">
-        <div className="select-none text-lg font-bold text-blue-600">nguonnhagiare.vn</div>
-
+        {/* <div className="select-none text-lg font-bold text-blue-600">nguonnhagiare.vn</div> */}
+        <div>
+          <Link href={'/'}>
+            <Image
+              src={images.Logo}
+              alt={'Logo'}
+              width={50}
+              height={50}
+              className={'w-[50px] font-black text-primary transition-all duration-300'}
+            ></Image>
+          </Link>
+        </div>
         <div className="flex items-center gap-3">
           <FaRegHeart size="20px" className="text-gray-700" />
           <button onClick={toggleMenu}>

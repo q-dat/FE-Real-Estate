@@ -9,6 +9,7 @@ import CustomCursor from '@/components/userPage/CustomCursor';
 import FooterFC from '@/components/userPage/FooterFC';
 import Header from '@/components/userPage/Header';
 import { RentalFavoriteProvider } from '@/context/RentalFavoriteContext';
+import { homeMetadata } from '@/metadata/homeMetadata';
 
 const geistSans = Inter({
   variable: '--font-geist-sans',
@@ -22,7 +23,7 @@ const geistMono = Roboto_Mono({
   display: 'swap', // Giảm CLS
 });
 
-// export const metadata = homeMetadata;
+export const metadata = homeMetadata;
 
 export default function RootLayout({
   children,

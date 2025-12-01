@@ -1,5 +1,5 @@
 export const images = {
-  Logo:'/images/Logo.jpg',
+  Logo:'/images/Logo.png',
   LogoZalo:'/images/LogoZalo.webp',
   Popup:'/images/Popup.jpg',
 };

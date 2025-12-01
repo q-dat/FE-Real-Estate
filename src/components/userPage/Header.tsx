@@ -10,6 +10,8 @@ import HeaderResponsive from './HeaderResponsive';
 import { menuItems, menuItems2 } from '@/constants/menuItems';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { motion, useAnimation } from 'framer-motion';
+import Image from 'next/image';
+import { images } from '../../../public/images';
 
 export default function Header() {
   const pathname = usePathname();
@@ -49,10 +51,18 @@ export default function Header() {
           )}
         >
           {/* Logo */}
-          <p className={clsx('font-black text-primary transition-all duration-300', scrolled ? 'text-2xl text-white' : 'text-2xl')}>
+          {/* <p className={clsx('font-black text-primary transition-all duration-300', scrolled ? 'text-2xl text-white' : 'text-2xl')}>
             Nguonnhagiare.vn
-          </p>
-
+          </p> */}
+          <Link href={'/'}>
+            <Image
+              src={images.Logo}
+              alt={'Logo'}
+              width={60}
+              height={60}
+              className={clsx('font-black text-primary transition-all duration-300', scrolled ? 'w-[60px]' : 'w-[90px]')}
+            ></Image>
+          </Link>
           {/* Middle Navigation */}
           <div className="flex flex-col items-center justify-center gap-1">
             <div className={clsx('flex flex-row items-center', scrolled ? 'gap-4' : 'gap-10')}>
