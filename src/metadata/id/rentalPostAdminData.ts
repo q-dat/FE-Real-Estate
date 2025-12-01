@@ -4,12 +4,12 @@ import { Metadata } from 'next';
 
 export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
   const slug = slugify(post.title);
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/cho-thue/${slug}/${post._id}`;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/${slug}/${post._id}`;
 
-  const title = `${post.title} - Cho Thuê ${post.area}m² tại ${post.province} - 7Teck.vn`;
+  const title = `${post.title} - Cho Thuê ${post.area}m² tại ${post.province} - https://www.nguonnhagiare.vn/`;
   const description =
     post.description ||
-    `Khám phá bất động sản cho thuê: ${post.title}, diện tích ${post.area}m², giá ${post.price.toLocaleString()} ${post.priceUnit} tại ${post.province}. Xem ngay trên 7Teck.vn`;
+    `Khám phá bất động sản cho thuê: ${post.title}, diện tích ${post.area}m², giá ${post.price.toLocaleString()} ${post.priceUnit} tại ${post.province}. Xem ngay trên https://www.nguonnhagiare.vn/`;
 
   return {
     title,
@@ -19,7 +19,7 @@ export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
       `cho thuê ${post.category.name}`,
       `bất động sản ${post.province}`,
       `${post.area}m² cho thuê`,
-      '7Teck.vn',
+      'https://www.nguonnhagiare.vn/',
       'cho thuê nhanh',
       `${post.price.toLocaleString()} ${post.priceUnit}`,
     ],
@@ -31,7 +31,7 @@ export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
       title,
       description,
       url,
-      siteName: '7Teck.vn',
+      siteName: 'https://www.nguonnhagiare.vn/',
       images: post.images?.length
         ? post.images.map((img) => ({
             url: img,
