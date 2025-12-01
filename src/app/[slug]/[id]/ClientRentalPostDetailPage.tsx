@@ -27,7 +27,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
 
   return (
     <main className="pt-mobile-padding-top xl:pt-desktop-padding-top bg-white px-2 text-black xl:px-desktop-padding">
-      <div className="grid w-full grid-cols-1 gap-10 xl:grid-cols-3">
+      <div className="grid w-full grid-cols-1 gap-10 xl:mt-10 xl:grid-cols-3">
         {/* Left */}
         <Card className="rounded-lg border border-neutral-200 p-3 shadow-sideBar xl:col-span-2">
           {/* Title */}

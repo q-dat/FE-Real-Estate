@@ -1,7 +1,7 @@
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { RentalGrid } from '@/components/userPage/rental';
 import FilterBar from '@/components/userPage/filterBar/FilterBar';
-import Link from 'next/link';
+import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 
 // 0. Mua bán nhà đất
 // 1. Căn hộ cho thuê
@@ -9,7 +9,7 @@ import Link from 'next/link';
 // 3. Cho thuê mặt bằng
 
 const CATEGORY_CODE = 1;
-const CATEGORY_NAME = 'Cho thuê căn hộ';
+const CATEGORY_NAME = 'Căn Hộ';
 
 export default async function Page() {
   const posts = await rentalPostAdminService.getAll({ categoryCode: CATEGORY_CODE });
@@ -19,16 +19,7 @@ export default async function Page() {
       {/* FilterBar */}
       <FilterBar />
       {/* Breadcrumbs */}
-      <div className="breadcrumbs px-2 py-2 text-sm text-primary xl:px-desktop-padding">
-        <ul className="font-medium">
-          <li>
-            <Link href="/">Trang Chủ</Link>
-          </li>
-          <li>
-            <Link href="#">{CATEGORY_NAME}</Link>
-          </li>
-        </ul>
-      </div>
+      <Breadcrumbs label={CATEGORY_NAME} />
       <RentalGrid posts={posts} title={CATEGORY_NAME} slogan="" />;
     </div>
   );

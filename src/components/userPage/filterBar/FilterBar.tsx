@@ -37,20 +37,14 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
   useEffect(() => {
     let typeLabel = 'Bất động sản thuê';
     switch (pathname) {
-      // case '/cho-thue-phong-tro':
-      //   typeLabel = 'Cho thuê phòng trọ';
-      //   break;
-      case '/cho-thue-nha-nguyen-can':
+      case '/nha-nguyen-can':
         typeLabel = 'Nhà nguyên căn';
         break;
-      case '/cho-thue-can-ho':
-        typeLabel = 'Căn hộ cho thuê';
+      case '/can-ho':
+        typeLabel = 'Căn hộ';
         break;
-      case '/cho-thue-mat-bang':
-        typeLabel = 'Cho thuê mặt bằng';
-        break;
-      case '/nha-dat':
-        typeLabel = 'Mua bán nhà đất';
+      case '/mat-bang':
+        typeLabel = 'Mặt bằng';
         break;
     }
     setFilters((prev) => ({ ...prev, type: typeLabel }));
