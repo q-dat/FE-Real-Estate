@@ -1,11 +1,10 @@
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { RentalGrid } from '@/components/userPage/rental';
 
-// 0. Bất động sản thuê
+// 0. Mua bán nhà đất
 // 1. Căn hộ cho thuê
 // 2. Nhà nguyên căn
 // 3. Cho thuê mặt bằng
-// 4. Mua bán nhà đất
 
 const CATEGORY_CODE = 1;
 const CATEGORY_NAME = 'Cho thuê căn hộ';

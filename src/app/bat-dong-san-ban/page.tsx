@@ -1,14 +1,13 @@
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { RentalGrid } from '@/components/userPage/rental';
 
-// 0. Bất động sản thuê
+// 0. Mua bán nhà đất
 // 1. Căn hộ cho thuê
 // 2. Nhà nguyên căn
-// 3. Cho thuê mặt bằng
-// 4. Mua bán nhà đất
+// 3. Cho thuê mặt bằng 
 
 const CATEGORY_CODE = 0;
-const CATEGORY_NAME = 'Bất động sản thuê';
+const CATEGORY_NAME = 'Bất động sản bán';
 
 export default async function Page() {
   const posts = await rentalPostAdminService.getAll({ categoryCode: CATEGORY_CODE });
