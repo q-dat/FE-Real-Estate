@@ -10,6 +10,7 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import { slugify } from '@/lib/slugify';
 import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 import { usePrefetchRentalPost } from '@/hooks/usePrefetchRentalPost';
+import imageRepresent from '../../public/image-represent';
 
 interface Props {
   salePosts: IRentalPostAdmin[];
@@ -37,10 +38,7 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
           <div key={section.title} className="pb-8 xl:mt-10">
             {/* Header dạng trang tin */}
             <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-900 xl:text-3xl">{section.title}</h2>
-                <p className="mt-1 text-sm text-gray-500">Tin tức cập nhật mới nhất từ thị trường bất động sản</p>
-              </div>
+              <h2 className="text-2xl font-semibold text-gray-900 xl:text-3xl">{section.title}</h2>
 
               <Link href={section.link} className="text-sm font-semibold text-primary underline">
                 Xem tất cả
@@ -48,9 +46,9 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
             </div>
 
             {/* Grid kiểu bản tin BĐS */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4 xl:gap-3 2xl:grid-cols-5">
               {section.data.slice(0, 6).map((post) => {
-                const thumbnail = post.images?.[0] || '/no-image.png';
+                const thumbnail = post.images?.[0] || `${imageRepresent.Fallback}`;
                 const totalImages = post.images?.length || 0;
                 const slug = slugify(post.title);
 
@@ -83,14 +81,14 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
                     </figure>
 
                     {/* Nội dung */}
-                    <div className="card-body p-3">
+                    <div className="card-body p-2">
                       <h4 className="line-clamp-3 border-b border-primary pb-1 text-lg font-bold text-gray-900 transition-colors group-hover:text-primary">
                         {post.title}
                       </h4>
                       <div className="mt-1 flex flex-col items-start justify-between gap-1 xl:flex-row xl:items-center">
                         <div className="text-2xl font-bold text-primary">
-                          {formatCurrency(post.price)} {post.priceUnit}
-                        </div>
+                            {formatCurrency(post.price)} {post.priceUnit}
+                          </div>
 
                         <div className="inline-flex items-center text-sm text-gray-600">
                           <IoMdExpand />
