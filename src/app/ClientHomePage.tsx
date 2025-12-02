@@ -29,7 +29,7 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
   ];
 
   return (
-    <div className="pt-mobile-padding-top xl:pt-desktop-padding-top px-2 xl:px-desktop-padding">
+    <div className="px-2 pt-mobile-padding-top xl:px-desktop-padding xl:pt-desktop-padding-top">
       {sections.map((section) => {
         if (!section.data.length) return null;
 
@@ -59,7 +59,7 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
                     key={post._id}
                     onClick={() => prefetchById(post._id)}
                     href={`/${slug}/${post._id}`}
-                    className="group card relative overflow-hidden rounded-md bg-base-100 shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+                    className="group card relative overflow-hidden rounded-md bg-base-100 shadow-md transition-all duration-300 xl:hover:-translate-y-2 xl:hover:shadow-xl"
                   >
                     {/* Thumbnail */}
                     <figure className="relative aspect-[4/3] overflow-hidden">
