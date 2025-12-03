@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { FaListUl, FaExpand, FaOrcid, FaRulerCombined, FaPhone } from 'react-icons/fa';
 import { Button, Card } from 'react-daisyui';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
@@ -12,21 +12,19 @@ import { GiCutDiamond } from 'react-icons/gi';
 import Link from 'next/link';
 import { Space } from '@/components/userPage/ui/space/Space';
 import { images } from '../../../../public/images';
+import { PropertyGallery } from './PropertyGallery';
 
 interface Props {
   post: IRentalPostAdmin;
 }
 
 export default function ClientRentalPostDetailPage({ post }: Props) {
-  const [showAll, setShowAll] = useState(false);
-
   const imagesRental = useMemo(() => post?.images || [], [post?.images]);
-  const visibleImages = showAll ? imagesRental : imagesRental.slice(0, 5);
   const youtubeId = post?.youtubeLink?.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/)?.[1];
   const encodedAddress = encodeURIComponent(`${post?.address}, ${post?.district}, ${post?.province}`);
 
   return (
-    <main className="pt-mobile-padding-top xl:pt-desktop-padding-top bg-white px-2 text-black xl:px-desktop-padding">
+    <main className="bg-white px-2 pt-mobile-padding-top text-black xl:px-desktop-padding xl:pt-desktop-padding-top">
       <div className="grid w-full grid-cols-1 gap-10 xl:mt-10 xl:grid-cols-3">
         {/* Left */}
         <Card className="rounded-lg border border-neutral-200 p-3 shadow-sideBar xl:col-span-2">
@@ -92,50 +90,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
           <Space />
 
           {/* Images */}
-          {imagesRental.length > 0 && (
-            <section className="my-10">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4 }}
-                className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-              >
-                {visibleImages.slice(0, 25).map((src, index) => (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1 }}
-                    className={`relative cursor-pointer overflow-hidden rounded-lg ${
-                      index === 0 ? 'col-span-1 row-span-2 xl:col-span-3 xl:row-span-2' : ''
-                    }`}
-                  >
-                    <Image
-                      src={src}
-                      alt={`${post?.title}-${index}`}
-                      width={800}
-                      height={600}
-                      className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                    />
-                    {/* <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity hover:opacity-100">
-                      <FaExpand className="text-xl text-white" />
-                    </div> */}
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {imagesRental.length > 5 && !showAll && (
-                <div className="mt-4 flex justify-center">
-                  <Button
-                    color="primary"
-                    size="sm"
-                    className="rounded-full text-sm font-semibold text-white shadow-sm hover:brightness-110"
-                    onClick={() => setShowAll(true)}
-                  >
-                    Xem tất cả {Math.min(imagesRental.length, 25)} ảnh
-                  </Button>
-                </div>
-              )}
-            </section>
-          )}
+          {imagesRental.length > 0 && <PropertyGallery images={imagesRental} />}
 
           {/* Des */}
           <div className="bg-neutral-50 p-2 leading-10">

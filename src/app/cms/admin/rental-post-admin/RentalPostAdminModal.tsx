@@ -39,7 +39,7 @@ interface Ward {
 }
 
 export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload }: Props) {
-  const { register, handleSubmit, reset, getValues } = useForm<IRentalPostAdmin>();
+  const { register, handleSubmit, reset, getValues, watch, setValue } = useForm<IRentalPostAdmin>();
   const [images, setImages] = useState<FileList | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [adminImages, setAdminImages] = useState<FileList | null>(null);
@@ -58,23 +58,23 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   const [priceMultiplier, setPriceMultiplier] = useState<number>(1);
 
   // Tự động tính pricePerM2 = (price * multiplier) / area và cập nhật vào input pricePerM2
-  useEffect(() => {
-    const { price, area } = getValues();
+  const watchPrice = watch('price');
+  const watchArea = watch('area');
 
-    const priceNum = Number(price);
-    const areaNum = Number(area);
+  useEffect(() => {
+    const priceNum = Number(watchPrice);
+    const areaNum = Number(watchArea);
 
     if (!priceNum || !areaNum || priceNum <= 0 || areaNum <= 0) {
-      reset({ ...getValues(), pricePerM2: 0 });
+      setValue('pricePerM2', 0); // chỉ update field pricePerM2, không reset cả form
       return;
     }
 
     const perM2 = (priceNum * priceMultiplier) / areaNum;
-
     if (!isNaN(perM2) && isFinite(perM2)) {
-      reset({ ...getValues(), pricePerM2: Math.round(perM2) });
+      setValue('pricePerM2', Math.round(perM2));
     }
-  }, [priceMultiplier]);
+  }, [watchPrice, watchArea, priceMultiplier, setValue]);
 
   useEffect(() => {
     fetch('https://provinces.open-api.vn/api/p/')
