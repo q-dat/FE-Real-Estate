@@ -1,12 +1,14 @@
 'use client';
 import React from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
-import { FaRegHeart } from 'react-icons/fa6';
+import clsx from 'clsx'; // tiện cho xử lý class động
 import Link from 'next/link';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { menuItems } from '@/constants/menuItems';
 import Image from 'next/image';
 import { images } from '../../../public/images';
+import { AiFillHeart } from 'react-icons/ai';
+import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 
 // 🧩 Biến variants cho chữ (menu items)
 const textVariants: Variants = {
@@ -24,6 +26,7 @@ const textVariants: Variants = {
 };
 
 export default function HeaderResponsive() {
+  const { favoriteCount } = useRentalFavorite();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const toggleMenu = () => setIsMenuOpen((p) => !p);
 
@@ -52,9 +55,23 @@ export default function HeaderResponsive() {
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <FaRegHeart size="20px" className="text-white" />
+          <Link
+            href="/yeu-thich"
+            className="rounded-fulltransition-all relative flex items-center justify-center duration-200 hover:scale-105 hover:shadow-md"
+          >
+            <AiFillHeart
+              size={24}
+              className={clsx('transition-colors duration-200', favoriteCount > 0 ? 'text-red-600' : 'text-white xl:hover:text-red-500')}
+            />
+
+            {favoriteCount > 0 && (
+              <span className="absolute -right-2 -top-1 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-red-600 text-xs font-semibold text-white shadow-md">
+                {favoriteCount}
+              </span>
+            )}
+          </Link>
           <button onClick={toggleMenu}>
-            <FiMenu size="24px" className="text-white" />
+            <FiMenu size={24} className="text-white" />
           </button>
         </div>
       </div>

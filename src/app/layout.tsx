@@ -63,7 +63,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <RentalFavoriteProvider>
             <CustomCursor />
-            <ToastContainer style={{ marginTop: '50px' }} />
+            <ToastContainer style={{ marginTop: '80px' }} />
             <div className="flex min-h-screen flex-col bg-primary-white">
               <Header />
               <div className="flex-1 bg-primary-white selection:bg-primary selection:text-white xl:pt-0">{children}</div>
