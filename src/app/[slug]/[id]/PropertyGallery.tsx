@@ -19,19 +19,19 @@ export function PropertyGallery({ images }: { images: string[] }) {
 
   return (
     <>
-      <section className="my-10">
+      <section className="my-2">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+          className="grid h-[70vh] grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
         >
           {visible.map((src, index) => (
             <motion.div
               key={index}
               onClick={() => openBox(index)}
               whileHover={{ scale: 1 }}
-              className={`relative cursor-pointer overflow-hidden rounded-lg ${
+              className={`group relative cursor-pointer overflow-hidden rounded-md ${
                 index === 0 ? 'col-span-1 row-span-2 xl:col-span-3 xl:row-span-2' : ''
               }`}
             >
@@ -66,7 +66,7 @@ export function PropertyGallery({ images }: { images: string[] }) {
         </motion.div>
 
         {!showAll && images.length > 5 && (
-          <div className="mt-6 text-center">
+          <div className="mt-2 text-center">
             <button onClick={() => setShowAll(true)} className="rounded-lg bg-black px-6 py-3 text-white transition hover:scale-105">
               Xem tất cả {images.length} ảnh
             </button>

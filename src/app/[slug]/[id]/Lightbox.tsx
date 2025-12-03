@@ -34,7 +34,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        onClick={onClose}
+        // onClick={onClose}
       >
         {/* Close Button */}
         <button
