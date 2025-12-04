@@ -65,7 +65,7 @@ export default function Header() {
           </Link>
           {/* Middle Navigation */}
           <div className="flex flex-col items-center justify-center gap-1">
-            <div className={clsx('flex flex-row items-center', scrolled ? 'gap-5' : 'gap-2')}>
+            <div className={clsx('flex flex-row items-center', scrolled ? 'gap-4' : 'gap-1')}>
               {menuItems.map((item) => {
                 const isActive = pathname === item.link;
                 return (
@@ -74,7 +74,7 @@ export default function Header() {
                     href={item.link}
                     className={clsx(
                       'rounded-sm px-2 py-1 font-bold transition-all duration-200 hover:scale-105',
-                      scrolled ? 'text-sm' : 'text-sm',
+                      scrolled ? 'text-xs 2xl:text-base' : 'text-xs 2xl:text-base',
                       isActive ? 'bg-primary-lighter text-primary' : 'text-white'
                     )}
                   >
@@ -109,18 +109,18 @@ export default function Header() {
               <>
                 <Link
                   href="/tu-van-tim-nha"
-                  className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-primary bg-white p-1 text-black transition-all duration-200 hover:scale-105"
+                  className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-primary bg-white p-1 text-black transition-all duration-200 hover:scale-105"
                 >
-                  <TbHomeSearch size={30} />
-                  <p className="text-base font-bold uppercase">Tìm nhà</p>
+                  <TbHomeSearch size={24} />
+                  <p className="text-sm font-bold uppercase">Tìm nhà</p>
                 </Link>
 
                 <Link
                   href="/tu-van-tim-nha"
-                  className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-white bg-primary p-1 text-white transition-all duration-200 hover:scale-105"
+                  className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-white bg-primary p-1 text-white transition-all duration-200 hover:scale-105"
                 >
-                  <LuHandshake size={30} />
-                  <p className="text-base font-bold uppercase">Kí gửi</p>
+                  <LuHandshake size={24} />
+                  <p className="text-sm font-bold uppercase">Kí gửi</p>
                 </Link>
               </>
             )}
@@ -130,7 +130,7 @@ export default function Header() {
               <>
                 <Link
                   href="/tu-van-tim-nha"
-                  className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-primary bg-white p-2 text-black"
+                  className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-primary bg-white p-2 text-black"
                 >
                   <TbHomeSearch size={30} />
                   <div className="flex flex-col">
@@ -141,7 +141,7 @@ export default function Header() {
 
                 <Link
                   href="/tu-van-tim-nha"
-                  className="flex w-[120px] items-center justify-center gap-1 rounded-md border border-primary bg-primary p-2 text-white"
+                  className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-white bg-primary p-2 text-white"
                 >
                   <LuHandshake size={30} />
                   <div className="flex flex-col">
