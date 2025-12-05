@@ -7,6 +7,7 @@ import PriceModal from './modals/PriceModal';
 import AreaModal from './modals/AreaModal';
 import FilterResetModal from './modals/FilterResetModal';
 import PropertyTypeModal from './modals/PropertyTypeModal';
+import { getPriceParamsFromLabel, PriceRangeKey } from '@/constants/priceRanges';
 
 interface FilterValues {
   type?: string;
@@ -60,31 +61,14 @@ export default function FilterBar() {
     router.push(val.link); // chuyển trang
     setActiveModal(null);
   };
-  const handleSelectPrice = (label: string, customFrom?: number, customTo?: number) => {
-    const map: Record<string, [number | undefined, number | undefined, boolean?]> = {
-      'Tất cả': [undefined, undefined],
-      'Dưới 1 triệu': [undefined, 1, true],
-      '1 - 2 triệu': [1, 2],
-      '2 - 4 triệu': [2, 4],
-      '4 - 6 triệu': [4, 6],
-      '6 - 8 triệu': [6, 8],
-      '8 - 10 triệu': [8, 10],
-      '10 - 15 triệu': [10, 15],
-      '15 - 20 triệu': [15, 20],
-      'Trên 20 triệu': [20, 999],
-      'Thoả thuận': [undefined, undefined, true],
-    };
-
-    const [pf, pt, isSingle] = map[label] ?? [undefined, undefined];
+  const handleSelectPrice = (label: string) => {
+    const params = getPriceParamsFromLabel(label as PriceRangeKey);
 
     setFilters((prev) => ({
       ...prev,
-      displayPrice: label,
-      price: isSingle ? pt : undefined,
-      priceFrom: !isSingle ? (pf ?? customFrom) : undefined,
-      priceTo: !isSingle ? (pt ?? customTo) : undefined,
+      displayPrice: label === 'Tất cả' ? undefined : label,
+      ...params, // tự động spread priceFrom, priceTo, price, isNegotiable
     }));
-
     setActiveModal(null);
   };
 
@@ -120,7 +104,7 @@ export default function FilterBar() {
     }));
     setActiveModal(null);
   };
-  
+
   useEffect(() => {
     if (!Object.keys(filters).length) return; // nếu filters trống, không push
     const params = new URLSearchParams();
@@ -132,9 +116,17 @@ export default function FilterBar() {
 
   const resetFilters = () => {
     setFilters({
-      // location: 'Toàn quốc',
-      // displayPrice: 'Tất cả',
-      // displayArea: 'Tất cả',
+      displayPrice: undefined,
+      displayArea: undefined,
+      location: undefined,
+      province: undefined,
+      district: undefined,
+      price: undefined,
+      priceFrom: undefined,
+      priceTo: undefined,
+      area: undefined,
+      areaFrom: undefined,
+      areaTo: undefined,
     });
     setActiveModal(null);
   };

@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import CancelBtn from '../../ui/btn/CancelBtn';
 import SubmitBtn from '../../ui/btn/SubmitBtn';
+import { PRICE_RANGES, PriceRange } from '@/constants/priceRanges';
 
 interface PriceModalProps {
   onSelect: (value: string) => void;
@@ -13,20 +14,6 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(20);
   const [selected, setSelected] = useState<string | null>('Tất cả');
-
-  const quickOptions = [
-    { label: 'Tất cả', value: [0, 20] },
-    { label: 'Dưới 1 triệu', value: [0, 1] },
-    { label: '1 - 2 triệu', value: [1, 2] },
-    { label: '2 - 4 triệu', value: [2, 4] },
-    { label: '4 - 6 triệu', value: [4, 6] },
-    { label: '6 - 8 triệu', value: [6, 8] },
-    { label: '8 - 10 triệu', value: [8, 10] },
-    { label: '10 - 15 triệu', value: [10, 15] },
-    { label: '15 - 20 triệu', value: [15, 20] },
-    { label: 'Trên 20 triệu', value: [20, 100] },
-    { label: 'Thoả thuận', value: [0, 0] },
-  ];
 
   // Đóng khi nhấn ESC
   useEffect(() => {
@@ -52,10 +39,13 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
     setSelected(null);
   };
 
-  const handleQuickSelect = (item: (typeof quickOptions)[0]) => {
+  const quickOptions = PRICE_RANGES;
+
+  const handleQuickSelect = (item: PriceRange) => {
     setSelected(item.label);
-    setMin(item.value[0]);
-    setMax(item.value[1]);
+    const [minVal, maxVal] = item.sliderValue;
+    setMin(minVal);
+    setMax(maxVal === 100 ? 20 : maxVal); // nếu >20 thì hiển thị 20+
   };
 
   const handleReset = () => {
