@@ -26,32 +26,44 @@ if (typeof setInterval !== 'undefined') {
 
 export const rentalPostAdminService = {
   async getAll(params?: Record<string, string | number>): Promise<IRentalPostAdmin[]> {
-    // Nếu cache còn hiệu lực 60s thì trả về cache
-    if (cache.data.length > 0 && Date.now() - cache.timestamp < 60_000) {
+    const hasFilter = params && Object.keys(params).length > 0;
+
+    const baseUrl = getServerApiUrl('api/rental-admin-posts');
+
+    // ----- Không dùng cache khi có filter -----
+    if (!hasFilter && cache.data.length > 0 && Date.now() - cache.timestamp < 60_000) {
       return cache.data;
     }
 
-    const baseUrl = getServerApiUrl('api/rental-admin-posts');
+    // ----- Build query -----
     let apiUrl = baseUrl;
 
-    if (params && Object.keys(params).length > 0) {
-      const queryString = Object.entries(params)
-        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
-        .join('&');
-      apiUrl += '?' + queryString;
+    if (hasFilter) {
+      const query = new URLSearchParams();
+      Object.entries(params!).forEach(([key, value]) => {
+        query.set(key, String(value));
+      });
+      apiUrl += `?${query.toString()}`;
     }
 
-    const res = await fetch(apiUrl, {
-      next: { revalidate: 60 }, // ISR 60s
-    });
+    console.log('>>> CALL API:', apiUrl);
 
-    if (!res.ok) throw new Error(`Fetch lỗi: ${res.status}`);
+    const res = await fetch(apiUrl, { cache: 'no-store' });
+
+    if (!res.ok) {
+      throw new Error(`Fetch lỗi: ${res.status}`);
+    }
 
     const data = await res.json();
-    cache.data = data?.rentalPosts ?? [];
-    cache.timestamp = Date.now();
+    const list = data?.rentalPosts ?? [];
 
-    return cache.data;
+    // ----- Chỉ cache kết quả mặc định -----
+    if (!hasFilter) {
+      cache.data = list;
+      cache.timestamp = Date.now();
+    }
+
+    return list;
   },
 
   async getById(id: string): Promise<IRentalPostAdmin | null> {

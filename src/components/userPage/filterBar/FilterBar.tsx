@@ -2,101 +2,166 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, RefreshCcw } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import PropertyTypeModal from './modals/PropertyTypeModal';
 import LocationModal from './modals/LocationModal';
 import PriceModal from './modals/PriceModal';
 import AreaModal from './modals/AreaModal';
 import FilterResetModal from './modals/FilterResetModal';
+import PropertyTypeModal from './modals/PropertyTypeModal';
 
-export type LocationValue = { province: string; district?: string } | string;
+interface FilterValues {
+  type?: string;
+  province?: string;
+  district?: string;
 
-export interface FilterValues {
-  type: string;
-  location: LocationValue;
-  price: string;
-  area: string;
+  price?: number;
+  priceFrom?: number;
+  priceTo?: number;
+
+  area?: number;
+  areaFrom?: number;
+  areaTo?: number;
+
+  displayPrice?: string;
+  displayArea?: string;
+  location?: string;
 }
 
-interface FilterBarProps {
-  onFilterChange?: (filters: FilterValues) => void; // callback khi bộ lọc thay đổi
-}
-
-export default function FilterBar({ onFilterChange }: FilterBarProps) {
-  const pathname = usePathname();
+export default function FilterBar() {
   const router = useRouter();
-
+  const pathname = usePathname();
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterValues>({
-    type: 'Bất động sản thuê',
-    location: 'Toàn quốc',
-    price: 'Tất cả',
-    area: 'Tất cả',
+    // location: 'Toàn quốc',
+    // displayPrice: 'Tất cả',
+    // displayArea: 'Tất cả',
   });
 
-  // tự động cập nhật "type" khi pathname thay đổi
+  // type riêng, không push lên URL
+  const [typeLabel, setTypeLabel] = useState('Bất động sản thuê');
+
+  // tự động cập nhật type khi pathname thay đổi
   useEffect(() => {
-    let typeLabel = 'Bất động sản thuê';
+    let type = 'Bất động sản thuê';
     switch (pathname) {
       case '/can-ho':
-        typeLabel = 'Căn hộ';
+        type = 'Căn hộ';
         break;
       case '/nha-nguyen-can':
-        typeLabel = 'Nhà nguyên căn';
+        type = 'Nhà nguyên căn';
         break;
       case '/mat-bang':
-        typeLabel = 'Mặt bằng';
+        type = 'Mặt bằng';
         break;
     }
-    setFilters((prev) => ({ ...prev, type: typeLabel }));
+    setTypeLabel(type);
   }, [pathname]);
 
-  // 🧠 emit filters ra ngoài (chuẩn bị cho gọi API)
-  useEffect(() => {
-    if (onFilterChange) {
-      onFilterChange(filters);
-      // 🚀 sau này chỉ cần gọi API tại đây
-      // fetch(`/api/rentals?type=${filters.type}&price=${filters.price}`)
-      //   .then(res => res.json())
-      //   .then(data => console.log(data))
-    }
-  }, [filters, onFilterChange]);
+  const handleSelectType = (val: { title: string; link: string }) => {
+    router.push(val.link); // chuyển trang
+    setActiveModal(null);
+  };
+  const handleSelectPrice = (label: string, customFrom?: number, customTo?: number) => {
+    const map: Record<string, [number | undefined, number | undefined, boolean?]> = {
+      'Tất cả': [undefined, undefined],
+      'Dưới 1 triệu': [undefined, 1, true],
+      '1 - 2 triệu': [1, 2],
+      '2 - 4 triệu': [2, 4],
+      '4 - 6 triệu': [4, 6],
+      '6 - 8 triệu': [6, 8],
+      '8 - 10 triệu': [8, 10],
+      '10 - 15 triệu': [10, 15],
+      '15 - 20 triệu': [15, 20],
+      'Trên 20 triệu': [20, 999],
+      'Thoả thuận': [undefined, undefined, true],
+    };
 
-  // 📦 chọn giá trị từ các modal
-  const handleSelect = (key: keyof FilterValues, value: string | { province: string; district?: string } | { title: string; link: string }) => {
-    if (key === 'type' && typeof value === 'object' && 'link' in value) {
-      setFilters((prev) => ({ ...prev, type: value.title }));
-      router.push(value.link);
-    } else {
-      setFilters((prev) => ({ ...prev, [key]: value }));
-    }
+    const [pf, pt, isSingle] = map[label] ?? [undefined, undefined];
+
+    setFilters((prev) => ({
+      ...prev,
+      displayPrice: label,
+      price: isSingle ? pt : undefined,
+      priceFrom: !isSingle ? (pf ?? customFrom) : undefined,
+      priceTo: !isSingle ? (pt ?? customTo) : undefined,
+    }));
+
     setActiveModal(null);
   };
 
-  // 🔁 reset toàn bộ bộ lọc
-  const resetFilters = () => {
-    const reset = {
-      type: 'Bất động sản thuê',
-      location: 'Toàn quốc',
-      price: 'Tất cả',
-      area: 'Tất cả',
+  const handleSelectArea = (label: string) => {
+    const map: Record<string, [number | undefined, number | undefined]> = {
+      'Tất cả': [undefined, undefined],
+      'Dưới 30m²': [undefined, 30],
+      '30 - 50m²': [30, 50],
+      '50 - 80m²': [50, 80],
+      '80 - 100m²': [80, 100],
+      'Trên 100m²': [100, 999],
     };
-    setFilters(reset);
-    router.push('/can-ho');
+
+    const [af, at] = map[label] ?? [undefined, undefined];
+
+    setFilters((prev) => ({
+      ...prev,
+      displayArea: label,
+      area: af !== undefined && at === undefined ? af : undefined,
+      areaFrom: af !== undefined && at !== undefined ? af : undefined,
+      areaTo: at !== undefined ? at : undefined,
+    }));
+
+    setActiveModal(null);
+  };
+
+  const handleSelectLocation = (v: { province: string; district?: string }) => {
+    setFilters((prev) => ({
+      ...prev,
+      province: v.province || undefined,
+      district: v.district || undefined,
+      location: v.province ? `${v.province}${v.district ? ' - ' + v.district : ''}` : 'Toàn quốc',
+    }));
+    setActiveModal(null);
+  };
+  
+  useEffect(() => {
+    if (!Object.keys(filters).length) return; // nếu filters trống, không push
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v !== undefined) params.set(k, String(v));
+    });
+    router.push(`${pathname}?${params.toString()}`);
+  }, [filters, pathname, router]);
+
+  const resetFilters = () => {
+    setFilters({
+      // location: 'Toàn quốc',
+      // displayPrice: 'Tất cả',
+      // displayArea: 'Tất cả',
+    });
+    setActiveModal(null);
   };
 
   return (
     <div className="w-full bg-primary-lighter p-2 shadow-md">
       <div className="flex w-full flex-row items-center justify-start gap-1.5 overflow-auto scrollbar-hide xl:justify-center">
+        {/* Nút type riêng */}
+        <button className="rounded-[10px] border border-gray-50 bg-white px-2 py-0.5 text-sm leading-4" onClick={() => setActiveModal('type')}>
+          <p className="inline-flex w-[100px] items-center justify-start">
+            <span className="text-xs font-normal text-gray-600">Loại nhà đất</span> <ChevronDown size="14px" />
+          </p>
+          <p className={`w-20 truncate text-start text-sm font-bold text-red-600 xl:w-auto`}>{typeLabel}</p>
+        </button>
+
         {[
-          { key: 'type', label: 'Loại nhà đất' },
           { key: 'location', label: 'Khu vực' },
           { key: 'price', label: 'Khoảng giá' },
           { key: 'area', label: 'Diện tích' },
         ].map(({ key, label }) => {
-          const value = filters[key as keyof FilterValues];
-          const displayValue = typeof value === 'string' ? value : `${value.province}${value.district ? ' - ' + value.district : ''}`;
+          let displayValue = '';
+          if (key === 'price') displayValue = filters.displayPrice ?? 'Tất cả';
+          else if (key === 'area') displayValue = filters.displayArea ?? 'Tất cả';
+          else if (key === 'location') displayValue = filters.location ?? 'Toàn quốc';
+          else displayValue = (filters[key as keyof FilterValues] as string) ?? '';
 
-          const isAll = typeof value === 'string' && value.localeCompare('tất cả', undefined, { sensitivity: 'base' }) === 0;
+          const isAll = !displayValue || displayValue.toLowerCase() === 'tất cả' || displayValue === 'Toàn quốc';
 
           return (
             <button
@@ -120,21 +185,11 @@ export default function FilterBar({ onFilterChange }: FilterBarProps) {
           </p>
         </button>
       </div>
-
-      {/* Modal */}
-      {activeModal === 'type' && <PropertyTypeModal onSelect={(val) => handleSelect('type', val)} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'location' && <LocationModal onSelect={(val) => handleSelect('location', val)} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'price' && <PriceModal onSelect={(val) => handleSelect('price', val)} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'area' && <AreaModal onSelect={(val) => handleSelect('area', val)} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'reset' && (
-        <FilterResetModal
-          onConfirm={() => {
-            resetFilters();
-            setActiveModal(null);
-          }}
-          onClose={() => setActiveModal(null)}
-        />
-      )}
+      {activeModal === 'type' && <PropertyTypeModal onSelect={() => handleSelectType} onClose={() => setActiveModal(null)} />}{' '}
+      {activeModal === 'location' && <LocationModal onSelect={handleSelectLocation} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'price' && <PriceModal onSelect={handleSelectPrice} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'area' && <AreaModal onSelect={handleSelectArea} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'reset' && <FilterResetModal onConfirm={resetFilters} onClose={() => setActiveModal(null)} />}
     </div>
   );
 }

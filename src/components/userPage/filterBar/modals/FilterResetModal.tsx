@@ -36,7 +36,13 @@ export default function FilterResetModal({ onClose, onConfirm }: FilterResetModa
 
         <div className="flex justify-center gap-2">
           <CancelBtn value="Đóng" onClick={onClose} />
-          <SubmitBtn value="Đồng ý" onClick={onConfirm} />
+          <SubmitBtn
+            value="Đồng ý"
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+          />
         </div>
       </div>
     </div>
