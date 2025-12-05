@@ -1,18 +1,29 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
+import { RefreshCcw } from 'lucide-react';
 import CancelBtn from '../../ui/btn/CancelBtn';
 import SubmitBtn from '../../ui/btn/SubmitBtn';
 import { PRICE_RANGES, PriceRange } from '@/constants/priceRanges';
 
+interface PriceOutput {
+  label: string;
+  priceFrom?: number;
+  priceTo?: number;
+}
+
 interface PriceModalProps {
-  onSelect: (value: string) => void;
+  onSelect: (data: PriceOutput) => void;
   onClose: () => void;
 }
 
+// Cấu hình giới hạn thanh trượt
+const MIN_LIMIT = 0;
+const MAX_LIMIT = 1000;
+
 export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const [min, setMin] = useState(0);
-  const [max, setMax] = useState(20);
+  const [min, setMin] = useState(MIN_LIMIT);
+  const [max, setMax] = useState(MAX_LIMIT);
   const [selected, setSelected] = useState<string | null>('Tất cả');
 
   // Đóng khi nhấn ESC
@@ -27,117 +38,173 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) onClose();
   };
 
+  // --- LOGIC SLIDER ---
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Math.min(Number(e.target.value), max - 0.5);
+    const val = Math.min(Number(e.target.value), max - 10); // Giữ khoảng cách tối thiểu 10 đơn vị
     setMin(val);
-    setSelected(null);
+    setSelected(null); // Bỏ highlight preset khi user tự kéo
   };
 
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Math.max(Number(e.target.value), min + 0.5);
+    const val = Math.max(Number(e.target.value), min + 10);
     setMax(val);
-    setSelected(null);
+    setSelected(null); // Bỏ highlight preset khi user tự kéo
   };
 
   const quickOptions = PRICE_RANGES;
 
+  // --- LOGIC CHỌN NHANH (PRESET) ---
   const handleQuickSelect = (item: PriceRange) => {
     setSelected(item.label);
+
+    // Nếu chọn "Tất cả" hoặc item không có min/max -> reset về full range
     const [minVal, maxVal] = item.sliderValue;
-    setMin(minVal);
-    setMax(maxVal === 100 ? 20 : maxVal); // nếu >20 thì hiển thị 20+
+    const newMin = minVal !== undefined ? minVal : MIN_LIMIT;
+    const newMax = maxVal !== undefined ? maxVal : MAX_LIMIT;
+
+    setMin(newMin);
+    setMax(newMax);
   };
 
   const handleReset = () => {
     setSelected('Tất cả');
-    setMin(0);
-    setMax(20);
+    setMin(MIN_LIMIT);
+    setMax(MAX_LIMIT);
   };
 
+  // Tính toán phần trăm
+  const getPercent = (value: number) => Math.round(((value - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT)) * 100);
+
+  // --- LOGIC ÁP DỤNG ---
   const handleApply = () => {
-    if (selected) onSelect(selected);
-    else onSelect(`Từ ${min} - ${max} triệu+`);
+    let finalLabel = selected;
+    const isFullRange = min === MIN_LIMIT && max === MAX_LIMIT;
+
+    // Nếu không chọn preset (activeLabel rỗng), tự sinh label từ slider
+    if (!finalLabel) {
+      if (isFullRange) {
+        finalLabel = 'Tất cả';
+      } else if (min === MIN_LIMIT) {
+        finalLabel = `Dưới ${max} triệu`;
+      } else if (max === MAX_LIMIT) {
+        finalLabel = `Trên ${min} triệu`;
+      } else {
+        finalLabel = `${min} - ${max} triệu`;
+      }
+    }
+
+    // Xác định giá trị gửi đi
+    // Nếu là "Tất cả" -> gửi undefined để BE không filter
+    const isAll = finalLabel === 'Tất cả';
+
+    onSelect({
+      label: finalLabel,
+      // Logic: nếu KHÔNG phải "Tất cả", GỬI min và max (kể cả khi min=0 hoặc max=1000).
+      priceFrom: isAll ? undefined : min, // Sẽ là 0 nếu min=0 và KHÔNG phải "Tất cả"
+      priceTo: isAll ? undefined : max, // Sẽ là 1000 nếu max=1000 và KHÔNG phải "Tất cả"
+    });
+
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3" onClick={handleClickOutside}>
-      <div ref={modalRef} className="w-full max-w-lg rounded-2xl bg-white shadow-xl transition-all">
+      <div ref={modalRef} className="animate-in fade-in zoom-in w-full max-w-lg rounded-2xl bg-white shadow-xl transition-all duration-200">
         {/* Header */}
         <div className="flex items-center justify-between border-b px-4 py-3">
-          <h5 className="text-lg font-semibold text-gray-800">KHOẢNG GIÁ</h5>
-          <button onClick={onClose} className="btn btn-ghost btn-sm text-gray-500 hover:text-gray-700">
+          <h5 className="text-lg font-bold uppercase text-gray-800">KHOẢNG GIÁ</h5>
+          <button onClick={onClose} className="btn btn-ghost btn-sm h-8 w-8 rounded-full p-0 text-gray-500 hover:bg-gray-100">
             ✕
           </button>
         </div>
 
         {/* Body */}
-        <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
-          <div className="mb-3 text-sm text-gray-700">
-            Từ <span className="font-semibold text-blue-600">{min}</span> - <span className="font-semibold text-blue-600">{max}</span> triệu+
+        <div className="max-h-[80vh] overflow-y-auto px-5 py-4">
+          {/* Hiển thị số liệu hiện tại */}
+          <div className="mb-6 flex items-center justify-center gap-2 text-sm text-gray-700">
+            <span>Khoảng giá:</span>
+            <div className="flex items-center font-bold text-blue-600">
+              {min === MIN_LIMIT && max === MAX_LIMIT ? (
+                'Tất cả'
+              ) : (
+                <>
+                  {min} - {max === MAX_LIMIT ? '1000+' : max} triệu
+                </>
+              )}
+            </div>
           </div>
 
-          {/* Slider */}
-          <div className="relative mb-3 h-2 w-full rounded bg-gray-200">
+          {/* --- SLIDER PRICE (Tới 1000) --- */}
+          <div className="relative mb-8 h-2 w-full select-none rounded bg-gray-200">
+            {/* Thanh màu xanh ở giữa */}
+            <div
+              className="absolute top-0 h-2 rounded bg-blue-600"
+              style={{
+                left: `${getPercent(min)}%`,
+                right: `${100 - getPercent(max)}%`,
+              }}
+            ></div>
+
+            {/* Input Slider Min */}
             <input
               type="range"
-              min={0}
-              max={20}
-              step={0.5}
+              min={MIN_LIMIT}
+              max={MAX_LIMIT}
+              step={10}
               value={min}
               onChange={handleMinChange}
-              className="absolute z-20 h-2 w-full cursor-pointer appearance-none bg-transparent"
+              className="pointer-events-none absolute z-20 h-2 w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_4px_6px_rgba(0,0,0,0.1)] [&::-webkit-slider-thumb]:hover:scale-110"
             />
+
+            {/* Input Slider Max */}
             <input
               type="range"
-              min={0}
-              max={20}
-              step={0.5}
+              min={MIN_LIMIT}
+              max={MAX_LIMIT}
+              step={10}
               value={max}
               onChange={handleMaxChange}
-              className="absolute z-30 h-2 w-full cursor-pointer appearance-none bg-transparent"
+              className="pointer-events-none absolute z-30 h-2 w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_4px_6px_rgba(0,0,0,0.1)] [&::-webkit-slider-thumb]:hover:scale-110"
             />
-            <div
-              className="absolute top-0 h-2 rounded bg-blue-500 transition-all"
-              style={{
-                left: `${(min / 20) * 100}%`,
-                right: `${100 - (max / 20) * 100}%`,
-              }}
-            />
+
+            {/* Chỉ số dưới slider */}
+            <div className="absolute top-4 flex w-full justify-between text-xs font-medium text-gray-400">
+              <span>0</span>
+              <span>250</span>
+              <span>500</span>
+              <span>750</span>
+              <span>1000+</span>
+            </div>
           </div>
 
-          <div className="mb-2 flex justify-between text-xs text-gray-500">
-            <span>0</span>
-            <span>20 triệu+</span>
-          </div>
-
-          {/* Quick select */}
-          <div className="mt-4">
-            <p className="mb-2 text-xs font-medium text-gray-500">Chọn nhanh</p>
-            <ul className="grid grid-cols-2 gap-2">
+          {/* --- QUICK SELECT GRID --- */}
+          <div className="mt-6">
+            <p className="mb-3 text-sm font-semibold text-gray-700">Chọn nhanh</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {quickOptions.map((opt) => (
-                <li
+                <button
+                  type="button"
                   key={opt.label}
                   onClick={() => handleQuickSelect(opt)}
-                  className={`cursor-pointer rounded-md border px-3 py-2 text-center text-xs transition-all ${
+                  className={`rounded-lg border px-3 py-2 text-center text-xs font-medium transition-all ${
                     selected === opt.label
-                      ? 'border-blue-500 bg-blue-50 font-medium text-blue-600'
-                      : 'border-gray-200 hover:border-blue-400 hover:text-blue-600'
+                      ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
+                      : 'border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-gray-50'
                   }`}
                 >
                   {opt.label}
-                </li>
+                </button>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t px-5 py-3">
-          <button className="text-sm text-blue-600 hover:underline" onClick={handleReset}>
-            Đặt lại
+        <div className="flex items-center justify-between rounded-b-2xl border-t bg-gray-50 px-5 py-4">
+          <button className="flex items-center gap-1 text-sm font-medium text-gray-500 transition-colors hover:text-gray-800" onClick={handleReset}>
+            <RefreshCcw size={14} className="mb-[1px]" /> Đặt lại
           </button>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <CancelBtn value="Huỷ" onClick={onClose} />
             <SubmitBtn value="Áp dụng" onClick={handleApply} />
           </div>

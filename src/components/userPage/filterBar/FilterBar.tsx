@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, RefreshCcw } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -8,7 +7,7 @@ import PriceModal from './modals/PriceModal';
 import AreaModal from './modals/AreaModal';
 import FilterResetModal from './modals/FilterResetModal';
 import PropertyTypeModal from './modals/PropertyTypeModal';
-import { getPriceParamsFromLabel, PriceRangeKey } from '@/constants/priceRanges';
+// Đã xóa: import { getPriceParamsFromLabel, PriceRangeKey } from '@/constants/priceRanges';
 
 interface FilterValues {
   type?: string;
@@ -21,12 +20,18 @@ interface FilterValues {
 
   area?: number;
   areaFrom?: number;
-  areaTo?: number;
+  areaTo?: number; // Các field hiển thị UI (sẽ bị loại bỏ khỏi URL)
 
-  // Các field hiển thị UI (sẽ bị loại bỏ khỏi URL)
   displayPrice?: string;
   displayArea?: string;
   location?: string;
+}
+
+// Interface của dữ liệu nhận từ PriceModal
+interface PriceOutput {
+  label: string;
+  priceFrom?: number;
+  priceTo?: number;
 }
 
 export default function FilterBar() {
@@ -34,12 +39,10 @@ export default function FilterBar() {
   const pathname = usePathname();
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
-  const [filters, setFilters] = useState<FilterValues>({});
+  const [filters, setFilters] = useState<FilterValues>({}); // type riêng, không push lên URL query param vì nó nằm ở pathname
 
-  // type riêng, không push lên URL query param vì nó nằm ở pathname
-  const [typeLabel, setTypeLabel] = useState('Căn hộ');
+  const [typeLabel, setTypeLabel] = useState('Căn hộ'); // Tự động cập nhật label type khi pathname thay đổi
 
-  // Tự động cập nhật label type khi pathname thay đổi
   useEffect(() => {
     let type = 'Căn hộ';
     switch (pathname) {
@@ -59,42 +62,36 @@ export default function FilterBar() {
   const handleSelectType = (val: { title: string; link: string }) => {
     router.push(val.link);
     setActiveModal(null);
-  };
+  }; // Hàm xử lý khi chọn Giá
+  const handleSelectPrice = (data: PriceOutput) => {
+    const label = data.label; // GIÁ TRỊ PRICEFROM VÀ PRICETO ĐÃ ĐƯỢC TÍNH TOÁN (UNDEFINED KHI BẰNG 0 HOẶC 1000)
 
-  const handleSelectPrice = (label: string) => {
-    const params = getPriceParamsFromLabel(label as PriceRangeKey);
+    const from = data.priceFrom;
+    const to = data.priceTo;
 
     setFilters((prev) => ({
-      ...prev,
-      displayPrice: label === 'Tất cả' ? undefined : label,
-      ...params,
+      ...prev, // Hiển thị UI
+      displayPrice: label === 'Tất cả' ? undefined : label, // Params cho URL: priceFrom sẽ là undefined nếu min = 0
+
+      priceFrom: from,
+      priceTo: to,
+
+      price: undefined,
     }));
     setActiveModal(null);
-  };
+  }; // Hàm xử lý khi chọn Diện tích
 
-  const handleSelectArea = (label: string) => {
-    const map: Record<string, [number | undefined, number | undefined]> = {
-      'Tất cả': [undefined, undefined],
-      'Dưới 30m²': [undefined, 30],
-      '30 - 50m²': [30, 50],
-      '50 - 80m²': [50, 80],
-      '80 - 100m²': [80, 100],
-      'Trên 100m²': [100, 999],
-    };
-
-    const [af, at] = map[label] ?? [undefined, undefined];
-
+  const handleSelectArea = (data: { label: string; from?: number; to?: number }) => {
     setFilters((prev) => ({
       ...prev,
-      displayArea: label,
-      area: af !== undefined && at === undefined ? af : undefined, // Logic cũ của bạn
-      areaFrom: af !== undefined && at !== undefined ? af : undefined,
-      areaTo: at !== undefined ? at : undefined,
+      displayArea: data.label, // areaFrom sẽ là undefined nếu min = 0
+      areaFrom: data.from, // areaTo sẽ là undefined nếu max = 1000
+      areaTo: data.to,
+      area: undefined,
     }));
 
     setActiveModal(null);
-  };
-
+  }; // Hàm xử lý khi chọn Khu vực
   const handleSelectLocation = (v: { province: string; district?: string }) => {
     setFilters((prev) => ({
       ...prev,
@@ -105,38 +102,31 @@ export default function FilterBar() {
     setActiveModal(null);
   };
 
-  // --- PHẦN QUAN TRỌNG ĐÃ SỬA ---
   useEffect(() => {
     // 1. Tạo danh sách các key KHÔNG muốn đưa lên URL
     const excludedKeys: (keyof FilterValues)[] = ['displayPrice', 'displayArea', 'location'];
 
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(); // 2. Duyệt qua các key trong filters với Type Assertion an toàn
 
-    // 2. Duyệt qua các key trong filters với Type Assertion an toàn
     (Object.keys(filters) as Array<keyof FilterValues>).forEach((key) => {
-      const value = filters[key];
-
-      // 3. Chỉ set param nếu:
+      const value = filters[key]; // 3. Chỉ set param nếu:
       // - Key không nằm trong danh sách loại trừ
       // - Value có giá trị (khác undefined, null, rỗng)
+
       if (!excludedKeys.includes(key) && value !== undefined && value !== null && value !== '') {
         params.set(key, String(value));
       }
     });
 
-    const queryString = params.toString();
+    const queryString = params.toString(); // Chỉ push nếu có params hoặc muốn clear params (tùy logic business của bạn)
 
-    // Chỉ push nếu có params hoặc muốn clear params (tùy logic business của bạn)
-    // Ở đây dùng replace để tránh tạo quá nhiều lịch sử back, hoặc push tùy nhu cầu
     if (queryString) {
       router.push(`${pathname}?${queryString}`);
     } else {
-      // Nếu không có params nào (đã reset hết), có thể muốn trả về pathname gốc
+      // Nếu không có params nào (đã reset hết), trả về pathname gốc
       router.push(pathname);
     }
-  }, [filters, pathname, router]);
-  // -----------------------------
-
+  }, [filters, pathname, router]); // -----------------------------
   const resetFilters = () => {
     setFilters({
       displayPrice: undefined,
@@ -164,15 +154,13 @@ export default function FilterBar() {
           </p>
           <p className={`w-20 truncate text-start text-sm font-bold text-red-600 xl:w-auto`}>{typeLabel}</p>
         </button>
-
         {/* Các nút Filter động */}
         {[
           { key: 'location', label: 'Khu vực' },
           { key: 'price', label: 'Khoảng giá' },
           { key: 'area', label: 'Diện tích' },
         ].map(({ key, label }) => {
-          let displayValue = '';
-          // Lấy giá trị hiển thị từ state UI
+          let displayValue = ''; // Lấy giá trị hiển thị từ state UI
           if (key === 'price') displayValue = filters.displayPrice ?? 'Tất cả';
           else if (key === 'area') displayValue = filters.displayArea ?? 'Tất cả';
           else if (key === 'location') displayValue = filters.location ?? 'Toàn quốc';
@@ -194,7 +182,6 @@ export default function FilterBar() {
             </button>
           );
         })}
-
         {/* Nút Reset */}
         <button className="rounded-[10px] border border-gray-50 bg-white px-2 py-0 text-sm font-medium" onClick={() => setActiveModal('reset')}>
           <p className="inline-flex h-10 w-[80px] items-center justify-center gap-1">
@@ -202,7 +189,6 @@ export default function FilterBar() {
           </p>
         </button>
       </div>
-
       {activeModal === 'type' && <PropertyTypeModal onSelect={() => handleSelectType} onClose={() => setActiveModal(null)} />}
       {activeModal === 'location' && <LocationModal onSelect={handleSelectLocation} onClose={() => setActiveModal(null)} />}
       {activeModal === 'price' && <PriceModal onSelect={handleSelectPrice} onClose={() => setActiveModal(null)} />}
