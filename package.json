@@ -63,7 +63,7 @@
     "typescript": "^5.9.3"
   },
   "main": "index.js",
-  "repository": "https://github.com/q-dat/bds.git",
+  "repository": "https://github.com/q-dat/FE-Real-Estate",
   "author": "q-dat <quocdatstore79@gmail.com>",
   "license": "MIT"
 }
