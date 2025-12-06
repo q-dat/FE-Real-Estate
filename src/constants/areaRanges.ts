@@ -14,5 +14,7 @@ export const AREA_RANGES: AreaRange[] = [
   { label: '150 - 200m²', min: 150, max: 200 },
   { label: '200 - 300m²', min: 200, max: 300 },
   { label: '300 - 500m²', min: 300, max: 500 },
-  { label: 'Trên 500m²', min: 500, max: 1000 },
+  { label: '500 - 700m²', min: 500, max: 700 },
+  { label: '700 - 900m²', min: 700, max: 900 },
+  { label: 'Trên 1000m²', min: 1000, max: 9999 },
 ];

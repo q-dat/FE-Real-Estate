@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Button, Input } from 'react-daisyui';
+import { Input } from 'react-daisyui';
 import { BaseLocationModalProps } from './types';
 import CancelBtn from '../../ui/btn/CancelBtn';
 
@@ -71,8 +71,10 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
   const modalRef = useRef<HTMLDivElement>(null);
   const [districts, setDistricts] = useState<District[]>([]);
   const [selectedProvince, setSelectedProvince] = useState<Province | null>(null);
+  const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
   const [filter, setFilter] = useState('');
 
+  // Normalize text: remove accent + lowercase
   const normalizeText = (text: string) =>
     text
       .normalize('NFD')
@@ -80,6 +82,7 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
       .toLowerCase();
 
   useEffect(() => {
+    // Chỉ lấy dữ liệu TPHCM (Mã 79)
     fetch('https://provinces.open-api.vn/api/p/79?depth=2')
       .then((res) => res.json())
       .then((data) => {
@@ -110,49 +113,55 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3" onClick={handleClickOutside}>
-      <div ref={modalRef} className="w-full max-w-lg scale-95 transform rounded-2xl bg-white shadow-xl transition-all duration-200 ease-out">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-2" onClick={handleClickOutside}>
+      <div ref={modalRef} className="animate-in fade-in zoom-in w-full rounded-2xl bg-white shadow-xl transition-all duration-200 xl:w-1/2">
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3">
-          <h5 className="text-lg font-semibold text-gray-800">{selectedProvince ? 'Chọn Quận / Huyện' : 'Chọn Tỉnh / Thành phố'}</h5>
-          <button onClick={onClose} className="btn btn-ghost btn-sm text-gray-500 hover:text-gray-700">
+        <div className="flex items-center justify-between border-b p-2">
+          <h5 className="text-lg font-bold uppercase text-gray-800">CHỌN QUẬN / HUYỆN</h5>
+          <button onClick={onClose} className="btn btn-ghost btn-sm h-8 w-8 rounded-full p-0 text-gray-500 hover:bg-gray-100">
             ✕
           </button>
         </div>
 
         {/* Body */}
-        <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
+        <div className="overflow-y-auto p-2">
           <Input
-            placeholder={selectedProvince ? 'Tìm kiếm quận/huyện' : 'Tìm kiếm tỉnh/thành phố'}
-            className="mb-4 w-full"
+            autoFocus
+            type="text"
+            placeholder="Tìm kiếm quận/huyện"
+            className="mb-4 w-full rounded-lg focus:outline-none focus:ring-opacity-50"
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(e) => {
+              setFilter(e.target.value);
+              setSelectedDistrict(null); // Reset chọn khi tìm kiếm
+            }}
           />
 
-          {!selectedProvince ? (
-            <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto pr-1">
-              {filteredDistricts.map((item) => (
-                <Button key={item.code} size="sm" className="justify-center text-xs" onClick={() => handleSelectDistrict(item)}>
-                  {item.name}
-                </Button>
-              ))}
-            </div>
-          ) : (
-            <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto pr-1">
-              {filteredDistricts.map((item) => (
-                <Button key={item.code} size="sm" className="justify-center text-xs" onClick={() => handleSelectDistrict(item)}>
-                  {item.name}
-                </Button>
-              ))}
-            </div>
-          )}
+          {/* Danh sách Quận/Huyện */}
+          <div className="grid max-h-[60vh] grid-cols-2 gap-2 overflow-y-auto scrollbar-hide xl:grid-cols-5">
+            {filteredDistricts.map((item) => (
+              <button
+                type="button"
+                key={item.code}
+                onClick={() => handleSelectDistrict(item)}
+                className={`rounded-lg border px-3 py-2 text-center text-xs font-medium transition-all duration-150 ${
+                  selectedDistrict?.code === item.code
+                    ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
+                    : 'border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-gray-50'
+                }`}
+              >
+                {item.name}
+              </button>
+            ))}
+            {filteredDistricts.length === 0 && <p className="col-span-2 mt-4 text-center text-sm text-gray-500">Không tìm thấy kết quả.</p>}
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t px-5 py-3">
+        <div className="flex items-center justify-between rounded-b-2xl border-t bg-primary px-5 py-3">
           {selectedProvince && (
             <span
-              className="cursor-pointer text-sm text-blue-600 hover:underline"
+              className="cursor-pointer text-sm text-white hover:underline"
               onClick={() => {
                 setSelectedProvince(null);
                 setDistricts([]);

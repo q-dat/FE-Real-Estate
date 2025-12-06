@@ -39,7 +39,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
           </motion.h1>
 
           <div className="grid w-full grid-cols-2 items-center justify-center gap-4 md:grid-cols-4">
-            {/* --- Giá --- */}
+            {/* Giá */}
             <div className="col-span-full">
               <InfoChip
                 className="text-2xl font-black text-price xl:text-xl"
@@ -48,7 +48,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
               />
             </div>
 
-            {/* --- Các InfoChip còn lại --- */}
+            {/* Các InfoChip còn lại */}
             {[
               { icon: <FaExpand size={16} className="text-primary" />, label: `${post?.area}m²` },
               { icon: <FaOrcid size={16} className="text-primary" />, label: `${post?.code}` },

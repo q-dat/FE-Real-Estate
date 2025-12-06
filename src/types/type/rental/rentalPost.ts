@@ -8,7 +8,7 @@ export interface IRentalPost {
   _id: string; // id bài đăng (ObjectId)
   code: string; // mã bài đăng ngắn (vd: "POST-17234")
 
-  /** -------------------- THÔNG TIN CƠ BẢN -------------------- */
+  /** THÔNG TIN CƠ BẢN */
   title: string; // tiêu đề bài đăng
   description: string; // mô tả chi tiết nội dung bài đăng
 
@@ -23,7 +23,7 @@ export interface IRentalPost {
   ward?: string; // phường/xã
   address: string; // địa chỉ cụ thể
 
-  /** -------------------- HÌNH ẢNH & VIDEO -------------------- */
+  /** HÌNH ẢNH & VIDEO */
   images: string[]; // danh sách ảnh
   amenities?: string[]; // tiện ích đi kèm (vd: máy lạnh, chỗ để xe,...)
 
@@ -31,13 +31,13 @@ export interface IRentalPost {
   videoTitle?: string; // tiêu đề video minh họa
   videoDescription?: string; // mô tả ngắn cho video
 
-  /** -------------------- TRẠNG THÁI & LOẠI TIN -------------------- */
+  /** TRẠNG THÁI & LOẠI TIN */
   postType: 'basic' | 'vip1' | 'vip2' | 'vip3' | 'highlight'; // loại tin (ảnh hưởng hiển thị)
   fastRent: 0 | 1; // Thuê nhanh (0 = tắt, 1 = bật)
   status: 'active' | 'pending' | 'expired' | 'hidden'; // trạng thái tin
   isApproved: boolean; // tin đã được admin duyệt chưa
 
-  /** -------------------- GÓI ĐĂNG TIN -------------------- */
+  /** GÓI ĐĂNG TIN */
   postPackage: {
     packageName: 'Tin thường' | 'VIP1' | 'VIP2' | 'VIP3'; // tên gói
     pricePerDay: number; // giá mỗi ngày (VNĐ)
@@ -48,7 +48,7 @@ export interface IRentalPost {
     autoExtend?: boolean; // có bật gia hạn tự động không
   };
 
-  /** -------------------- ĐẨY TIN TỰ ĐỘNG -------------------- */
+  /** ĐẨY TIN TỰ ĐỘNG */
   autoBoost?: {
     enabled: boolean; // true = bật tự động đẩy tin
     intervalHours: number; // ví dụ: 7h/lần
@@ -56,14 +56,14 @@ export interface IRentalPost {
     nextBoostAt?: string; // thời điểm dự kiến đẩy tiếp
   };
 
-  /** -------------------- THỐNG KÊ & TƯƠNG TÁC -------------------- */
+  /** THỐNG KÊ & TƯƠNG TÁC */
   views: number; // số lượt xem
   favoritesCount: number; // số lượt yêu thích
 
-  /** -------------------- THÔNG TIN NGƯỜI ĐĂNG -------------------- */
+  /** THÔNG TIN NGƯỜI ĐĂNG */
   author: IRentalAuthor; // người đăng tin
 
-  /** -------------------- THỜI GIAN & QUẢN TRỊ -------------------- */
+  /** THỜI GIAN & QUẢN TRỊ */
   expiredAt?: string; // ngày hết hạn tin
   adminNote?: string; // ghi chú nội bộ cho admin
   createdAt: string; // ngày tạo tin

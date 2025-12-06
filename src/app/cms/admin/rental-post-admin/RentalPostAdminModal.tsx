@@ -101,7 +101,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   useEscClose(open, onClose);
 
   // Load dữ liệu khi chỉnh sửa
-  // --- Khi editingPost thay đổi ---
+  // Khi editingPost thay đổi
   useEffect(() => {
     if (!editingPost) return;
 
@@ -118,7 +118,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
     setAdminPreviewUrls(editingPost.adminImages || []);
   }, [editingPost, reset]);
 
-  // --- Khi provinces đã load và có editingPost ---
+  // Khi provinces đã load và có editingPost
   useEffect(() => {
     if (!editingPost || provinces.length === 0) return;
 
@@ -128,7 +128,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
     }
   }, [editingPost, provinces]);
 
-  // --- Khi districts đã load và có editingPost ---
+  // Khi districts đã load và có editingPost
   useEffect(() => {
     if (!editingPost || districts.length === 0) return;
 
@@ -138,7 +138,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
     }
   }, [editingPost, districts]);
 
-  // --- Khi wards đã load và có editingPost ---
+  // Khi wards đã load và có editingPost
   useEffect(() => {
     if (!editingPost || wards.length === 0) return;
 
@@ -250,7 +250,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     {...register('category', { required: true })}
                     className="select select-bordered w-full bg-primary text-center text-sm font-bold text-white hover:bg-white hover:text-primary focus:outline-none"
                   >
-                    <option value="">-- DANH MỤC BÀI ĐĂNG --</option>
+                    <option value=""> DANH MỤC BÀI ĐĂNG </option>
                     {categories.map((c) => (
                       <option key={c._id} value={c._id}>
                         {c.name}
@@ -466,7 +466,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     }}
                     className="select select-bordered w-full focus:outline-none"
                   >
-                    <option value="">-- Chọn Tỉnh / Thành phố --</option>
+                    <option value=""> Chọn Tỉnh / Thành phố </option>
                     {provinces.map((p) => (
                       <option key={p.code} value={p.code}>
                         {p.name}
@@ -491,7 +491,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     disabled={!districts.length}
                     className="select select-bordered w-full focus:outline-none"
                   >
-                    <option value="">-- Chọn Quận / Huyện --</option>
+                    <option value=""> Chọn Quận / Huyện </option>
                     {districts.map((d) => (
                       <option key={d.code} value={d.code}>
                         {d.name}
@@ -514,7 +514,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     disabled={!wards.length}
                     className="select select-bordered w-full focus:outline-none"
                   >
-                    <option value="">-- Chọn Phường / Xã --</option>
+                    <option value=""> Chọn Phường / Xã </option>
                     {wards.map((w) => (
                       <option key={w.code} value={w.code}>
                         {w.name}

@@ -38,7 +38,7 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) onClose();
   };
 
-  // --- LOGIC SLIDER ---
+  // LOGIC SLIDER
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = Math.min(Number(e.target.value), max - 10); // Giữ khoảng cách tối thiểu 10 đơn vị
     setMin(val);
@@ -53,7 +53,7 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
 
   const quickOptions = PRICE_RANGES;
 
-  // --- LOGIC CHỌN NHANH (PRESET) ---
+  // LOGIC CHỌN NHANH (PRESET)
   const handleQuickSelect = (item: PriceRange) => {
     setSelected(item.label);
 
@@ -75,7 +75,7 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
   // Tính toán phần trăm
   const getPercent = (value: number) => Math.round(((value - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT)) * 100);
 
-  // --- LOGIC ÁP DỤNG ---
+  // LOGIC ÁP DỤNG
   const handleApply = () => {
     let finalLabel = selected;
     const isFullRange = min === MIN_LIMIT && max === MAX_LIMIT;
@@ -108,10 +108,10 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3" onClick={handleClickOutside}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-2" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in w-full max-w-lg rounded-2xl bg-white shadow-xl transition-all duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3">
+        <div className="flex items-center justify-between border-b p-2">
           <h5 className="text-lg font-bold uppercase text-gray-800">KHOẢNG GIÁ</h5>
           <button onClick={onClose} className="btn btn-ghost btn-sm h-8 w-8 rounded-full p-0 text-gray-500 hover:bg-gray-100">
             ✕
@@ -119,7 +119,7 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
         </div>
 
         {/* Body */}
-        <div className="max-h-[80vh] overflow-y-auto px-5 py-4">
+        <div className="overflow-y-auto p-2">
           {/* Hiển thị số liệu hiện tại */}
           <div className="mb-6 flex items-center justify-center gap-2 text-sm text-gray-700">
             <span>Khoảng giá:</span>
@@ -128,13 +128,13 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
                 'Tất cả'
               ) : (
                 <>
-                  {min} - {max === MAX_LIMIT ? '1000+' : max} triệu
+                  {min} - {max === MAX_LIMIT ? '1000+' : max}
                 </>
               )}
             </div>
           </div>
 
-          {/* --- SLIDER PRICE (Tới 1000) --- */}
+          {/* SLIDER PRICE (Tới 1000) */}
           <div className="relative mb-8 h-2 w-full select-none rounded bg-gray-200">
             {/* Thanh màu xanh ở giữa */}
             <div
@@ -177,7 +177,7 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
             </div>
           </div>
 
-          {/* --- QUICK SELECT GRID --- */}
+          {/* QUICK SELECT GRID */}
           <div className="mt-6">
             <p className="mb-3 text-sm font-semibold text-gray-700">Chọn nhanh</p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -200,8 +200,8 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between rounded-b-2xl border-t bg-gray-50 px-5 py-4">
-          <button className="flex items-center gap-1 text-sm font-medium text-gray-500 transition-colors hover:text-gray-800" onClick={handleReset}>
+        <div className="flex items-center justify-between rounded-b-2xl border-t bg-primary px-5 py-4">
+          <button className="flex items-center gap-1 text-sm font-medium text-white transition-colors xl:hover:scale-105" onClick={handleReset}>
             <RefreshCcw size={14} className="mb-[1px]" /> Đặt lại
           </button>
           <div className="flex gap-3">

@@ -28,8 +28,7 @@ export interface PriceRange {
   };
 }
 
-// Giả định MAX_SLIDER_LIMIT là 500 (vì mức Trên 500 là max)
-const MAX_SLIDER_LIMIT = 500;
+const MAX_SLIDER_LIMIT = 1000;
 
 export const PRICE_RANGES: PriceRange[] = [
   {
@@ -77,7 +76,6 @@ export const PRICE_RANGES: PriceRange[] = [
     sliderValue: [15, 20],
     apiParams: { priceFrom: 15, priceTo: 20 },
   },
-  // --- MỨC GIÁ MỚI THÊM VÀO ---
   {
     label: '20 - 30',
     sliderValue: [20, 30],
@@ -95,14 +93,14 @@ export const PRICE_RANGES: PriceRange[] = [
   },
   {
     label: '100 - 500',
-    sliderValue: [100, MAX_SLIDER_LIMIT], // Sử dụng MAX_SLIDER_LIMIT = 500
+    sliderValue: [100, 500],
     apiParams: { priceFrom: 100, priceTo: 500 },
   },
-  // --- MỨC CUỐI CÙNG CẬP NHẬT ---
+  // MỨC CUỐI CÙNG CẬP NHẬT
   {
     label: 'Trên 500',
-    sliderValue: [MAX_SLIDER_LIMIT, MAX_SLIDER_LIMIT],
-    apiParams: { priceFrom: 500 }, // Chỉ cần priceFrom: 500
+    sliderValue: [500, MAX_SLIDER_LIMIT],
+    apiParams: { priceFrom: 500 },
   },
   {
     label: 'Thoả thuận',

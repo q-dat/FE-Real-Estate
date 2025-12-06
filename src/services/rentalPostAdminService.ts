@@ -12,7 +12,7 @@ const cache: CacheEntry = {
   timestamp: 0,
 };
 
-// --- Cleanup cache cũ (>5 phút) mỗi 1 phút ---
+//  Cleanup cache cũ (>5 phút) mỗi 1 phút
 const CACHE_CLEANUP_INTERVAL = 60_000; // 1 phút
 const CACHE_MAX_AGE = 5 * 60_000; // 5 phút
 if (typeof setInterval !== 'undefined') {
@@ -30,12 +30,12 @@ export const rentalPostAdminService = {
 
     const baseUrl = getServerApiUrl('api/rental-admin-posts');
 
-    // ----- Không dùng cache khi có filter -----
+    //  Không dùng cache khi có filter
     if (!hasFilter && cache.data.length > 0 && Date.now() - cache.timestamp < 60_000) {
       return cache.data;
     }
 
-    // ----- Build query -----
+    //  Build query
     let apiUrl = baseUrl;
 
     if (hasFilter) {
@@ -46,8 +46,6 @@ export const rentalPostAdminService = {
       apiUrl += `?${query.toString()}`;
     }
 
-    console.log('>>> CALL API:', apiUrl);
-
     const res = await fetch(apiUrl, { cache: 'no-store' });
 
     if (!res.ok) {
@@ -57,7 +55,7 @@ export const rentalPostAdminService = {
     const data = await res.json();
     const list = data?.rentalPosts ?? [];
 
-    // ----- Chỉ cache kết quả mặc định -----
+    //  Chỉ cache kết quả mặc định
     if (!hasFilter) {
       cache.data = list;
       cache.timestamp = Date.now();
