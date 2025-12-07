@@ -138,9 +138,11 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
             <div className="flex flex-col">
               <p className="whitespace-nowrap text-xs">
                 <span className="font-semibold uppercase tracking-wider text-slate-400">Diện tích:</span>
-                <span className="px-1 font-bold text-black">
-                  ({post.length}X {post.width})
-                </span>
+                {post.length && post.width && (
+                  <span className="px-1 font-bold text-black">
+                    ({post.length} x {post.width})
+                  </span>
+                )}
               </p>
 
               <div className="flex items-baseline gap-1 text-slate-700">
