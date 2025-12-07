@@ -201,7 +201,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
           <motion.div
             key="modal"
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full overflow-hidden rounded-md border-8 border-white bg-white shadow-xl xl:max-w-[80vw]"
+            className="relative w-full overflow-hidden rounded-md border-8 border-white bg-white shadow-xl xl:max-w-[90vw]"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -233,7 +233,11 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
             {/* Form */}
             <div className="relative max-h-[80vh] overflow-y-auto border-2 border-white scrollbar-hide">
-              <form id="rental-post-form" onSubmit={handleSubmit(handleFormSubmit)} className="mt-4 grid gap-x-1 gap-y-4 xl:grid-cols-2">
+              <form
+                id="rental-post-form"
+                onSubmit={handleSubmit(handleFormSubmit)}
+                className="mt-4 grid gap-x-1 gap-y-4 xl:grid-cols-2 2xl:grid-cols-3"
+              >
                 <div className="col-span-full">
                   <InputForm
                     autoFocus
