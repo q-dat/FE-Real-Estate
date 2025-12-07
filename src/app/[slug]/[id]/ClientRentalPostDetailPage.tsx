@@ -1,325 +1,385 @@
 'use client';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { useMemo } from 'react';
-import { FaListUl, FaExpand, FaOrcid, FaRulerCombined, FaPhone } from 'react-icons/fa';
-import { Button, Card } from 'react-daisyui';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-import { IoPricetagsSharp } from 'react-icons/io5';
-import { MdOutlineUpdate } from 'react-icons/md';
-import { SiGooglemaps } from 'react-icons/si';
-import { GiCutDiamond } from 'react-icons/gi';
 import Link from 'next/link';
-import { Space } from '@/components/userPage/ui/space/Space';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { useMemo } from 'react';
+import { FaPhone, FaBed, FaShower, FaHeart, FaRegHeart, FaRulerHorizontal, FaRulerVertical, FaTools, FaCheckCircle, FaClock } from 'react-icons/fa';
+import { Button, Divider, Badge } from 'react-daisyui';
+import { IoShareSocial } from 'react-icons/io5';
+import { GiHouse, GiPencilRuler, GiStarsStack } from 'react-icons/gi';
+import { BsBuildingFillUp } from 'react-icons/bs';
+import { SiGooglemaps } from 'react-icons/si';
 import { images } from '../../../../public/images';
+
+// Import Types & Components
+import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import { PropertyGallery } from './PropertyGallery';
+import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 
 interface Props {
   post: IRentalPostAdmin;
 }
 
+// --- UTILS ---
+const formatPhoneNumber = (phone?: string) => {
+  if (!phone) return '';
+  return phone.replace(/^(\d{4})(\d+)/, (_, first, rest) => {
+    const chunks = rest.match(/.{1,3}/g);
+    return chunks ? `${first}.${chunks.join('.')}` : phone;
+  });
+};
+
+const getStatusColor = (type: IRentalPostAdmin['postType']) => {
+  switch (type) {
+    case 'highlight':
+      return 'error'; // Đỏ
+    case 'vip1':
+      return 'warning'; // Vàng
+    case 'vip2':
+      return 'accent'; // Cam/Xanh lơ
+    case 'vip3':
+      return 'info'; // Xanh dương
+    default:
+      return 'ghost'; // Xám
+  }
+};
+
+const getStatusLabel = (status: IRentalPostAdmin['postType']): string => {
+  const map: Record<string, string> = {
+    basic: 'Tin thường',
+    vip1: 'Vip 1',
+    vip2: 'Vip 2',
+    vip3: 'Vip 3',
+    highlight: 'Nổi bật',
+  };
+  return map[status] || 'Tin đăng';
+};
+
+// --- SUB COMPONENTS ---
+
+// 1. New Modern Header Component
+const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
+  return (
+    <div className="mb-6">
+      {/* Top Meta: Badges & Code */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Badge color={getStatusColor(post.postType)} className="font-bold text-white shadow-sm">
+            {post.postType === 'highlight' && <GiStarsStack className="mr-1" />}
+            {getStatusLabel(post.postType)}
+          </Badge>
+          <Badge variant="outline" className="border-neutral-300 text-neutral-500">
+            #{post.code}
+          </Badge>
+          <span className="flex items-center text-xs text-neutral-400">
+            <FaClock className="mr-1" />
+            {new Date(post.updatedAt).toLocaleDateString('vi-VN')}
+          </span>
+        </div>
+        <div className="hidden sm:block">
+          <Button size="sm" shape="circle" className="text-blue-600 hover:scale-125">
+            <IoShareSocial size={20} />
+          </Button>
+        </div>
+      </div>
+
+      {/* Title */}
+      <motion.h1
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-2xl font-extrabold leading-tight text-slate-800 xl:text-3xl"
+      >
+        {post.title}
+      </motion.h1>
+
+      {/* Address */}
+      <div className="flex w-full flex-wrap items-start justify-between gap-3 text-sm font-medium xl:text-xl">
+        {/*  */}
+        <p className="flex-1 break-words text-gray-600">
+          <b className="mr-2 text-gray-800">Địa chỉ:</b>
+          <span className="text-primary">{post?.address}</span>
+        </p>
+
+        {/*  */}
+        <Link
+          href="#map"
+          onClick={(e) => {
+            e.preventDefault();
+            document.querySelector('#map')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-primary-lighter bg-white px-2 py-0.5 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary/10 hover:text-primary"
+        >
+          <SiGooglemaps className="text-green-700" size={16} />
+          Xem bản đồ
+        </Link>
+      </div>
+
+      <Divider className="my-2" />
+
+      {/* Price & Area Section */}
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100 p-5 shadow-sm">
+        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+          {/* Price - Highlighted */}
+          <div className="flex w-full flex-col items-center xl:items-start">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Mức giá</span>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 200 }}
+              className="flex items-baseline gap-1"
+            >
+              <span className="bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-5xl font-black text-transparent">{post.price}</span>
+              <span className="text-xl font-bold text-red-500">{post.priceUnit}</span>
+            </motion.div>
+          </div>
+
+          <div className="flex w-full flex-row items-start justify-between gap-10 xl:items-center">
+            {/* Area - Secondary */}
+            <div className="flex flex-col">
+              <p className="whitespace-nowrap text-xs">
+                <span className="font-semibold uppercase tracking-wider text-slate-400">Diện tích:</span>
+                <span className="px-1 font-bold text-black">
+                  ({post.length}X {post.width})
+                </span>
+              </p>
+
+              <div className="flex items-baseline gap-1 text-slate-700">
+                <span className="text-3xl font-bold">{post.area}</span>
+                <span className="text-lg font-medium">m²</span>
+              </div>
+            </div>
+
+            {/* Price per m2 (Optional calculation) */}
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Đơn giá</span>
+              <div className="text-lg font-semibold text-slate-600">
+                {post.area > 0 && post.price > 0 ? `~ ${((post.price * (post.priceUnit === 'Tỷ' ? 1000 : 1)) / post.area).toFixed(1)} Tr/m²` : '—'}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 2. Property Specs Grid (Clean & Minimal)
+const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
+  const specs = [
+    { icon: <BsBuildingFillUp size={20} className="text-blue-500" />, label: 'Số tầng', value: post?.floorNumber },
+    { icon: <FaBed size={20} className="text-blue-500" />, label: 'Phòng ngủ', value: post?.bedroomNumber },
+    { icon: <FaShower size={20} className="text-blue-500" />, label: 'WC/Toilet', value: post?.toiletNumber },
+    { icon: <GiHouse size={20} className="text-blue-500" />, label: 'Loại BĐS', value: post?.propertyType },
+    { icon: <FaRulerHorizontal size={20} className="text-blue-500" />, label: 'Chiều dài', value: post?.length ? `${post.length}m` : null },
+    { icon: <FaRulerVertical size={20} className="text-blue-500" />, label: 'Chiều ngang', value: post?.width ? `${post.width}m` : null },
+    { icon: <FaTools size={20} className="text-blue-500" />, label: 'Nội thất', value: post?.furnitureStatus },
+    { icon: <GiPencilRuler size={20} className="text-blue-500" />, label: 'Pháp lý', value: post?.legalStatus },
+  ];
+
+  const validSpecs = specs.filter((s) => s.value && s.value !== '—' && s.value !== 0);
+
+  if (validSpecs.length === 0) return null;
+
+  return (
+    <div className="mt-8">
+      <h2 className="mb-4 text-lg font-bold text-slate-800">Thông tin chi tiết</h2>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {validSpecs.map((spec, i) => (
+          <div
+            key={i}
+            className="flex flex-col items-center justify-center gap-1 rounded-xl border border-slate-100 bg-slate-50 p-3 transition-colors hover:border-blue-100 hover:bg-blue-50"
+          >
+            {spec.icon}
+            <span className="text-xs text-slate-500">{spec.label}</span>
+            <span className="line-clamp-1 text-center font-bold text-slate-800">{spec.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN PAGE ---
+
 export default function ClientRentalPostDetailPage({ post }: Props) {
   const imagesRental = useMemo(() => post?.images || [], [post?.images]);
   const youtubeId = post?.youtubeLink?.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/)?.[1];
   const encodedAddress = encodeURIComponent(`${post?.address}, ${post?.district}, ${post?.province}`);
+  const isFavorite = false;
+
+  const formattedPhone = useMemo(() => formatPhoneNumber(post?.phoneNumbers), [post?.phoneNumbers]);
 
   return (
-    <main className="bg-white px-2 pt-mobile-padding-top text-black xl:px-desktop-padding xl:pt-desktop-padding-top">
-      <div className="grid w-full grid-cols-1 gap-10 xl:mt-10 xl:grid-cols-3">
-        {/* Left */}
-        <Card className="rounded-lg border border-neutral-200 p-3 shadow-sideBar xl:col-span-2">
-          {/* Title */}
-          <motion.h1
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="mb-4 text-xl font-bold text-blue-800 xl:text-2xl"
-          >
-            {post?.title}
-          </motion.h1>
-
-          <div className="grid w-full grid-cols-2 items-center justify-center gap-4 md:grid-cols-4">
-            {/* Giá */}
-            <div className="col-span-full">
-              <InfoChip
-                className="text-2xl font-black text-price xl:text-xl"
-                icon={<IoPricetagsSharp size={16} className="text-primary" />}
-                label={`${post?.price} ${post?.priceUnit}`}
-              />
+    <main className="w-full px-2 pt-mobile-padding-top xl:pt-desktop-padding-top">
+      <Breadcrumbs label={post.title} />
+      <div className="bg-white text-black xl:px-desktop-padding">
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
+          {/* LEFT COLUMN (Main Content) - 8/12 */}
+          <div className="flex flex-col gap-6 xl:col-span-8">
+            {/* Gallery Wrapper */}
+            <div className="overflow-hidden">
+              {imagesRental.length > 0 ? (
+                <PropertyGallery images={imagesRental} />
+              ) : (
+                <div className="flex aspect-video w-full items-center justify-center bg-neutral-100 text-neutral-400">Chưa có hình ảnh</div>
+              )}
             </div>
 
-            {/* Các InfoChip còn lại */}
-            {[
-              { icon: <FaExpand size={16} className="text-primary" />, label: `${post?.area}m²` },
-              { icon: <FaOrcid size={16} className="text-primary" />, label: `${post?.code}` },
-              {
-                icon: <MdOutlineUpdate size={18} className="text-primary" />,
-                label: new Date(post?.postedAt || post?.createdAt).toLocaleDateString('vi-VN'),
-              },
-              { icon: <GiCutDiamond size={18} className="text-primary" />, label: getStatusLabel(post?.postType) },
-            ].map((info, i) => (
-              <div key={i} className={`flex w-full ${i % 2 === 0 ? 'justify-start xl:justify-center' : 'justify-end xl:justify-center'}`}>
-                <InfoChip className="text-sm font-bold text-default" icon={info.icon} label={info.label} />
-              </div>
-            ))}
-          </div>
+            {/* Main Info Card */}
+            <div className="rounded-none bg-white p-0 md:p-2 xl:rounded-xl">
+              {/* NEW HEADER HERE */}
+              <PropertyHeader post={post} />
 
-          {/* Address */}
-          <div className="mt-5 flex w-full flex-wrap items-start justify-between gap-3 text-sm xl:text-base">
-            {/*  */}
-            <p className="flex-1 break-words text-gray-700">
-              <b className="mr-2 text-gray-800">Địa chỉ:</b>
-              {post?.address}
-            </p>
+              <Divider className="my-2" />
 
-            {/*  */}
-            <Link
-              href="#map"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#map')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-primary-lighter bg-white px-1 py-0.5 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary/10 hover:text-primary"
-            >
-              <SiGooglemaps className="text-green-700" size={16} />
-              Xem bản đồ
-            </Link>
-          </div>
-
-          {/* Space */}
-          <Space />
-
-          {/* Images */}
-          {imagesRental.length > 0 && <PropertyGallery images={imagesRental} />}
-
-          {/* Des */}
-          <div className="bg-neutral-50 p-2 leading-10">
-            <h2 className="mb-3 text-xl font-bold text-black">Thông tin mô tả</h2>
-            {/* Size */}
-            {post?.length && post?.width && (
-              <div className="inline-flex items-center">
-                <FaRulerCombined className="mr-2 text-primary" size={16} />
-                <p className="text-sm sm:text-base">
-                  ( {post?.length}m x {post?.width}m) = <span className="font-semibold">{post?.area} m²</span>
-                </p>
-              </div>
-            )}
-            {/* Adress */}
-            <div>
-              <b>Khu vực:&nbsp;</b>
-              <span className="font-normal text-blue-700">
-                {post?.category.name}&nbsp;{post?.district}
-              </span>
-            </div>
-            {/* Des */}
-            <p className="whitespace-pre-line border-t border-gray-100 pt-3 text-sm leading-relaxed text-gray-800 sm:text-base">
-              {post?.description || 'Chưa có mô tả'}
-            </p>
-          </div>
-
-          {/*  Amenities */}
-          {post?.amenities && (
-            <div className="bg-white p-2 leading-10">
-              <h2 className="text-xl font-bold text-black">Tiện ích</h2>
-              <ul className="my-4 grid grid-cols-2 items-center justify-around gap-3 text-black xl:grid-cols-3 2xl:grid-cols-4">
-                {post?.amenities
-                  ?.split(/[.,\r?\n]+/) // tách theo dấu phẩy, dấu chấm hoặc xuống dòng
-                  .map((a) => a.trim())
-                  .filter(Boolean)
-                  .map((a, i) => (
-                    <li key={i} className="flex items-center space-x-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary"></span>
-                      <span className="rounded-md bg-primary/10 px-2 py-0.5 text-sm font-medium text-primary">{a}</span>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Video */}
-          {youtubeId && (
-            <motion.section
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              className="h-full w-full overflow-hidden"
-            >
-              <div className="aspect-video">
-                <iframe
-                  src={`https://www.youtube.com/embed/${youtubeId}`}
-                  title={post?.videoTitle || post?.title}
-                  allowFullScreen
-                  className="h-full w-full border-0"
+              {/* Description */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-slate-900">Mô tả bất động sản</h2>
+                <div
+                  className="whitespace-pre-line text-base leading-relaxed text-slate-700"
+                  dangerouslySetInnerHTML={{ __html: post?.description?.replace(/\n/g, '<br />') || 'Đang cập nhật...' }}
                 />
               </div>
-            </motion.section>
-          )}
 
-          {/* Space */}
-          <Space />
+              {/* Specs Grid */}
+              <PropertySpecGrid post={post} />
 
-          {/* Post Type Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="w-full rounded-2xl border border-neutral-200 bg-white p-2 shadow-sm"
-          >
-            <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-blue-900">
-              <FaListUl className="text-primary" /> Đặc điểm tin đăng
-            </h2>
+              <Divider className="my-2" />
 
-            <div className="grid grid-cols-1 gap-3 text-sm text-neutral-700 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="flex items-center gap-2">
-                <MdOutlineUpdate className="text-primary" size={16} />
-                <span>
-                  <b>Ngày cập nhật:</b> {new Date(post?.updatedAt || post?.createdAt).toLocaleDateString('vi-VN')}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MdOutlineUpdate className="text-primary" size={16} />
-                <span>
-                  <b>Ngày hết hạn:</b> {new Date(post?.expiredAt || 'Chưa xác định!').toLocaleDateString('vi-VN')}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <IoPricetagsSharp className="text-primary" size={16} />
-                <span>
-                  <b>Loại tin:&nbsp;</b>
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                      post?.postType === 'highlight'
-                        ? 'bg-orange-100 text-orange-700'
-                        : post?.postType === 'vip1'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : post?.postType === 'vip2'
-                            ? 'bg-amber-100 text-amber-700'
-                            : post?.postType === 'vip3'
-                              ? 'bg-red-100 text-red-700'
-                              : 'bg-gray-100 text-gray-700'
-                    } `}
-                  >
-                    {getStatusLabel(post?.postType)}
-                  </span>
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaOrcid className="text-primary" size={16} />
-                <span>
-                  <b>Mã tin:</b> {post?.code}
-                </span>
-              </div>
+              {/* Amenities */}
+              {post?.amenities && (
+                <div className="mb-6">
+                  <h2 className="mb-4 text-lg font-bold text-slate-900">Tiện ích đi kèm</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {post.amenities.split(/[.,\r?\n]+/).map(
+                      (item, idx) =>
+                        item.trim() && (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-green-100 bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700"
+                          >
+                            <FaCheckCircle className="text-xs" /> {item.trim()}
+                          </span>
+                        )
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Video Section */}
+              {youtubeId && (
+                <div className="mb-6">
+                  <h2 className="mb-4 text-lg font-bold text-slate-900">Video giới thiệu</h2>
+                  <div className="aspect-video w-full overflow-hidden rounded-md">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${youtubeId}`}
+                      title={post?.videoTitle || 'Video BĐS'}
+                      allowFullScreen
+                      className="h-full w-full border-0"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Maps */}
+              {post?.address && (
+                <div id="map" className="bg-white">
+                  <div className="p-2">
+                    <h2 className="text-xl font-bold text-black">Vị trí trên bản đồ: </h2>
+                    <span>{post?.address}</span>
+                  </div>
+                  <div className="my-4 overflow-hidden rounded-md">
+                    <iframe
+                      width="100%"
+                      height="400"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      src={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}
+                    ></iframe>
+                  </div>
+                </div>
+              )}
             </div>
-
-            <div className="mt-4 rounded-xl bg-blue-50 p-3 text-sm leading-relaxed text-blue-900">
-              Bạn đang xem nội dung tin đăng <b className="text-blue-700">“{post?.title}”</b>. Mọi thông tin liên quan đến tin đăng này chỉ mang tính
-              chất tham khảo. Nếu bạn có phản hồi (báo xấu, tin đã cho thuê, không liên lạc được,...), vui lòng thông báo để chúng tôi xử lý.
-            </div>
-          </motion.div>
-          {/* Gg Map */}
-          {post?.address && (
-            <div id="map" className="bg-whit">
-              <div className="p-2">
-                <h2 className="text-xl font-bold text-black">Vị trí trên bản đồ: </h2>
-                <span>{post?.address}</span>
-              </div>
-              <div className="my-4 overflow-hidden">
-                <iframe
-                  width="100%"
-                  height="400"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}
-                ></iframe>
-              </div>
-            </div>
-          )}
-        </Card>
-        {/* Right */}
-        <div>
-          {/* Contact */}
-          <div className="rounded-2xl bg-white p-4 shadow-lg">
-            <h2 className="mb-4 text-xl font-bold text-black">Liên hệ nhanh</h2>
-
-            {/* ZaloLink */}
-            {post?.zaloLink ? (
-              <Button
-                fullWidth
-                className="gap-2 rounded-xl bg-white font-medium text-black shadow-md transition-all hover:scale-95 hover:brightness-105"
-                onClick={() => window.open(`https://zalo.me/${post?.zaloLink}`, '_blank')}
-              >
-                <Image src={images.LogoZalo} width={25} height={25} alt="" /> Nhắn Zalo
-              </Button>
-            ) : (
-              <p className="text-neutral-500">Chưa có thông tin liên hệ</p>
-            )}
-
-            {/* PhoneNumbers */}
-            {post?.phoneNumbers &&
-              (() => {
-                const formatPhone = (phone?: string) => {
-                  if (!phone) return '';
-                  // 4 số đầu + . + các nhóm 3 số tiếp theo
-                  return phone.replace(/^(\d{4})(\d+)/, (_, first, rest) => {
-                    return `${first}.${rest.match(/.{1,3}/g)?.join('.')}`;
-                  });
-                };
-
-                const formatted = formatPhone(post.phoneNumbers);
-
-                return (
-                  <a
-                    href={`tel:${post.phoneNumbers}`}
-                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-2xl font-bold text-white shadow-md transition-all hover:scale-95"
-                  >
-                    <FaPhone /> {formatted}
-                  </a>
-                );
-              })()}
           </div>
 
-          {/* Catalog */}
-          <div className="bg-neutral-50 p-6 shadow-md">
-            <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold text-black">
-              <FaListUl /> Danh mục liên quan
-            </h2>
-            <ul className="space-y-2 text-neutral-700">
-              {['Nhà cho thuê', 'Căn hộ mini'].map((cat, i) => (
-                <motion.li key={i} whileHover={{ x: 5 }} className="cursor-pointer transition-colors hover:text-primary">
-                  • {cat}
-                </motion.li>
-              ))}
-            </ul>
+          {/* RIGHT COLUMN (Sidebar) - 4/12 */}
+          <div className="xl:col-span-4">
+            <div className="sticky top-mobile-padding-top flex flex-col gap-3 xl:top-desktop-padding-top">
+              {/* Author/Contact Card */}
+              <div className="space-y-3 rounded-2xl border border-blue-100 bg-white p-2 shadow-xl shadow-blue-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600">
+                    {post.author?.[0] || 'A'}
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-500">Được đăng bởi</p>
+                    <p className="text-lg font-bold text-slate-900">{post.author || 'Môi giới'}</p>
+                  </div>
+                </div>
+
+                {/* Call Action - Formatted Phone */}
+                {post?.phoneNumbers && (
+                  <a
+                    href={`tel:${post.phoneNumbers}`}
+                    className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-xl bg-gradient-to-r from-green-600 to-green-500 py-3.5 text-white shadow-lg transition-all hover:shadow-green-500/30 active:scale-[0.98]"
+                  >
+                    <div className="flex items-center justify-center rounded-full bg-white/20 p-1.5 transition-transform group-hover:rotate-12">
+                      <FaPhone className="h-4 w-4" />
+                    </div>
+                    <span className="text-xl font-bold tracking-wide">{formattedPhone}</span>
+                  </a>
+                )}
+
+                {/* Zalo Action */}
+                {post?.zaloLink && (
+                  <Button
+                    fullWidth
+                    className="gap-2 rounded-xl bg-white font-medium text-black shadow-md transition-all hover:scale-95 hover:brightness-105"
+                    onClick={() => window.open(`https://zalo.me/${post?.zaloLink}`, '_blank')}
+                  >
+                    <Image src={images.LogoZalo} width={25} height={25} alt="" /> Chat Zalo
+                  </Button>
+                )}
+
+                {/* Favorite Action */}
+                <Button
+                  fullWidth
+                  variant="outline"
+                  className={`gap-2 rounded-xl border-slate-200 py-3 font-semibold hover:border-red-200 hover:bg-red-50 hover:text-red-500 ${isFavorite ? 'border-red-200 bg-red-50 text-red-500' : 'text-slate-600'}`}
+                >
+                  {isFavorite ? <FaHeart /> : <FaRegHeart />}
+                  {isFavorite ? 'Đã lưu tin' : 'Lưu tin này'}
+                </Button>
+              </div>
+
+              {/* Safety/Note Card */}
+              <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900">
+                <p className="mb-1 font-bold">Lưu ý an toàn:</p>
+                <p className="opacity-90">
+                  <b>KHÔNG</b> đóng phí trước khi xem nhà. Hãy kiểm tra kỹ giấy tờ pháp lý và xác thực chính chủ trước khi giao dịch.
+                </p>
+              </div>
+
+              {/* Feedback Section */}
+              <div className="rounded-xl border border-base-200 bg-base-100 p-4 text-sm text-base-content">
+                <p className="mb-2 font-semibold">Gửi phản hồi</p>
+                <p className="mb-3 opacity-90">
+                  Nếu cần hỗ trợ hoặc muốn báo cáo thông tin không chính xác, vui lòng liên hệ qua số điện thoại hoặc email dưới đây.
+                </p>
+
+                <div className="space-y-1">
+                  <p className="font-medium">
+                    Số điện thoại: <span className="opacity-80">...</span>
+                  </p>
+                  <p className="font-medium">
+                    Email: <span className="opacity-80">...</span>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </main>
   );
-}
-function InfoChip({ icon, label, className }: { icon: React.ReactNode; label: string; className?: React.ReactNode }) {
-  return (
-    <motion.div whileHover={{ scale: 0.95 }} whileTap={{ scale: 0.98 }} className="relative flex items-center gap-1 text-primary">
-      <span className="flex-shrink-0">{icon}</span>
-      <span className={`tracking-wide ${className}`}>{label}</span>
-
-      {/* Light glow effect */}
-      <span className="absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-transparent via-primary/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-    </motion.div>
-  );
-}
-function getStatusLabel(status: IRentalPostAdmin['postType']): string {
-  switch (status) {
-    case 'basic':
-      return 'Tin thường';
-    case 'vip1':
-      return 'Vip 1';
-    case 'vip2':
-      return 'Vip 2';
-    case 'vip3':
-      return 'Vip 3';
-    case 'highlight':
-      return 'Nổi bật';
-    default:
-      return 'Không xác định';
-  }
 }

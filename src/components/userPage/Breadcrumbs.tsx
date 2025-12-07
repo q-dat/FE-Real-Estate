@@ -8,7 +8,7 @@ interface BreadcrumbsProps {
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ label }) => {
   return (
-    <div className="breadcrumbs px-2 py-4 text-sm text-primary xl:px-desktop-padding xl:py-5">
+    <div className="breadcrumbs overflow-x-auto px-2 py-4 text-sm text-primary scrollbar-hide xl:px-desktop-padding xl:py-5">
       <ul className="font-medium">
         <li>
           <Link href="/">Trang Chủ</Link>

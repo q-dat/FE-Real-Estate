@@ -18,12 +18,12 @@ export function PropertyGallery({ images }: { images: string[] }) {
 
   return (
     <>
-      <section className="my-2">
+      <section className="">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="grid h-[70vh] grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+          className="grid h-[70vh] grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
         >
           {visible.map((src, index) => (
             <motion.div
@@ -65,8 +65,11 @@ export function PropertyGallery({ images }: { images: string[] }) {
         </motion.div>
 
         {!showAll && images.length > 5 && (
-          <div className="mt-2 text-center">
-            <button onClick={() => setShowAll(true)} className="rounded-lg bg-black px-6 py-3 text-white transition hover:scale-105">
+          <div className="mt-2 text-end">
+            <button
+              onClick={() => setShowAll(true)}
+              className="w-full rounded-lg border border-dashed border-primary bg-white p-1 font-semibold text-primary transition hover:bg-primary hover:text-white"
+            >
               Xem tất cả {images.length} ảnh
             </button>
           </div>

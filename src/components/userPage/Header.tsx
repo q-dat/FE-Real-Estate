@@ -41,7 +41,7 @@ export default function Header() {
 
       {/* Desktop Header */}
       <motion.nav
-        className={clsx('fixed left-0 top-0 z-[99999] hidden w-full border-b shadow-sm xl:block', scrolled ? 'bg-primary' : 'bg-primary')}
+        className={clsx('fixed left-0 top-0 z-[999999] hidden w-full border-b shadow-sm xl:block', scrolled ? 'bg-primary' : 'bg-primary')}
         animate={controls}
       >
         <div

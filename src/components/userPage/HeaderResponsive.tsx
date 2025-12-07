@@ -41,7 +41,7 @@ export default function HeaderResponsive() {
   return (
     <header className="relative block xl:hidden">
       {/* Top Header */}
-      <div className="fixed z-[99999] flex h-[60px] w-full items-center justify-between bg-primary px-4 shadow-sm">
+      <div className="fixed z-[999999] flex h-[60px] w-full items-center justify-between bg-primary px-4 shadow-sm">
         {/* <div className="select-none text-lg font-bold text-blue-600">nguonnhagiare.vn</div> */}
         <div>
           <Link href={'/'}>
@@ -82,7 +82,7 @@ export default function HeaderResponsive() {
           <>
             {/* Overlay background */}
             <motion.div
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+              className="fixed inset-0 z-[999999] bg-black/40 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -92,7 +92,7 @@ export default function HeaderResponsive() {
 
             {/* Drawer Menu */}
             <motion.div
-              className="fixed right-0 top-0 z-50 flex h-full w-3/4 max-w-[300px] flex-col bg-white shadow-2xl"
+              className="fixed right-0 top-0 z-[999999] flex h-full w-3/4 max-w-[300px] flex-col bg-white shadow-2xl"
               initial={{ x: '100%' }}
               animate={{
                 x: 0,
@@ -109,10 +109,10 @@ export default function HeaderResponsive() {
               }}
             >
               {/* Header Drawer */}
-              <div className="flex items-center justify-between border-b p-4">
-                <span className="text-lg font-semibold text-gray-800">Menu</span>
+              <div className="flex items-center justify-between border-b bg-primary p-4 text-white">
+                <span className="text-lg font-semibold">Menu</span>
                 <button onClick={toggleMenu}>
-                  <FiX size="24px" className="text-gray-700" />
+                  <FiX size={24} />
                 </button>
               </div>
 
@@ -139,7 +139,7 @@ export default function HeaderResponsive() {
               </motion.nav>
 
               {/* Optional Footer */}
-              <div className="mt-auto border-t p-4 text-sm text-gray-500">© 2025 MyWebsite</div>
+              <div className="mt-auto border-t p-4 text-sm text-gray-500">© 2025 Nguonnhagiare.vn</div>
             </motion.div>
           </>
         )}
