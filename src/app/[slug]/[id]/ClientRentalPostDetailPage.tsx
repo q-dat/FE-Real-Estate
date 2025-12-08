@@ -64,8 +64,8 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
     <div className="mb-6">
       {/* Top Meta: Badges & Code */}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Badge color={getStatusColor(post.postType)} className="font-bold text-white shadow-sm">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge color={getStatusColor(post.postType)} className="font-bold whitespace-nowrap text-white shadow-sm">
             {post.postType === 'highlight' && <GiStarsStack className="mr-1" />}
             {getStatusLabel(post.postType)}
           </Badge>
@@ -77,8 +77,8 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
             {new Date(post.updatedAt).toLocaleDateString('vi-VN')}
           </span>
         </div>
-        <div className="hidden sm:block">
-          <div className="flex items-center justify-center gap-2">
+        <div className="">
+          <div className="flex flex-row items-center justify-center gap-2">
             {/* Share */}
             <Button size="sm" shape="circle" className="text-blue-600 hover:scale-125">
               <IoShareSocial size={20} />
@@ -181,8 +181,8 @@ const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
     { icon: <FaBed size={20} className="text-blue-500" />, label: 'Phòng ngủ', value: post?.bedroomNumber },
     { icon: <FaShower size={20} className="text-blue-500" />, label: 'WC/Toilet', value: post?.toiletNumber },
     { icon: <GiHouse size={20} className="text-blue-500" />, label: 'Loại BĐS', value: post?.propertyType },
-    { icon: <FaRulerHorizontal size={20} className="text-blue-500" />, label: 'Chiều dài', value: post?.length ? `${post.length}m` : null },
-    { icon: <FaRulerVertical size={20} className="text-blue-500" />, label: 'Chiều ngang', value: post?.width ? `${post.width}m` : null },
+    { icon: <FaRulerHorizontal size={20} className="text-blue-500" />, label: 'Chiều ngang', value: post?.width ? `${post.width}m` : null },
+    { icon: <FaRulerVertical size={20} className="text-blue-500" />, label: 'Chiều dài', value: post?.length ? `${post.length}m` : null },
     { icon: <FaTools size={20} className="text-blue-500" />, label: 'Nội thất', value: post?.furnitureStatus },
     { icon: <GiPencilRuler size={20} className="text-blue-500" />, label: 'Pháp lý', value: post?.legalStatus },
   ];
