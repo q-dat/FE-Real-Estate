@@ -20,7 +20,7 @@ interface Props {
   post: IRentalPostAdmin;
 }
 
-// --- UTILS ---
+// UTILS
 const formatPhoneNumber = (phone?: string) => {
   if (!phone) return '';
   return phone.replace(/^(\d{4})(\d+)/, (_, first, rest) => {
@@ -55,7 +55,7 @@ const getStatusLabel = (status: IRentalPostAdmin['postType']): string => {
   return map[status] || 'Tin đăng';
 };
 
-// --- SUB COMPONENTS ---
+// SUB COMPONENTS
 
 // 1. New Modern Header Component
 const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
@@ -138,9 +138,10 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
             <div className="flex flex-col">
               <p className="whitespace-nowrap text-xs">
                 <span className="font-semibold uppercase tracking-wider text-slate-400">Diện tích:</span>
-                {post.length && post.width && (
+                {/* Ngang trước - Dài sau */}
+                {post.width && post.length && (
                   <span className="px-1 font-bold text-black">
-                    ({post.length} x {post.width})
+                    ({post.width} x {post.length})
                   </span>
                 )}
               </p>
@@ -201,7 +202,7 @@ const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
   );
 };
 
-// --- MAIN PAGE ---
+// MAIN PAGE
 
 export default function ClientRentalPostDetailPage({ post }: Props) {
   const imagesRental = useMemo(() => post?.images || [], [post?.images]);
