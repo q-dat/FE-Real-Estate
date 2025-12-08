@@ -8,9 +8,10 @@ interface FavoriteButtonProps {
   post: IRentalPostAdmin;
   className?: string;
   size?: number;
+  color?: string;
 }
 
-export default function FavoriteBtn({ post, className = '', size = 22 }: FavoriteButtonProps) {
+export default function FavoriteBtn({ post, className = '', size = 22, color = 'text-white' }: FavoriteButtonProps) {
   const { favorites, toggleFavorite } = useRentalFavorite();
   const isFavorite = favorites.some((fav) => fav._id === post._id);
 
@@ -28,7 +29,7 @@ export default function FavoriteBtn({ post, className = '', size = 22 }: Favorit
       {isFavorite ? (
         <AiFillHeart size={size} className="text-red-500 drop-shadow-sm" />
       ) : (
-        <AiOutlineHeart size={size} className="text-white group-hover:text-red-500" />
+        <AiOutlineHeart size={size} className={`group-hover:text-red-500 ${color}`} />
       )}
     </motion.button>
   );

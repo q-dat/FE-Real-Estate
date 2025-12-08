@@ -15,6 +15,7 @@ import { images } from '../../../../public/images';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import { PropertyGallery } from './PropertyGallery';
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';
+import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 
 interface Props {
   post: IRentalPostAdmin;
@@ -77,9 +78,16 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
           </span>
         </div>
         <div className="hidden sm:block">
-          <Button size="sm" shape="circle" className="text-blue-600 hover:scale-125">
-            <IoShareSocial size={20} />
-          </Button>
+          <div className="flex items-center justify-center gap-2">
+            {/* Share */}
+            <Button size="sm" shape="circle" className="text-blue-600 hover:scale-125">
+              <IoShareSocial size={20} />
+            </Button>
+            {/* Favorite */}
+            <div className="w-full rounded-full border border-primary">
+              <FavoriteBtn post={post} size={24} color="text-primary" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -203,12 +211,10 @@ const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
 };
 
 // MAIN PAGE
-
 export default function ClientRentalPostDetailPage({ post }: Props) {
   const imagesRental = useMemo(() => post?.images || [], [post?.images]);
   const youtubeId = post?.youtubeLink?.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/)?.[1];
   const encodedAddress = encodeURIComponent(`${post?.address}, ${post?.district}, ${post?.province}`);
-  const isFavorite = false;
 
   const formattedPhone = useMemo(() => formatPhoneNumber(post?.phoneNumbers), [post?.phoneNumbers]);
 
@@ -343,16 +349,6 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                     <Image src={images.LogoZalo} width={25} height={25} alt="" /> Chat Zalo
                   </Button>
                 )}
-
-                {/* Favorite Action */}
-                <Button
-                  fullWidth
-                  variant="outline"
-                  className={`gap-2 rounded-xl border-slate-200 py-3 font-semibold hover:border-red-200 hover:bg-red-50 hover:text-red-500 ${isFavorite ? 'border-red-200 bg-red-50 text-red-500' : 'text-slate-600'}`}
-                >
-                  {isFavorite ? <FaHeart /> : <FaRegHeart />}
-                  {isFavorite ? 'Đã lưu tin' : 'Lưu tin này'}
-                </Button>
               </div>
 
               {/* Safety/Note Card */}
