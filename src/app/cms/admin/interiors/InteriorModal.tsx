@@ -1,19 +1,17 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button } from 'react-daisyui';
 import Image from 'next/image';
-import { MdClose } from 'react-icons/md';
+import { Button } from 'react-daisyui';
+import { IInterior } from '@/types/type/interiors/interiors';
+import { interiorService } from '@/services/interiorsService';
 import InputForm from '@/components/userPage/ui/form/InputForm';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import Zoom from '@/lib/Zoom';
 import { useEscClose } from '@/hooks/useEscClose';
-import { interiorService } from '@/services/interiorsService';
-import { IInterior } from '@/types/type/interiors/interiors';
 
 interface Props {
   open: boolean;
@@ -26,32 +24,46 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
   const { register, handleSubmit, reset } = useForm<IInterior>();
   const [loading, setLoading] = useState(false);
 
-  // File upload
   const [images, setImages] = useState<FileList | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
 
   useEscClose(open, onClose);
 
-  // Load data
   useEffect(() => {
     if (!editingItem) {
-      reset({ name: '', description: '', status: '', images: [] });
+      reset({ name: '', description: '', status: '', images: [], thumbnail: '' });
       setPreviewUrls([]);
+      setThumbnailUrl(null);
       return;
     }
+
+    // safe image array
+    const safeImages = Array.isArray(editingItem.images) ? editingItem.images.filter((x): x is string => typeof x === 'string') : [];
+
+    const safeThumb = typeof editingItem.thumbnail === 'string' ? editingItem.thumbnail : null;
 
     reset({
       name: editingItem.name,
       description: editingItem.description || '',
       status: editingItem.status || '',
-      images: editingItem.images || [],
+      images: safeImages,
+      thumbnail: safeThumb || '',
     });
 
-    setPreviewUrls(editingItem.images || []);
+    setPreviewUrls(safeImages);
+    setThumbnailUrl(safeThumb);
   }, [editingItem, reset]);
 
   const removeImage = (url: string) => {
     setPreviewUrls((prev) => prev.filter((u) => u !== url));
+  };
+
+  const removeThumbnail = () => {
+    setThumbnailUrl(null);
+    setThumbnailFile(null);
   };
 
   const submitHandler: SubmitHandler<IInterior> = async (data) => {
@@ -63,16 +75,18 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
       formData.append('description', data.description || '');
       formData.append('status', data.status || '');
 
-      // Giữ ảnh cũ
-      previewUrls.forEach((existingUrl) => {
-        formData.append('oldImages', existingUrl);
-      });
+      previewUrls.forEach((u) => formData.append('oldImages', u));
 
-      // Ảnh mới
+      if (thumbnailUrl) {
+        formData.append('oldThumbnail', thumbnailUrl);
+      }
+
       if (images) {
-        Array.from(images).forEach((file) => {
-          formData.append('images', file);
-        });
+        Array.from(images).forEach((f) => formData.append('images', f));
+      }
+
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
       }
 
       if (editingItem?._id) {
@@ -83,8 +97,8 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
 
       await reload();
       onClose();
-    } catch (err) {
-      console.error('Interior submit error:', err);
+    } catch (error) {
+      console.error('Submit interior error:', error);
     } finally {
       setLoading(false);
     }
@@ -100,18 +114,18 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="relative w-full overflow-hidden rounded-md border-8 border-white bg-white shadow-xl xl:max-w-[70vw]"
+            className="relative w-full rounded-md border-8 border-white bg-white shadow-xl xl:max-w-[70vw]"
             onClick={(e) => e.stopPropagation()}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 180, damping: 18 }}
+            transition={{ type: 'spring', stiffness: 160, damping: 20 }}
           >
             <div className="flex items-center justify-between border-b bg-white p-3">
               <h3 className="text-lg font-semibold">{editingItem ? 'Chỉnh sửa thiết kế' : 'Thêm thiết kế mới'}</h3>
 
-              <Button onClick={onClose} className="rounded-md bg-red-700 px-2 py-1 text-sm font-semibold text-white hover:bg-red-800">
-                <MdClose size={18} />
+              <Button onClick={onClose} className="rounded-md bg-red-700 px-2 py-1 text-sm font-semibold text-white">
+                Đóng
               </Button>
             </div>
 
@@ -119,15 +133,52 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
               <form id="interior-form" onSubmit={handleSubmit(submitHandler)} className="grid gap-4 xl:grid-cols-2">
                 <InputForm {...register('name', { required: true })} label="Tên thiết kế" placeholder="Nhập tên thiết kế" bordered required />
 
-                <InputForm {...register('status')} label="Trạng thái" placeholder="Trạng thái (tùy chọn)" bordered />
+                <InputForm {...register('status')} label="Trạng thái" placeholder="Trạng thái" bordered />
 
                 <div className="xl:col-span-2">
-                  <TextareaForm {...register('description')} placeholder="Mô tả chi tiết..." />
+                  <TextareaForm {...register('description')} placeholder="Mô tả..." />
                 </div>
 
-                {/* Upload Ảnh */}
+                {/* Thumbnail */}
                 <div className="xl:col-span-2">
-                  <LabelForm title="Ảnh thiết kế" />
+                  <LabelForm title="Thumbnail" />
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      setThumbnailFile(file);
+                      if (file) {
+                        setThumbnailUrl(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="file-input file-input-ghost file-input-primary w-full"
+                  />
+
+                  {thumbnailUrl && (
+                    <div className="mt-3 w-28">
+                      <div className="group relative aspect-square overflow-hidden rounded-xl border border-gray-200">
+                        <Zoom>
+                          <Image src={thumbnailUrl} alt="thumbnail" width={200} height={200} unoptimized className="h-full w-full object-cover" />
+                        </Zoom>
+
+                        <button
+                          type="button"
+                          onClick={removeThumbnail}
+                          className="absolute right-1 top-1 h-6 w-6 rounded-full bg-black/60 text-white opacity-0 transition-all group-hover:opacity-100"
+                        >
+                          X
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Images */}
+                <div className="xl:col-span-2">
+                  <LabelForm title="Ảnh thiết kế (nhiều ảnh)" />
+
                   <input
                     type="file"
                     multiple
@@ -147,9 +198,9 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
                           <button
                             type="button"
                             onClick={() => removeImage(url)}
-                            className="absolute right-1 top-1 h-6 w-6 rounded-full bg-black/60 text-white opacity-0 transition-all group-hover:opacity-100 hover:bg-red-600"
+                            className="absolute right-1 top-1 h-6 w-6 rounded-full bg-black/60 text-white opacity-0 transition-all group-hover:opacity-100"
                           >
-                            <MdClose size={14} />
+                            X
                           </button>
                         </div>
                       ))}
@@ -161,7 +212,7 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
 
             <div className="flex justify-end gap-3 border-t bg-white p-3">
               <CancelBtn value="Hủy" type="button" onClick={onClose} />
-              <Button type="submit" form="interior-form" color="primary" disabled={loading} className="px-4 py-2">
+              <Button type="submit" form="interior-form" color="primary" disabled={loading}>
                 {loading ? 'Đang xử lý...' : editingItem ? 'Cập nhật' : 'Tạo mới'}
               </Button>
             </div>
