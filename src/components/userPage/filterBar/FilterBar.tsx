@@ -97,7 +97,7 @@ export default function FilterBar() {
       ...prev,
       province: v.province || undefined,
       district: v.district || undefined,
-      location: v.province ? `${v.province}${v.district ? ' - ' + v.district : ''}` : 'Toàn quốc',
+      location: v.province ? `${v.province}${v.district ? ' - ' + v.district : ''}` : 'Thành phố Hồ Chí Minh',
     }));
     setActiveModal(null);
   };
@@ -144,16 +144,20 @@ export default function FilterBar() {
     setActiveModal(null);
   };
 
+  const isHideType = pathname.includes('/bat-dong-san-ban');
+
   return (
     <div className="w-full bg-primary-lighter p-2 shadow-md">
       <div className="flex w-full flex-row items-center justify-start gap-1.5 overflow-auto scrollbar-hide xl:justify-center">
         {/* Nút Type */}
-        <button className="rounded-[10px] border border-gray-50 bg-white px-2 py-0.5 text-sm leading-4" onClick={() => setActiveModal('type')}>
-          <p className="inline-flex w-[100px] items-center justify-start">
-            <span className="text-xs font-normal text-gray-600">Loại nhà đất</span> <ChevronDown size="14px" />
-          </p>
-          <p className={`w-20 truncate text-start text-sm font-bold text-red-600 xl:w-auto`}>{typeLabel}</p>
-        </button>
+        {!isHideType && (
+          <button className="rounded-[10px] border border-gray-50 bg-white px-2 py-0.5 text-sm leading-4" onClick={() => setActiveModal('type')}>
+            <p className="inline-flex w-[100px] items-center justify-start">
+              <span className="text-xs font-normal text-gray-600">Loại nhà đất</span> <ChevronDown size="14px" />
+            </p>
+            <p className={`w-20 truncate text-start text-sm font-bold text-red-600 xl:w-auto`}>{typeLabel}</p>
+          </button>
+        )}
         {/* Các nút Filter động */}
         {[
           { key: 'location', label: 'Khu vực' },
@@ -163,9 +167,9 @@ export default function FilterBar() {
           let displayValue = ''; // Lấy giá trị hiển thị từ state UI
           if (key === 'price') displayValue = filters.displayPrice ?? 'Tất cả';
           else if (key === 'area') displayValue = filters.displayArea ?? 'Tất cả';
-          else if (key === 'location') displayValue = filters.location ?? 'Toàn quốc';
+          else if (key === 'location') displayValue = filters.location ?? 'Thành phố Hồ Chí Minh';
 
-          const isAll = !displayValue || displayValue.toLowerCase() === 'tất cả' || displayValue === 'Toàn quốc';
+          const isAll = !displayValue || displayValue.toLowerCase() === 'tất cả' || displayValue === 'Thành phố Hồ Chí Minh';
 
           return (
             <button
