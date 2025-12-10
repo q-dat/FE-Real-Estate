@@ -1,17 +1,20 @@
 'use client';
+
 import { useEffect, useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { AnimatePresence, motion } from 'framer-motion';
-import Image from 'next/image';
 import { Button } from 'react-daisyui';
-import { IInterior } from '@/types/type/interiors/interiors';
-import { interiorService } from '@/services/interiorsService';
+import Image from 'next/image';
+import { FaPlus, FaPen } from 'react-icons/fa';
+import { MdClose } from 'react-icons/md';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { motion, AnimatePresence } from 'framer-motion';
 import InputForm from '@/components/userPage/ui/form/InputForm';
-import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
+import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
-import Zoom from '@/lib/Zoom';
 import { useEscClose } from '@/hooks/useEscClose';
+import Zoom from '@/lib/Zoom';
+import { interiorService } from '@/services/interiorsService';
+import { IInterior } from '@/types/type/interiors/interiors';
 
 interface Props {
   open: boolean;
@@ -22,185 +25,166 @@ interface Props {
 
 export default function InteriorModal({ open, onClose, editingItem, reload }: Props) {
   const { register, handleSubmit, reset } = useForm<IInterior>();
-  const [loading, setLoading] = useState(false);
 
   const [images, setImages] = useState<FileList | null>(null);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
 
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [thumbnails, setThumbnails] = useState<FileList | null>(null);
+  const [previewThumbnails, setPreviewThumbnails] = useState<string[]>([]);
 
   useEscClose(open, onClose);
 
+  /* Khi mở modal để chỉnh sửa */
   useEffect(() => {
     if (!editingItem) {
-      reset({ name: '', description: '', status: '', images: [], thumbnail: '' });
-      setPreviewUrls([]);
-      setThumbnailUrl(null);
+      reset({
+        name: '',
+        description: '',
+        status: '',
+      });
+      setPreviewImages([]);
+      setPreviewThumbnails([]);
       return;
     }
 
-    // safe image array
-    const safeImages = Array.isArray(editingItem.images) ? editingItem.images.filter((x): x is string => typeof x === 'string') : [];
-
-    const safeThumb = typeof editingItem.thumbnail === 'string' ? editingItem.thumbnail : null;
-
     reset({
       name: editingItem.name,
-      description: editingItem.description || '',
-      status: editingItem.status || '',
-      images: safeImages,
-      thumbnail: safeThumb || '',
+      description: editingItem.description,
+      status: editingItem.status,
     });
 
-    setPreviewUrls(safeImages);
-    setThumbnailUrl(safeThumb);
+    setPreviewImages(editingItem.images ? [editingItem.images] : []);
+    setPreviewThumbnails(editingItem.thumbnails || []);
   }, [editingItem, reset]);
 
   const removeImage = (url: string) => {
-    setPreviewUrls((prev) => prev.filter((u) => u !== url));
+    setPreviewImages((prev) => prev.filter((u) => u !== url));
   };
 
-  const removeThumbnail = () => {
-    setThumbnailUrl(null);
-    setThumbnailFile(null);
+  const removeThumbnails = (url: string) => {
+    setPreviewThumbnails((prev) => prev.filter((u) => u !== url));
   };
 
-  const submitHandler: SubmitHandler<IInterior> = async (data) => {
-    try {
-      setLoading(true);
+  const onSubmit: SubmitHandler<IInterior> = async (data) => {
+    const formData = new FormData();
 
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('description', data.description || '');
-      formData.append('status', data.status || '');
+    formData.append('name', data.name);
+    formData.append('description', data.description || '');
+    formData.append('status', data.status || '');
 
-      previewUrls.forEach((u) => formData.append('oldImages', u));
-
-      if (thumbnailUrl) {
-        formData.append('oldThumbnail', thumbnailUrl);
-      }
-
-      if (images) {
-        Array.from(images).forEach((f) => formData.append('images', f));
-      }
-
-      if (thumbnailFile) {
-        formData.append('thumbnail', thumbnailFile);
-      }
-
-      if (editingItem?._id) {
-        await interiorService.update(editingItem._id, formData);
-      } else {
-        await interiorService.create(formData);
-      }
-
-      await reload();
-      onClose();
-    } catch (error) {
-      console.error('Submit interior error:', error);
-    } finally {
-      setLoading(false);
+    if (editingItem?.images && !images) {
+      formData.append('oldImages', editingItem.images);
     }
+
+    if (images) {
+      Array.from(images).forEach((f) => formData.append('images', f));
+      if (editingItem?.images) formData.append('oldImages', editingItem.images);
+    }
+
+    if (editingItem?.thumbnails?.length && !thumbnails) {
+      editingItem.thumbnails.forEach((t) => formData.append('oldThumbnails', t));
+    }
+
+    if (thumbnails) {
+      Array.from(thumbnails).forEach((f) => formData.append('thumbnails', f));
+      editingItem?.thumbnails?.forEach((t) => formData.append('oldThumbnails', t));
+    }
+
+    if (editingItem?._id) await interiorService.update(editingItem._id, formData);
+    else await interiorService.create(formData);
+
+    await reload();
+    onClose();
   };
+
+  const classNameLabel = 'bg-white px-2 font-medium';
 
   return (
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 p-2 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-2 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="relative w-full rounded-md border-8 border-white bg-white shadow-xl xl:max-w-[70vw]"
             onClick={(e) => e.stopPropagation()}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 160, damping: 20 }}
+            className="relative w-full overflow-hidden rounded-md border-8 border-white bg-white shadow-xl xl:max-w-[600px]"
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.9 }}
           >
             <div className="flex items-center justify-between border-b bg-white p-3">
-              <h3 className="text-lg font-semibold">{editingItem ? 'Chỉnh sửa thiết kế' : 'Thêm thiết kế mới'}</h3>
-
-              <Button onClick={onClose} className="rounded-md bg-red-700 px-2 py-1 text-sm font-semibold text-white">
-                Đóng
+              <div className="flex items-center gap-2 font-semibold">
+                {editingItem ? <FaPen /> : <FaPlus />}
+                <span>{editingItem ? 'Chỉnh sửa nội thất' : 'Thêm nội thất'}</span>
+              </div>
+              <Button className="bg-red-700 text-white" onClick={onClose}>
+                <MdClose />
               </Button>
             </div>
 
-            <div className="max-h-[75vh] overflow-y-auto p-3">
-              <form id="interior-form" onSubmit={handleSubmit(submitHandler)} className="grid gap-4 xl:grid-cols-2">
-                <InputForm {...register('name', { required: true })} label="Tên thiết kế" placeholder="Nhập tên thiết kế" bordered required />
+            <div className="max-h-[80vh] overflow-y-auto p-4 scrollbar-hide">
+              <form id="interior-form" onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+                <InputForm
+                  {...register('name', { required: true })}
+                  classNameLabel={classNameLabel}
+                  label="Tên nội thất"
+                  placeholder="Nhập tên nội thất"
+                  bordered
+                />
 
-                <InputForm {...register('status')} label="Trạng thái" placeholder="Trạng thái" bordered />
+                <TextareaForm {...register('description')} placeholder="Mô tả" />
+                <InputForm {...register('status')} classNameLabel={classNameLabel} label="Trạng thái" bordered />
 
-                <div className="xl:col-span-2">
-                  <TextareaForm {...register('description')} placeholder="Mô tả..." />
-                </div>
+                <div>
+                  <LabelForm title="Ảnh chính" />
+                  <input type="file" accept="image/*" onChange={(e) => setImages(e.target.files)} className="file-input file-input-bordered w-full" />
 
-                {/* Thumbnail */}
-                <div className="xl:col-span-2">
-                  <LabelForm title="Thumbnail" />
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0] || null;
-                      setThumbnailFile(file);
-                      if (file) {
-                        setThumbnailUrl(URL.createObjectURL(file));
-                      }
-                    }}
-                    className="file-input file-input-ghost file-input-primary w-full"
-                  />
-
-                  {thumbnailUrl && (
-                    <div className="mt-3 w-28">
-                      <div className="group relative aspect-square overflow-hidden rounded-xl border border-gray-200">
-                        <Zoom>
-                          <Image src={thumbnailUrl} alt="thumbnail" width={200} height={200} unoptimized className="h-full w-full object-cover" />
-                        </Zoom>
-
-                        <button
-                          type="button"
-                          onClick={removeThumbnail}
-                          className="absolute right-1 top-1 h-6 w-6 rounded-full bg-black/60 text-white opacity-0 transition-all group-hover:opacity-100"
-                        >
-                          X
-                        </button>
-                      </div>
+                  {previewImages.length > 0 && (
+                    <div className="mt-3 grid grid-cols-3 gap-3">
+                      {previewImages.map((url, i) => (
+                        <div key={i} className="group relative aspect-square overflow-hidden rounded-md border">
+                          <Zoom>
+                            <Image src={url} alt="preview" fill unoptimized className="object-cover" />
+                          </Zoom>
+                          <button
+                            type="button"
+                            onClick={() => removeImage(url)}
+                            className="absolute right-1 top-1 bg-black/60 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100"
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
 
-                {/* Images */}
-                <div className="xl:col-span-2">
-                  <LabelForm title="Ảnh thiết kế (nhiều ảnh)" />
-
+                <div>
+                  <LabelForm title="Thumbnails" />
                   <input
                     type="file"
-                    multiple
                     accept="image/*"
-                    onChange={(e) => setImages(e.target.files)}
-                    className="file-input file-input-ghost file-input-primary w-full"
+                    multiple
+                    onChange={(e) => setThumbnails(e.target.files)}
+                    className="file-input file-input-bordered w-full"
                   />
 
-                  {previewUrls.length > 0 && (
-                    <div className="mt-3 grid grid-cols-3 gap-3 md:grid-cols-4 xl:grid-cols-8">
-                      {previewUrls.map((url) => (
-                        <div key={url} className="group relative aspect-square overflow-hidden rounded-xl border border-gray-200">
+                  {previewThumbnails.length > 0 && (
+                    <div className="mt-3 grid grid-cols-3 gap-3">
+                      {previewThumbnails.map((url, i) => (
+                        <div key={i} className="group relative aspect-square overflow-hidden rounded-md border">
                           <Zoom>
-                            <Image src={url} alt="preview" width={100} height={100} unoptimized className="h-full w-full object-cover" />
+                            <Image src={url} alt="thumbnails" fill unoptimized className="object-cover" />
                           </Zoom>
-
                           <button
                             type="button"
-                            onClick={() => removeImage(url)}
-                            className="absolute right-1 top-1 h-6 w-6 rounded-full bg-black/60 text-white opacity-0 transition-all group-hover:opacity-100"
+                            onClick={() => removeThumbnails(url)}
+                            className="absolute right-1 top-1 bg-black/60 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100"
                           >
-                            X
+                            Xóa
                           </button>
                         </div>
                       ))}
@@ -208,13 +192,13 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
                   )}
                 </div>
               </form>
-            </div>
 
-            <div className="flex justify-end gap-3 border-t bg-white p-3">
-              <CancelBtn value="Hủy" type="button" onClick={onClose} />
-              <Button type="submit" form="interior-form" color="primary" disabled={loading}>
-                {loading ? 'Đang xử lý...' : editingItem ? 'Cập nhật' : 'Tạo mới'}
-              </Button>
+              <div className="sticky bottom-0 flex justify-end gap-3 border-t bg-white p-3">
+                <CancelBtn value="Hủy" onClick={onClose} type="button" />
+                <Button form="interior-form" type="submit" color="primary" className="px-4">
+                  {editingItem ? 'Cập nhật' : 'Tạo mới'}
+                </Button>
+              </div>
             </div>
           </motion.div>
         </motion.div>

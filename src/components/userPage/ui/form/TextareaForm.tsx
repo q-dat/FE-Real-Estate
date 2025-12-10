@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import { Textarea, TextareaProps } from 'react-daisyui';
 
 interface TextareaFormProps extends TextareaProps {

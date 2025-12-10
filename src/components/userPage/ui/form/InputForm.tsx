@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import { Input, InputProps } from 'react-daisyui';
 
 interface InputFormProps extends InputProps {
