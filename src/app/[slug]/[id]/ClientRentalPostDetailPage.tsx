@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
-import { FaPhone, FaBed, FaShower, FaHeart, FaRegHeart, FaRulerHorizontal, FaRulerVertical, FaTools, FaCheckCircle, FaClock } from 'react-icons/fa';
+import { FaPhone, FaBed, FaShower, FaRulerHorizontal, FaRulerVertical, FaTools, FaCheckCircle, FaClock } from 'react-icons/fa';
 import { Button, Divider, Badge } from 'react-daisyui';
 import { IoShareSocial } from 'react-icons/io5';
 import { GiHouse, GiPencilRuler, GiStarsStack } from 'react-icons/gi';
@@ -13,9 +13,10 @@ import { images } from '../../../../public/images';
 
 // Import Types & Components
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-import { PropertyGallery } from './PropertyGallery';
+import { PropertyGallery } from '../../../components/userPage/rental/detail/PropertyGallery';
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
+import DownloadImagesButton from '@/components/userPage/rental/detail/DownloadImagesButton';
 
 interface Props {
   post: IRentalPostAdmin;
@@ -79,12 +80,16 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
         </div>
         <div className="">
           <div className="flex flex-row items-center justify-center gap-2">
+            <div className="w-full rounded-full border border-primary hover:scale-125">
+              {/* DownloadImages */}
+              <DownloadImagesButton images={post.images} filePrefix={post.code} />
+            </div>
             {/* Share */}
             <Button size="sm" shape="circle" className="text-blue-600 hover:scale-125">
               <IoShareSocial size={20} />
             </Button>
             {/* Favorite */}
-            <div className="w-full rounded-full border border-primary">
+            <div className="w-full rounded-full border border-primary hover:scale-125">
               <FavoriteBtn post={post} size={24} color="text-primary" />
             </div>
           </div>
