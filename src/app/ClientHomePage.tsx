@@ -47,7 +47,7 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
 
             {/* Grid kiểu bản tin BĐS */}
             <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4 xl:gap-3 2xl:grid-cols-5">
-              {section.data.slice(0, 6).map((post) => {
+              {section.data.map((post) => {
                 const thumbnail = post.images?.[0] || `${imageRepresent.Fallback}`;
                 const totalImages = post.images?.length || 0;
                 const slug = slugify(post.title);
@@ -87,8 +87,8 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
                       </h4>
                       <div className="mt-1 flex flex-col items-start justify-between gap-1 xl:flex-row xl:items-center">
                         <div className="text-2xl font-bold text-primary">
-                            {formatCurrency(post.price)} {post.priceUnit}
-                          </div>
+                          {formatCurrency(post.price)} {post.priceUnit}
+                        </div>
 
                         <div className="inline-flex items-center text-sm text-gray-600">
                           <IoMdExpand />
