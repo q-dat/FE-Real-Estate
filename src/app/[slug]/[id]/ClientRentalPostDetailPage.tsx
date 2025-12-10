@@ -65,7 +65,7 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
       {/* Top Meta: Badges & Code */}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge color={getStatusColor(post.postType)} className="font-bold whitespace-nowrap text-white shadow-sm">
+          <Badge color={getStatusColor(post.postType)} className="whitespace-nowrap font-bold text-white shadow-sm">
             {post.postType === 'highlight' && <GiStarsStack className="mr-1" />}
             {getStatusLabel(post.postType)}
           </Badge>
@@ -95,7 +95,7 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
       <motion.h1
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-2xl font-extrabold leading-tight text-slate-800 xl:text-3xl"
+        className="hidden text-2xl font-extrabold leading-tight text-slate-800 xl:block xl:text-3xl"
       >
         {post.title}
       </motion.h1>
@@ -226,6 +226,14 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
           {/* LEFT COLUMN (Main Content) - 8/12 */}
           <div className="flex flex-col gap-6 xl:col-span-8">
             {/* Gallery Wrapper */}
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="block text-2xl font-extrabold leading-tight text-slate-800 xl:hidden xl:text-3xl"
+            >
+              {post.title}
+            </motion.h1>
             <div className="overflow-hidden">
               {imagesRental.length > 0 ? (
                 <PropertyGallery images={imagesRental} />

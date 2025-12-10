@@ -64,7 +64,7 @@ export function PropertyGallery({ images }: { images: string[] }) {
           ))}
         </motion.div>
 
-        {!showAll && images.length > 5 && (
+        {/* {!showAll && images.length > 5 && (
           <div className="mt-2 text-end">
             <button
               onClick={() => setShowAll(true)}
@@ -73,7 +73,7 @@ export function PropertyGallery({ images }: { images: string[] }) {
               Xem tất cả {images.length} ảnh
             </button>
           </div>
-        )}
+        )} */}
       </section>
       <AnimatePresence>{open && <Lightbox images={images} initialIndex={index} onClose={() => setOpen(false)} />}</AnimatePresence>
     </>
