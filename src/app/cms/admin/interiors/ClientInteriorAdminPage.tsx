@@ -1,8 +1,10 @@
 'use client';
+
 import { useState } from 'react';
-import { Button } from 'react-daisyui';
+import { Button, Badge } from 'react-daisyui'; // Thêm Badge
 import Image from 'next/image';
-import { FaPlus, FaPen, FaTrashAlt, FaImages } from 'react-icons/fa';
+import { FaPlus, FaPen, FaTrashAlt, FaImages, FaLayerGroup } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion'; // Thêm animation
 import DeleteModal from '../DeleteModal';
 import { IInterior } from '@/types/type/interiors/interiors';
 import { interiorService } from '@/services/interiorsService';
@@ -39,91 +41,136 @@ export default function ClientInteriorAdminPage({ interiors: initialInteriors, c
     setDeletingId(null);
   };
 
+  // Animation variants
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const itemAnim = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="min-h-screen bg-white px-2 pt-mobile-padding-top text-black xl:px-4 xl:pt-desktop-padding-top">
-      <div className="interiors-center mb-5 mt-10 flex justify-between border-b border-gray-200 pb-3">
-        <h1 className="interiors-center flex gap-2 text-lg font-semibold text-black xl:text-xl">
-          <FaImages className="text-primary" /> Quản lý nội thất
-        </h1>
+    <div className="min-h-screen bg-gray-50/50 px-3 pb-20 pt-mobile-padding-top text-slate-800 xl:px-6 xl:pt-desktop-padding-top">
+      {/* Header Sticky & Glassmorphism */}
+      <div className="sticky top-0 z-30 mb-8 mt-4 flex items-center justify-between rounded-2xl border border-white/50 bg-white/80 px-6 py-4 shadow-sm backdrop-blur-xl transition-all">
+        <div>
+          <h1 className="flex items-center gap-2 text-xl font-bold text-slate-800 xl:text-2xl">
+            <FaLayerGroup className="text-primary" /> Quản lý nội thất
+          </h1>
+          <p className="text-sm text-slate-500">Tổng số: {interiors.length} mẫu thiết kế</p>
+        </div>
+
         <Button
-          size="sm"
-          className="interiors-center flex gap-2 rounded-md bg-primary text-white"
+          color="primary"
+          className="gap-2 rounded-xl shadow-lg shadow-primary/30 hover:scale-105"
           onClick={() => {
             setEditingItem(null);
             setOpenModal(true);
           }}
         >
-          <FaPlus /> Thêm
+          <FaPlus /> <span className="hidden sm:inline">Thêm mới</span>
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      {/* Grid Layout with Animation */}
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+      >
         {interiors.map((it) => {
           const thumbnails = it.thumbnails?.[0] || it.images || '/no-image.png';
+          const thumbCount = it.thumbnails?.length || 0;
+
           return (
-            <div
+            <motion.div
+              variants={itemAnim}
+              key={it._id}
+              layoutId={it._id}
               onClick={() => {
                 setEditingItem(it);
                 setOpenModal(true);
               }}
-              key={it._id}
-              className="group relative flex cursor-pointer flex-col overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10"
             >
-              <div className="relative aspect-[4/3] overflow-hidden">
+              {/* Image Section */}
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                 <Image
                   src={thumbnails}
                   alt={it.name}
-                  width={400}
-                  height={300}
+                  fill
                   unoptimized
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
                 />
-                {it.thumbnails && it.thumbnails.length > 1 && (
-                  <div className="interiors-center absolute right-2 top-2 flex gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] text-white">
-                    <FaImages />
-                    <span>{it.thumbnails.length}</span>
+
+                {/* Overlay Gradient on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                {/* Badges */}
+                <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+                  {it.status && (
+                    <Badge color="ghost" size="sm" className="bg-white/90 text-xs font-semibold shadow-sm backdrop-blur-md">
+                      {it.status}
+                    </Badge>
+                  )}
+                </div>
+
+                {thumbCount > 1 && (
+                  <div className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-md">
+                    <FaImages /> {thumbCount}
                   </div>
                 )}
-              </div>
 
-              <div className="flex flex-1 flex-col justify-between p-3 sm:p-4">
-                <div className="space-y-1">
-                  <h2 className="line-clamp-3 text-[15px] font-semibold text-gray-900 transition-colors duration-200 group-hover:text-primary">
-                    {it.name}
-                  </h2>
-
-                  {it.status && <span className="text-[13px] capitalize text-gray-500">{it.status}</span>}
-                </div>
-
-                <div className="interiors-center mt-3 flex justify-between">
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingItem(it);
-                        setOpenModal(true);
-                      }}
-                      className="rounded-full bg-blue-500 p-2 text-white shadow-md transition-all hover:bg-blue-600 hover:shadow-lg"
-                    >
-                      <FaPen size={12} />
-                    </button>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(it._id);
-                      }}
-                      className="rounded-full bg-rose-500 p-2 text-white shadow-md transition-all hover:bg-rose-600 hover:shadow-lg"
-                    >
-                      <FaTrashAlt size={12} />
-                    </button>
-                  </div>
+                {/* Quick Actions (Show on Hover) */}
+                <div className="absolute bottom-3 right-3 flex translate-y-10 gap-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingItem(it);
+                      setOpenModal(true);
+                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-blue-600 shadow-lg hover:bg-blue-50"
+                    title="Chỉnh sửa"
+                  >
+                    <FaPen size={12} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(it._id);
+                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-red-500 shadow-lg hover:bg-red-50"
+                    title="Xóa"
+                  >
+                    <FaTrashAlt size={12} />
+                  </button>
                 </div>
               </div>
-            </div>
+
+              {/* Content Section */}
+              <div className="flex flex-1 flex-col p-4">
+                <h2 className="mb-1 line-clamp-1 text-base font-bold text-slate-800 transition-colors group-hover:text-primary">{it.name}</h2>
+
+                {/* Category Name (Assumed from population or mapping) */}
+                <p className="line-clamp-2 text-xs text-slate-500">{it.description || 'Chưa có mô tả'}</p>
+
+                <div className="mt-auto flex items-center justify-between border-t border-dashed border-gray-100 pt-3 text-xs text-slate-400">
+                  <span>ID: ...{it._id.slice(-6)}</span>
+                </div>
+              </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       {openModal && (
         <InteriorModal
