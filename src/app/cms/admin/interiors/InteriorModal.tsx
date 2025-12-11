@@ -178,11 +178,11 @@ export default function InteriorModal({ open, onClose, editingItem, categories, 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          // onClick={onClose}
         >
           <motion.div
             onClick={(e) => e.stopPropagation()}
-            className="flex h-[90vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:h-auto sm:max-h-[85vh] sm:max-w-4xl sm:rounded-2xl"
+            className="flex h-[90vh] w-full flex-col overflow-hidden rounded-md bg-white shadow-2xl sm:h-auto sm:max-h-[85vh] sm:max-w-4xl"
             initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
@@ -207,7 +207,7 @@ export default function InteriorModal({ open, onClose, editingItem, categories, 
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-300">
+            <div className="flex-1 overflow-y-auto p-2 scrollbar-hide">
               <form id="interior-form" onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Column 1: Info */}
                 <div className="space-y-4">

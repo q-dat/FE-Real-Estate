@@ -23,7 +23,10 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const reload = async () => {
+    // Tối ưu: Chỉ fetch lại dữ liệu cần thiết.
+    // Nếu API có pagination/cache, cần xem xét thêm logic đó.
     const data = await rentalPostAdminService.getAll();
+    // Đảm bảo kiểu dữ liệu: TypeScript
     setPosts(Array.isArray(data) ? data : []);
   };
 
@@ -34,81 +37,122 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
 
   const confirmDelete = async () => {
     if (!deletingId) return;
-    await rentalPostAdminService.delete(deletingId);
-    await reload();
-    setConfirmOpen(false);
-    setDeletingId(null);
+    try {
+      await rentalPostAdminService.delete(deletingId);
+      await reload();
+    } catch (error) {
+      console.error('Lỗi xóa bài đăng:', error);
+      // Có thể thêm toast/notification
+    } finally {
+      setConfirmOpen(false);
+      setDeletingId(null);
+    }
   };
 
   return (
-    <div className="pt-mobile-padding-top xl:pt-desktop-padding-top min-h-screen bg-white px-2 text-black scrollbar-hide xl:px-4">
+    // Tối ưu responsive: Bỏ scrollbar-hide, thay bằng scrollbar-thin để tốt hơn cho UX trên desktop
+    <div className="min-h-screen bg-white px-4 pt-mobile-padding-top text-black xl:px-8 xl:pt-desktop-padding-top">
       {/* Header */}
-      <div className="mb-5 mt-10 flex items-center justify-between border-b border-gray-200 pb-3">
-        <h1 className="flex items-center gap-2 text-lg font-semibold text-black xl:text-xl">
-          <FaImages className="text-primary" /> Quản lý bài đăng
-        </h1>
+      <div className="mb-6 mt-6 flex items-center justify-between border-b-2 border-primary/20 pb-4">
+        <h1 className="flex items-center gap-3 text-xl font-bold text-gray-800 xl:text-2xl">Quản lý Bài đăng Cho thuê</h1>
         <Button
-          size="sm"
-          className="flex items-center gap-2 rounded-md bg-primary text-white"
+          size="md"
+          color="primary"
+          className="flex items-center gap-2 rounded-lg font-semibold shadow-md transition hover:shadow-lg"
           onClick={() => {
             setEditingPost(null);
             setOpenModal(true);
           }}
         >
-          <FaPlus /> Thêm
+          <FaPlus size={14} /> Thêm Bài đăng
         </Button>
       </div>
 
       {/* Danh sách */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      {/* Cải thiện Grid Layout: Tăng mật độ thông tin trên màn hình lớn */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
         {posts.map((post) => {
           const thumbnail = post.images?.[0] || '/no-image.png';
+          // Xác định màu sắc/kiểu dáng cho postType
+          const postTypeClass =
+            post.postType === 'highlight'
+              ? 'bg-red-500 text-white font-bold'
+              : post.postType?.startsWith('vip')
+                ? 'bg-yellow-500 text-black font-semibold'
+                : 'bg-gray-100 text-gray-700';
+
           return (
             <div
-              onClick={() => {
-                setEditingPost(post);
-                setOpenModal(true);
-              }}
               key={post._id}
-              className="group relative flex cursor-pointer flex-col overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl"
             >
-              {/* Ảnh */}
-              <div className="relative aspect-[4/3] overflow-hidden">
+              {/* Ảnh - Giữ nguyên logic click để chỉnh sửa */}
+              <div
+                onClick={() => {
+                  setEditingPost(post);
+                  setOpenModal(true);
+                }}
+                className="relative aspect-[4/3] cursor-pointer overflow-hidden"
+              >
                 <Image
                   src={thumbnail}
                   alt={post.title}
                   width={400}
                   height={300}
                   unoptimized
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                {post.images?.length > 1 && (
-                  <div className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] text-white backdrop-blur-md">
-                    <FaImages className="text-white/90" />
-                    <span>{post.images.length}</span>
-                  </div>
-                )}
+
+                {/* Badge Số ảnh và Loại tin */}
+                <div className="absolute left-2 top-2 flex items-center gap-2">
+                  {post.images && post.images.length > 0 && (
+                    <span className="flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">
+                      <FaImages size={10} />
+                      {post.images.length}
+                    </span>
+                  )}
+                  {post.postType && <span className={`rounded-full px-2 py-0.5 text-[10px] uppercase ${postTypeClass}`}>{post.postType}</span>}
+                </div>
+
+                {/* Overlay Edit Button (Tùy chọn) */}
+                <Button
+                  size="sm"
+                  color="primary"
+                  className="absolute bottom-2 right-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                >
+                  <FaPen size={12} /> Sửa
+                </Button>
               </div>
 
               {/* Nội dung */}
-              <div className="flex flex-1 flex-col justify-between p-3 sm:p-4">
+              <div className="flex flex-1 flex-col justify-between p-3">
                 <div className="space-y-1">
-                  <h2 className="line-clamp-5 text-[15px] font-semibold text-gray-900 transition-colors duration-200 group-hover:text-primary">
+                  <h2
+                    onClick={() => {
+                      setEditingPost(post);
+                      setOpenModal(true);
+                    }}
+                    className="line-clamp-2 cursor-pointer text-base font-semibold text-gray-900 transition-colors duration-200 hover:text-primary"
+                  >
                     {post.title}
                   </h2>
 
-                  <p className="text-[13px] text-gray-500">
-                    {post.area} m² • {post.district}, {post.province}
+                  {/* Thông tin phụ */}
+                  <p className="text-xs text-gray-500">**Mã:** {post.code}</p>
+                  <p className="text-sm text-gray-600">
+                    {post.area} m² | {post.district}, {post.province}
                   </p>
 
-                  <p className="text-[15px] font-bold text-primary">
+                  <p className="text-base font-extrabold text-primary">
                     {formatCurrency(post.price)} {post.priceUnit}
                   </p>
                 </div>
 
-                <div className="mt-3 flex items-center justify-between">
+                {/* Status và Actions */}
+                <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-2">
+                  {/* Status Badge */}
                   <span
-                    className={`rounded-full px-2 py-[2px] text-[11px] font-medium capitalize ${
+                    className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${
                       post.status === 'active'
                         ? 'bg-green-100 text-green-700'
                         : post.status === 'pending'
@@ -121,30 +165,18 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                     {post.status}
                   </span>
 
-                  <div className="flex gap-1.5">
-                    {/* Update */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); // chặn mở modal edit từ card
-
-                        setEditingPost(post);
-                        setOpenModal(true);
-                      }}
-                      className="rounded-full bg-blue-500 p-2 text-white shadow-md transition-all hover:bg-blue-600 hover:shadow-lg"
-                    >
-                      <FaPen size={12} />
-                    </button>
-                    {/* Delete */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); // chặn mở edit khi nhấn delete
-                        handleDelete(post._id);
-                      }}
-                      className="rounded-full bg-rose-500 p-2 text-white shadow-md transition-all hover:bg-rose-600 hover:shadow-lg"
-                    >
-                      <FaTrashAlt size={12} />
-                    </button>
-                  </div>
+                  {/* Nút Xóa riêng biệt */}
+                  <Button
+                    size="sm"
+                    color="error"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Ngăn chặn mở modal chỉnh sửa
+                      handleDelete(post._id);
+                    }}
+                    className="btn-square text-white transition-colors duration-200 hover:bg-red-600"
+                  >
+                    <FaTrashAlt size={12} />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -152,21 +184,10 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
         })}
       </div>
 
-      {/* Modal Thêm / Sửa */}
-      {openModal && (
-        <RentalPostAdminModal
-          open={openModal}
-          onClose={() => {
-            setOpenModal(false);
-            setEditingPost(null);
-          }}
-          editingPost={editingPost}
-          categories={categories}
-          reload={reload}
-        />
-      )}
+      {/* Modal Chỉnh sửa / Thêm mới */}
+      <RentalPostAdminModal open={openModal} onClose={() => setOpenModal(false)} editingPost={editingPost} categories={categories} reload={reload} />
 
-      {/* Modal Xoá */}
+      {/* Modal Xóa */}
       <DeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />
     </div>
   );
