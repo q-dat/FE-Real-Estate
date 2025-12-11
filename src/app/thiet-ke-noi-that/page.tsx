@@ -1,8 +1,11 @@
 import { interiorService } from '@/services/interiorsService';
 import ClientInteriorsPage from './ClientInteriorsPage';
 
-const interiors = await interiorService.getAll();
+export default async function Page() {
+  const [interiorSamples, interiorFinished] = await Promise.all([
+    interiorService.getAll({ categoryCode: 0 }), // Mẫu nội thất
+    interiorService.getAll({ categoryCode: 1 }), // Thành phẩm đã hoàn thành
+  ]);
 
-export default function page() {
-  return <ClientInteriorsPage interiors={interiors} />;
+  return <ClientInteriorsPage interiorSamples={interiorSamples} interiorFinished={interiorFinished} />;
 }
