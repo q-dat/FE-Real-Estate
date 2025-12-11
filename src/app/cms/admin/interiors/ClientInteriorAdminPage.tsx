@@ -3,17 +3,18 @@ import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import Image from 'next/image';
 import { FaPlus, FaPen, FaTrashAlt, FaImages } from 'react-icons/fa';
-import InteriorModal from './InteriorModal';
 import DeleteModal from '../DeleteModal';
 import { IInterior } from '@/types/type/interiors/interiors';
 import { interiorService } from '@/services/interiorsService';
+import InteriorModal from './InteriorModal';
 
 interface Props {
-  items: IInterior[];
+  interiors: IInterior[];
+  categories: { _id: string; name: string }[];
 }
 
-export default function ClientInteriorAdminPage({ items: initialItems }: Props) {
-  const [items, setItems] = useState<IInterior[]>(initialItems);
+export default function ClientInteriorAdminPage({ interiors: initialInteriors, categories }: Props) {
+  const [interiors, setInteriors] = useState<IInterior[]>(initialInteriors);
   const [openModal, setOpenModal] = useState(false);
   const [editingItem, setEditingItem] = useState<IInterior | null>(null);
 
@@ -22,7 +23,7 @@ export default function ClientInteriorAdminPage({ items: initialItems }: Props) 
 
   const reload = async () => {
     const data = await interiorService.getAll();
-    setItems(Array.isArray(data) ? data : []);
+    setInteriors(Array.isArray(data) ? data : []);
   };
 
   const handleDelete = (id: string) => {
@@ -40,13 +41,13 @@ export default function ClientInteriorAdminPage({ items: initialItems }: Props) 
 
   return (
     <div className="min-h-screen bg-white px-2 pt-mobile-padding-top text-black xl:px-4 xl:pt-desktop-padding-top">
-      <div className="mb-5 mt-10 flex items-center justify-between border-b border-gray-200 pb-3">
-        <h1 className="flex items-center gap-2 text-lg font-semibold text-black xl:text-xl">
+      <div className="interiors-center mb-5 mt-10 flex justify-between border-b border-gray-200 pb-3">
+        <h1 className="interiors-center flex gap-2 text-lg font-semibold text-black xl:text-xl">
           <FaImages className="text-primary" /> Quản lý nội thất
         </h1>
         <Button
           size="sm"
-          className="flex items-center gap-2 rounded-md bg-primary text-white"
+          className="interiors-center flex gap-2 rounded-md bg-primary text-white"
           onClick={() => {
             setEditingItem(null);
             setOpenModal(true);
@@ -57,7 +58,7 @@ export default function ClientInteriorAdminPage({ items: initialItems }: Props) 
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        {items.map((it) => {
+        {interiors.map((it) => {
           const thumbnails = it.thumbnails?.[0] || it.images || '/no-image.png';
           return (
             <div
@@ -78,7 +79,7 @@ export default function ClientInteriorAdminPage({ items: initialItems }: Props) 
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 {it.thumbnails && it.thumbnails.length > 1 && (
-                  <div className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] text-white">
+                  <div className="interiors-center absolute right-2 top-2 flex gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] text-white">
                     <FaImages />
                     <span>{it.thumbnails.length}</span>
                   </div>
@@ -94,7 +95,7 @@ export default function ClientInteriorAdminPage({ items: initialItems }: Props) 
                   {it.status && <span className="text-[13px] capitalize text-gray-500">{it.status}</span>}
                 </div>
 
-                <div className="mt-3 flex items-center justify-between">
+                <div className="interiors-center mt-3 flex justify-between">
                   <div className="flex gap-1.5">
                     <button
                       onClick={(e) => {
@@ -133,6 +134,7 @@ export default function ClientInteriorAdminPage({ items: initialItems }: Props) 
           }}
           editingItem={editingItem}
           reload={reload}
+          categories={categories}
         />
       )}
 

@@ -2,26 +2,27 @@
 import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
-import RentalCategoryModal from './RentalCategoryModal';
+import { interiorCategoryService } from '@/services/interiorCategoryService';
+import { IInteriorCategory } from '@/types/type/interiorsCategory/interiorsCategory';
+
+import InteriorCategoryModal from './InteriorCategoryModal';
 import DeleteModal from '../DeleteModal';
-import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';
-import { rentalCategoryService } from '@/services/rentalCategoryService';
 
 interface Props {
-  categories: IRentalCategory[];
+  categories: IInteriorCategory[];
 }
 
-export default function ClientRentalCategoryPage({ categories: initial }: Props) {
+export default function ClientInteriorCategoryPage({ categories: initial }: Props) {
   const [items, setItems] = useState(initial);
 
   const [openModal, setOpenModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<IRentalCategory | null>(null);
+  const [editingItem, setEditingItem] = useState<IInteriorCategory | null>(null);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const reload = async () => {
-    const data = await rentalCategoryService.getAll();
+    const data = await interiorCategoryService.getAll();
     setItems(Array.isArray(data) ? data : []);
   };
 
@@ -33,7 +34,7 @@ export default function ClientRentalCategoryPage({ categories: initial }: Props)
   const confirmDelete = async () => {
     if (!deletingId) return;
 
-    await rentalCategoryService.delete(deletingId);
+    await interiorCategoryService.delete(deletingId);
     await reload();
 
     setDeletingId(null);
@@ -108,7 +109,7 @@ export default function ClientRentalCategoryPage({ categories: initial }: Props)
       </div>
 
       {openModal && (
-        <RentalCategoryModal
+        <InteriorCategoryModal
           open={openModal}
           editing={editingItem}
           reload={reload}

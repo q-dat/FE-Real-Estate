@@ -42,7 +42,7 @@ const interiorService = {
     }
 
     const data = await res.json();
-    const list: IInterior[] = data?.interior ?? [];
+    const list: IInterior[] = data?.interiors ?? [];
 
     if (!hasFilter) {
       cache.list = list;

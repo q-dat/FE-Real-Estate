@@ -7,8 +7,8 @@ import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import InputForm from '@/components/userPage/ui/form/InputForm';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { useEscClose } from '@/hooks/useEscClose';
-import { rentalCategoryService } from '@/services/rentalCategoryService';
-import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';
+import { IInteriorCategory } from '@/types/type/interiorsCategory/interiorsCategory';
+import { interiorCategoryService } from '@/services/interiorCategoryService';
 
 export interface FormValues {
   name: string;
@@ -20,10 +20,10 @@ interface Props {
   open: boolean;
   onClose: () => void;
   reload: () => Promise<void>;
-  editing: IRentalCategory | null;
+  editing: IInteriorCategory | null;
 }
 
-export default function RentalCategoryModal({ open, onClose, reload, editing }: Props) {
+export default function InteriorCategoryModal({ open, onClose, reload, editing }: Props) {
   const {
     register,
     handleSubmit,
@@ -66,9 +66,9 @@ export default function RentalCategoryModal({ open, onClose, reload, editing }: 
     };
 
     if (editing?._id) {
-      await rentalCategoryService.update(editing._id, payload);
+      await interiorCategoryService.update(editing._id, payload);
     } else {
-      await rentalCategoryService.create(payload);
+      await interiorCategoryService.create(payload);
     }
 
     await reload();

@@ -53,3 +53,18 @@ export interface IRentalFavoriteLite {
   province: string;
   image?: string;
 }
+
+export interface Province {
+  code: number;
+  name: string;
+}
+
+export interface District {
+  code: number;
+  name: string;
+}
+
+export interface Ward {
+  code: number;
+  name: string;
+}

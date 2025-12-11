@@ -1,16 +1,16 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';
+import { IInteriorCategory } from '@/types/type/interiorsCategory/interiorsCategory';
 
-export const rentalCategoryService = {
-  async getAll(): Promise<IRentalCategory[]> {
-    const res = await fetch(getServerApiUrl('api/rental-categories'));
-    if (!res.ok) throw new Error(`Fetch danh mục lỗi: ${res.status}`);
+export const interiorCategoryService = {
+  async getAll(): Promise<IInteriorCategory[]> {
+    const res = await fetch(getServerApiUrl('api/interior-categories'));
+    if (!res.ok) throw new Error('Fetch failed');
     const data = await res.json();
-    return Array.isArray(data) ? data : (data?.rentalCategories ?? []);
+    return Array.isArray(data) ? data : (data?.interiorCategories ?? []);
   },
 
-  async create(payload: Partial<IRentalCategory>) {
-    const res = await fetch(getServerApiUrl('api/rental-category'), {
+  async create(payload: Partial<IInteriorCategory>) {
+    const res = await fetch(getServerApiUrl('api/interior-category'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -24,8 +24,8 @@ export const rentalCategoryService = {
     return res.json();
   },
 
-  async update(id: string, payload: Partial<IRentalCategory>) {
-    const res = await fetch(getServerApiUrl(`api/rental-category/${id}`), {
+  async update(id: string, payload: Partial<IInteriorCategory>) {
+    const res = await fetch(getServerApiUrl(`api/interior-category/${id}`), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -40,7 +40,7 @@ export const rentalCategoryService = {
   },
 
   async delete(id: string) {
-    const res = await fetch(getServerApiUrl(`api/rental-category/${id}`), {
+    const res = await fetch(getServerApiUrl(`api/interior-category/${id}`), {
       method: 'DELETE',
     });
 

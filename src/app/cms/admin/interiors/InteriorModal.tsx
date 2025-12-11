@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button } from 'react-daisyui';
+import { Button, Select } from 'react-daisyui';
 import Image from 'next/image';
 import { FaPlus, FaPen } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
@@ -20,10 +20,11 @@ interface Props {
   open: boolean;
   onClose: () => void;
   editingItem: IInterior | null;
+  categories: { _id: string; name: string }[];
   reload: () => Promise<void>;
 }
 
-export default function InteriorModal({ open, onClose, editingItem, reload }: Props) {
+export default function InteriorModal({ open, onClose, editingItem, categories, reload }: Props) {
   const { register, handleSubmit, reset } = useForm<IInterior>();
 
   const [images, setImages] = useState<FileList | null>(null);
@@ -48,10 +49,12 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
     }
 
     reset({
+      ...editingItem,
+      category: typeof editingItem.category === 'object' ? editingItem.category._id : editingItem.category,
       name: editingItem.name,
       description: editingItem.description,
       status: editingItem.status,
-    });
+    } as unknown as IInterior);
 
     setPreviewImages(editingItem.images ? [editingItem.images] : []);
     setPreviewThumbnails(editingItem.thumbnails || []);
@@ -68,6 +71,8 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
   const onSubmit: SubmitHandler<IInterior> = async (data) => {
     const formData = new FormData();
 
+    const categoryId = typeof data.category === 'string' ? data.category : data.category._id;
+    formData.append('category', categoryId);
     formData.append('name', data.name);
     formData.append('description', data.description || '');
     formData.append('status', data.status || '');
@@ -134,7 +139,19 @@ export default function InteriorModal({ open, onClose, editingItem, reload }: Pr
                   placeholder="Nhập tên nội thất"
                   bordered
                 />
-
+                <div className="col-span-full">
+                  <Select
+                    {...register('category', { required: true })}
+                    className="select select-bordered w-full bg-primary text-center text-sm font-bold text-white hover:bg-white hover:text-primary focus:outline-none"
+                  >
+                    <option value=""> DANH MỤC </option>
+                    {categories.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
                 <TextareaForm {...register('description')} placeholder="Mô tả" />
                 <InputForm {...register('status')} classNameLabel={classNameLabel} label="Trạng thái" bordered />
 

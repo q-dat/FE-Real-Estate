@@ -6,7 +6,7 @@ import { FaPlus, FaPen } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { District, IRentalPostAdmin, Province, Ward } from '@/types/type/rentalAdmin/rentalAdmin';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import InputForm from '@/components/userPage/ui/form/InputForm';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
@@ -23,20 +23,7 @@ interface Props {
   reload: () => Promise<void>;
 }
 
-interface Province {
-  code: number;
-  name: string;
-}
 
-interface District {
-  code: number;
-  name: string;
-}
-
-interface Ward {
-  code: number;
-  name: string;
-}
 
 export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload }: Props) {
   const { register, handleSubmit, reset, getValues, watch, setValue } = useForm<IRentalPostAdmin>();
