@@ -22,10 +22,9 @@ const rentalPostAdminService = {
    * - Logic: Luôn fetch "no-store" để lấy dữ liệu mới nhất từ DB.
    * - Sau khi lấy xong: Cập nhật vào RAM Cache để getById dùng lại.
    */
-  async getAll(params?: Record<string, string | number>): Promise<IRentalPostAdmin[]> {
+  async getAll(params?: Record<string, string | number>) {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    // Sử dụng logic string concatenation cũ để an toàn cho SSR (tránh lỗi window is undefined)
     let apiUrl = getServerApiUrl('api/rental-admin-posts');
 
     if (hasFilter) {
@@ -38,15 +37,20 @@ const rentalPostAdminService = {
       apiUrl += `?${query.toString()}`;
     }
 
-    // Fetch mode: 'no-store' -> Luôn gọi server thực, không dùng cache của Next.js fetch
-    const res = await fetch(apiUrl, { cache: 'no-store' });
+    const res = await fetch(apiUrl, {
+      cache: 'force-cache',
+      next: { revalidate: 60 },
+    });
 
     if (!res.ok) {
-      throw new Error(`[RentalAdminService] GetAll Failed: ${res.status}`);
+      throw new Error(`GetAll failed: ${res.status}`);
     }
 
-    const data = await res.json();
-    const list: IRentalPostAdmin[] = data?.rentalPosts ?? [];
+    const data = (await res.json()) as {
+      rentalPosts?: IRentalPostAdmin[];
+    };
+
+    const list: IRentalPostAdmin[] = data.rentalPosts ?? [];
 
     // Nếu không có filter (tức là lấy toàn bộ danh sách gốc), ta mới update Cache
     if (!hasFilter) {
@@ -93,7 +97,7 @@ const rentalPostAdminService = {
 
       return item;
     } catch (error) {
-      console.error('[RentalAdminService] GetById Error:', error);
+      console.error('GetById Error:', error);
       return null;
     }
   },

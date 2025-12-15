@@ -38,7 +38,7 @@ const interiorService = {
     const res = await fetch(apiUrl, { cache: 'no-store' });
 
     if (!res.ok) {
-      throw new Error(`[InteriorService] GetAll Failed: ${res.status}`);
+      throw new Error(`GetAll Failed: ${res.status}`);
     }
 
     const data = await res.json();
@@ -84,7 +84,7 @@ const interiorService = {
 
       return item;
     } catch (error) {
-      console.error('[InteriorService] GetById Error:', error);
+      console.error('GetById Error:', error);
       return null;
     }
   },
@@ -105,7 +105,7 @@ const interiorService = {
     });
 
     if (!res.ok) {
-      throw new Error(`[InteriorService] Create Error: ${res.status}`);
+      throw new Error(`Create Error: ${res.status}`);
     }
 
     // await this.handlePostMutation();
@@ -119,7 +119,7 @@ const interiorService = {
     });
 
     if (!res.ok) {
-      throw new Error(`[InteriorService] Update Error: ${res.status}`);
+      throw new Error(`Update Error: ${res.status}`);
     }
 
     // await this.handlePostMutation();
@@ -132,7 +132,7 @@ const interiorService = {
     });
 
     if (!res.ok) {
-      throw new Error(`[InteriorService] Delete Error: ${res.status}`);
+      throw new Error(`Delete Error: ${res.status}`);
     }
 
     // await this.handlePostMutation();
@@ -142,14 +142,14 @@ const interiorService = {
   /**
    * Reset cache + Trigger revalidate route
    */
-//   async handlePostMutation() {
-//     this.resetLocalCache();
-//     try {
-//       await fetch('/api/revalidate/interiors', { method: 'POST' });
-//     } catch (error) {
-//       console.warn('[InteriorService] Revalidate Warning:', error);
-//     }
-//   },
+  //   async handlePostMutation() {
+  //     this.resetLocalCache();
+  //     try {
+  //       await fetch('/api/revalidate/interiors', { method: 'POST' });
+  //     } catch (error) {
+  //       console.warn('Revalidate Warning:', error);
+  //     }
+  //   },
 
   resetLocalCache() {
     cache.list = [];
