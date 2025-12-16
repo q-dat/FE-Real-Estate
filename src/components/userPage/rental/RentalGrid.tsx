@@ -16,6 +16,21 @@ interface RentalGridProps {
 }
 
 export default function RentalGrid({ posts }: RentalGridProps) {
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="flex w-full flex-col items-center justify-center px-4 py-16 text-center">
+        <div className="max-w-md">
+          <p className="text-base font-semibold text-gray-900">
+            Không có dữ liệu phù hợp
+          </p>
+          <p className="mt-2 text-sm text-gray-500">
+            Hiện tại chưa có bài đăng nào. Vui lòng thử lại với bộ lọc khác hoặc quay lại sau.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       {/* Optional: Tiêu đề + slogan */}
@@ -73,7 +88,7 @@ export default function RentalGrid({ posts }: RentalGridProps) {
                 <p className="mt-1 line-clamp-2 inline-flex items-center text-gray-500">
                   <MdLocationPin size={16} />
                   <span className="text-sm">
-                    {post.district}, {post.province}
+                  {post.district}, {post.province}
                   </span>
                 </p>
               </div>
