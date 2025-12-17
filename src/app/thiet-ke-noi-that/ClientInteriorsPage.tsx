@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCouch, FaCheckCircle, FaLayerGroup } from 'react-icons/fa';
 import { IInterior } from '@/types/type/interiors/interiors';
+import Link from 'next/link';
 
 interface Props {
   interiorSamples: IInterior[];
@@ -63,47 +64,49 @@ const InteriorCard = ({ item, idx }: { item: IInterior; idx: number }) => {
       transition={{ duration: 0.4, delay: idx * 0.05 }}
       className="group relative flex h-full flex-col overflow-hidden rounded-md border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50"
     >
-      {/* Main Image  */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
-        <Image
-          src={item.images}
-          alt={item.name}
-          width={400}
-          height={400}
-          className="h-auto w-full object-contain transition-transform duration-700 ease-in-out group-hover:scale-110"
-        />
-        {/* Overlay gradient text on image bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      </div>
+      <Link href={`/nt/${item._id}`} target="_blank">
+        {/* Main Image  */}
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+          <Image
+            src={item.images}
+            alt={item.name}
+            width={400}
+            height={400}
+            className="h-auto w-full object-contain transition-transform duration-700 ease-in-out group-hover:scale-110"
+          />
+          {/* Overlay gradient text on image bottom */}
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        </div>
 
-      {/* Content Body */}
-      <div className="flex flex-1 flex-col p-2">
-        <h3 className="mb-2 line-clamp-2 text-lg font-bold text-slate-800 transition-colors group-hover:text-primary xl:text-xl">{item.name}</h3>
+        {/* Content Body */}
+        <div className="flex flex-1 flex-col p-2">
+          <h3 className="mb-2 line-clamp-2 text-lg font-bold text-slate-800 transition-colors group-hover:text-primary xl:text-xl">{item.name}</h3>
 
-        {item.description && <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-500">{item.description}</p>}
+          {item.description && <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-500">{item.description}</p>}
 
-        {/* Thumbnails Gallery - Compact & Clean */}
-        {item.thumbnails && item.thumbnails.length > 0 && (
-          <div className="mt-auto border-t border-slate-50 pt-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Chi tiết không gian</p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {item.thumbnails.slice(0, 4).map((thumb, tIdx) => (
-                <div
-                  key={tIdx}
-                  className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 transition-all"
-                >
-                  <Image src={thumb} alt="thumbnail" fill className="object-cover" />
-                </div>
-              ))}
-              {item.thumbnails.length > 4 && (
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-500">
-                  +{item.thumbnails.length - 4}
-                </div>
-              )}
+          {/* Thumbnails Gallery - Compact & Clean */}
+          {item.thumbnails && item.thumbnails.length > 0 && (
+            <div className="mt-auto border-t border-slate-50 pt-4">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Chi tiết không gian</p>
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {item.thumbnails.slice(0, 4).map((thumb, tIdx) => (
+                  <div
+                    key={tIdx}
+                    className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 transition-all"
+                  >
+                    <Image src={thumb} alt="thumbnail" fill className="object-cover" />
+                  </div>
+                ))}
+                {item.thumbnails.length > 4 && (
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-500">
+                    +{item.thumbnails.length - 4}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </Link>
     </motion.article>
   );
 };
