@@ -1,5 +1,13 @@
-import React from 'react';
+import { realEstateProjectService } from '@/services/realEstateProjectService';
+import ClientRealEstateProjectPage from './ClientRealEstateProjectPage';
 
-export default function page() {
-  return <div>page</div>;
+export default async function Page() {
+  const projects = await realEstateProjectService.getAll();
+
+  return (
+ <>
+ <ClientRealEstateProjectPage projects={projects}/>
+ </>
+  );
 }
+
