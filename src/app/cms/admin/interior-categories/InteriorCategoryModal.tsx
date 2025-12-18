@@ -125,7 +125,7 @@ export default function InteriorCategoryModal({ open, onClose, reload, editing }
               <div className="mt-4 flex justify-end gap-2">
                 <CancelBtn onClick={onClose} type="button" value="Hủy" />
 
-                <Button color="primary" type="submit" disabled={isSubmitting} className="rounded-md px-4">
+                <Button size="sm" color="primary" type="submit" disabled={isSubmitting} className="rounded-md px-4">
                   {isSubmitting ? 'Đang xử lý...' : editing?._id ? 'Cập nhật' : 'Tạo mới'}
                 </Button>
               </div>

@@ -56,7 +56,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
       <div className="mb-6 mt-6 flex items-center justify-between border-b-2 border-primary/20 pb-4">
         <h1 className="flex items-center gap-3 text-xl font-bold text-gray-800 xl:text-2xl">Quản lý Bài đăng Cho thuê</h1>
         <Button
-          size="md"
+          size="sm"
           color="primary"
           className="flex items-center gap-2 rounded-lg font-semibold shadow-md transition hover:shadow-lg"
           onClick={() => {

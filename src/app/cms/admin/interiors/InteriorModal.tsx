@@ -13,6 +13,7 @@ import { useEscClose } from '@/hooks/useEscClose';
 import Zoom from '@/lib/Zoom';
 import { interiorService } from '@/services/interiorsService';
 import { IInterior } from '@/types/type/interiors/interiors';
+import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 
 interface Props {
   open: boolean;
@@ -316,10 +317,10 @@ export default function InteriorModal({ open, onClose, editingItem, categories, 
 
             {/* Footer */}
             <div className="flex items-center justify-end gap-3 border-t bg-white px-6 py-4">
-              <Button type="button" className="btn-ghost hover:bg-gray-200" onClick={onClose} disabled={isLoading}>
-                Hủy bỏ
-              </Button>
+              <CancelBtn onClick={onClose} type="button" value="Hủy" />
+
               <Button
+                size="sm"
                 form="interior-form"
                 type="submit"
                 color="primary"

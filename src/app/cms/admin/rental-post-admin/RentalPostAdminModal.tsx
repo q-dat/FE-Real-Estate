@@ -13,6 +13,7 @@ import LabelForm from '@/components/userPage/ui/form/LabelForm';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { useEscClose } from '@/hooks/useEscClose';
 import Zoom from '@/lib/Zoom';
+import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 // import { FaPlus, FaPen } from 'react-icons/fa'; // Loại bỏ: Icons trong code nên được thay bằng `react-daisyui` hoặc được giữ lại một cách tối giản.
 
 interface Props {
@@ -661,15 +662,13 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
             {/* Footer: Sticky và UI hiện đại */}
             <div className="sticky bottom-0 z-10 flex justify-end gap-3 border-t border-gray-100 bg-white p-2 shadow-lg">
-              {/* Thay thế CancelBtn */}
-              <Button color="ghost" type="button" onClick={onClose} className="text-gray-600 hover:bg-gray-100">
-                Hủy
-              </Button>
+              <CancelBtn onClick={onClose} type="button" value="Hủy" />
+
               <Button
                 color="primary"
                 type="submit"
                 form="rental-post-form"
-                size="md"
+                size="sm"
                 disabled={loading}
                 className="flex items-center gap-4 rounded-lg font-semibold"
               >

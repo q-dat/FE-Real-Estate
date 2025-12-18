@@ -68,6 +68,7 @@ export default function ClientInteriorAdminPage({ interiors: initialInteriors, c
         </div>
 
         <Button
+          size="sm"
           color="primary"
           className="gap-2 rounded-xl shadow-lg shadow-primary/30 hover:scale-105"
           onClick={() => {
