@@ -27,9 +27,7 @@ export default function ClientRealEstateProjectDetailPage({ project }: Props) {
       <section className="border-b bg-gray-50/50 px-4 py-10 xl:px-desktop-padding">
         <h1 className="mb-2 text-2xl font-bold text-slate-800 xl:text-3xl">{project.name}</h1>
 
-        {project.status && <p className="text-sm text-primary">{project.status}</p>}
-
-        {project.introduction && <p className="mt-4 max-w-3xl text-sm leading-relaxed text-slate-600">{stripHtml(project.introduction)}</p>}
+        {project.description && <p className="mt-4 max-w-3xl text-sm leading-relaxed text-slate-600">{stripHtml(project.description)}</p>}
       </section>
 
       {/* TABS */}
@@ -53,7 +51,7 @@ export default function ClientRealEstateProjectDetailPage({ project }: Props) {
       {/* CONTENT */}
       <section className="mx-auto max-w-6xl px-4 py-10 xl:px-desktop-padding">
         <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
-          {activeTab === 'intro' && <ContentBlock html={project.description || project.introduction} />}
+          {activeTab === 'intro' && <ContentBlock html={project.introduction} />}
 
           {activeTab === 'pricing' && <ContentBlock html={project.pricing} empty="Chưa công bố bảng giá" />}
 

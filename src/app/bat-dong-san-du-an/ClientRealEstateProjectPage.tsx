@@ -22,7 +22,7 @@ export default function ClientRealEstateProjectPage({ projects }: Props) {
             >
               <h3 className="mb-2 line-clamp-2 font-semibold text-slate-800 group-hover:text-primary">{p.name}</h3>
 
-              <p className="line-clamp-3 text-sm text-slate-500">{stripHtml(p.introduction || p.description || '') || 'Đang cập nhật thông tin'}</p>
+              <p className="line-clamp-3 text-sm text-slate-500">{stripHtml( p.description || '') || 'Đang cập nhật thông tin'}</p>
 
               {p.status && <div className="mt-4 text-xs font-medium text-primary">{p.status}</div>}
             </Link>
