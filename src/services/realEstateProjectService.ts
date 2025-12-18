@@ -1,4 +1,3 @@
-// services/realEstateProjectService.ts
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRealEstateProject } from '@/types/type/realEstateProject/realEstateProject';
 
@@ -29,7 +28,6 @@ export const realEstateProjectService = {
     const res = await fetch(getServerApiUrl(`api/real-estate-project/slug/${slug}`), { cache: 'no-store' });
 
     if (!res.ok) return null;
-    console.log(res);
 
     const data = await res.json();
     return data?.project ?? null;
