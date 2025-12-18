@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { Button } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -99,18 +98,29 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
 
           {/* Main Tabs */}
           <div className="border-b px-6">
-            <div className="tabs tabs-bordered">
+            <div className="flex gap-6 border-b">
               {[
                 ['general', 'Thông tin'],
                 ['content', 'Nội dung'],
                 ['pricing', 'Bảng giá & Tiện ích'],
                 ['partner', 'Đối tác'],
                 ['contact', 'Liên hệ'],
-              ].map(([key, label]) => (
-                <button key={key} className={`tab ${mainTab === key ? 'tab-active' : ''}`} onClick={() => setMainTab(key as MainTab)}>
-                  {label}
-                </button>
-              ))}
+              ].map(([key, label]) => {
+                const active = mainTab === key;
+
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setMainTab(key as MainTab)}
+                    className={`relative py-1 text-sm font-medium transition ${active ? 'text-primary' : 'text-slate-500 hover:text-slate-700'} `}
+                  >
+                    {label}
+
+                    {active && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
