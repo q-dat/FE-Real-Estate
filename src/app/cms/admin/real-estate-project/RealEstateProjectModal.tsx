@@ -15,6 +15,7 @@ import { IRealEstateProject } from '@/types/type/realEstateProject/realEstatePro
 import { realEstateProjectService } from '@/services/realEstateProjectService';
 import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
+import LabelForm from '@/components/userPage/ui/form/LabelForm';
 
 interface Props {
   open: boolean;
@@ -169,6 +170,7 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
 
               {mainTab === 'pricing' && (
                 <div className="space-y-4">
+                  <LabelForm title={'Bảng giá'} />
                   <JoditEditorWrapper height={300} value={watch('pricing') || ''} onChange={(v) => setValue('pricing', v)} />
                   <TextareaForm {...register('amenities')} placeholder="Tiện ích" classNameLabel={classNameLabel} />
                 </div>
@@ -196,7 +198,7 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
           {/* Footer */}
           <div className="flex justify-end gap-3 border-t p-2">
             <CancelBtn onClick={onClose} type="button" value="Hủy" />
-            <Button size='sm' type="submit" form="real-estate-project-form" color="primary">
+            <Button size="sm" type="submit" form="real-estate-project-form" color="primary">
               {editingItem ? 'Lưu thay đổi' : 'Tạo mới'}
             </Button>
           </div>
