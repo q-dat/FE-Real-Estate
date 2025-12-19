@@ -86,6 +86,8 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [previewThumbnails, setPreviewThumbnails] = useState<string[]>([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [mainTab, setMainTab] = useState<MainTab>('img');
   const [contentTab, setContentTab] = useState<ContentTab>('introduction');
 
@@ -110,42 +112,49 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
     setThumbnails(null);
   }, [editingItem, reset]);
 
-const onSubmit = async (data: IRealEstateProject) => {
-  const formData = new FormData();
+  const onSubmit = async (data: IRealEstateProject) => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
 
-  Object.entries(data).forEach(([key, value]) => {
-    if (typeof value === 'string' && value.trim() !== '') {
-      formData.append(key, value);
+      Object.entries(data).forEach(([key, value]) => {
+        if (typeof value === 'string' && value.trim() !== '') {
+          formData.append(key, value);
+        }
+      });
+
+      if (editingItem?.images && !images) {
+        formData.append('oldImages', editingItem.images);
+      }
+
+      if (images) {
+        Array.from(images).forEach((f) => formData.append('images', f));
+        editingItem?.images && formData.append('oldImages', editingItem.images);
+      }
+
+      if (editingItem?.thumbnails?.length && !thumbnails) {
+        editingItem.thumbnails.forEach((t) => formData.append('oldThumbnails', t));
+      }
+
+      if (thumbnails) {
+        Array.from(thumbnails).forEach((f) => formData.append('thumbnails', f));
+        editingItem?.thumbnails?.forEach((t) => formData.append('oldThumbnails', t));
+      }
+
+      if (editingItem?._id) {
+        await realEstateProjectService.update(editingItem._id, formData);
+      } else {
+        await realEstateProjectService.create(formData);
+      }
+
+      await reload();
+      onClose();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
-  });
-
-  if (editingItem?.images && !images) {
-    formData.append('oldImages', editingItem.images);
-  }
-
-  if (images) {
-    Array.from(images).forEach((f) => formData.append('images', f));
-    editingItem?.images && formData.append('oldImages', editingItem.images);
-  }
-
-  if (editingItem?.thumbnails?.length && !thumbnails) {
-    editingItem.thumbnails.forEach((t) => formData.append('oldThumbnails', t));
-  }
-
-  if (thumbnails) {
-    Array.from(thumbnails).forEach((f) => formData.append('thumbnails', f));
-    editingItem?.thumbnails?.forEach((t) => formData.append('oldThumbnails', t));
-  }
-
-  if (editingItem?._id) {
-    await realEstateProjectService.update(editingItem._id, formData);
-  } else {
-    await realEstateProjectService.create(formData);
-  }
-
-  await reload();
-  onClose();
-};
+  };
 
   const removeImage = (url: string) => setPreviewImages((prev) => prev.filter((u) => u !== url));
   const removeThumbnails = (url: string) => setPreviewThumbnails((prev) => prev.filter((u) => u !== url));
@@ -381,7 +390,14 @@ const onSubmit = async (data: IRealEstateProject) => {
           {/* Footer */}
           <div className="flex justify-end gap-3 border-t p-2">
             <CancelBtn onClick={onClose} type="button" value="Hủy" />
-            <Button size="sm" type="submit" form="real-estate-project-form" color="primary">
+            <Button
+              size="sm"
+              type="submit"
+              form="real-estate-project-form"
+              color="primary"
+              className={`min-w-[120px] rounded-lg shadow-lg shadow-primary/30 ${isLoading ? 'loading' : ''}`}
+              disabled={isLoading}
+            >
               {editingItem ? 'Lưu thay đổi' : 'Tạo mới'}
             </Button>
           </div>
