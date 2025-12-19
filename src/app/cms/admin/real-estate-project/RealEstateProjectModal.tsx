@@ -256,11 +256,11 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
                       fileCount={images?.length || 0} // Truyền số lượng file vào đây
                     />
                     {previewImages.length > 0 && (
-                      <div className="mt-3 grid grid-cols-2 gap-3">
+                      <div className="mt-3 flex flex-wrap items-center gap-1">
                         {previewImages.map((url, i) => (
-                          <div key={i} className="group relative aspect-video overflow-hidden rounded-lg border bg-white shadow-sm">
+                          <div key={i} className="group relative overflow-hidden rounded-lg border bg-white shadow-sm">
                             <Zoom>
-                              <Image src={url} alt="preview" fill unoptimized className="object-cover" />
+                              <Image src={url} alt="preview" width={200} height={200} unoptimized className="h-auto w-[100px] object-cover" />
                             </Zoom>
                             <button
                               type="button"
@@ -284,11 +284,11 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
                       fileCount={thumbnails?.length || 0} // Truyền số lượng file vào đây
                     />
                     {previewThumbnails.length > 0 && (
-                      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                      <div className="mt-3 flex flex-wrap items-center gap-1">
                         {previewThumbnails.map((url, i) => (
-                          <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border bg-white shadow-sm">
+                          <div key={i} className="group relative overflow-hidden rounded-lg border bg-white shadow-sm">
                             <Zoom>
-                              <Image src={url} alt="thumb" fill unoptimized className="object-cover" />
+                              <Image src={url} alt="thumb" width={200} height={200} unoptimized className="h-auto w-[100px] object-cover" />
                             </Zoom>
                             <button
                               type="button"
