@@ -7,13 +7,13 @@ interface Props {
   project: IRealEstateProject;
 }
 
-type TabKey = 'intro' | 'pricing' | 'amenities' | 'location' | 'partner' | 'contact';
+type TabKey = 'intro' | 'pricing' | 'amenities' | 'address' | 'partner' | 'contact';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'intro', label: 'Giới thiệu' },
   { key: 'pricing', label: 'Bảng giá' },
   { key: 'amenities', label: 'Tiện ích' },
-  { key: 'location', label: 'Vị trí' },
+  { key: 'address', label: 'Vị trí' },
   { key: 'partner', label: 'Đối tác' },
   { key: 'contact', label: 'Liên hệ' },
 ];
@@ -57,7 +57,7 @@ export default function ClientRealEstateProjectDetailPage({ project }: Props) {
 
           {activeTab === 'amenities' && <ContentBlock html={project.amenities} empty="Đang cập nhật tiện ích" />}
 
-          {activeTab === 'location' && <ContentBlock html={project.location} empty="Đang cập nhật vị trí" />}
+          {activeTab === 'address' && <ContentBlock html={project.address} empty="Đang cập nhật vị trí" />}
 
           {activeTab === 'partner' && (
             <div className="space-y-4 text-sm text-slate-600">
