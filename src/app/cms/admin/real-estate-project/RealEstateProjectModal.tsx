@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button } from 'react-daisyui';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaPen } from 'react-icons/fa';
+import { FaPlus, FaPen, FaCheckCircle, FaCloudUploadAlt, FaTimes } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 
 import InputForm from '@/components/userPage/ui/form/InputForm';
@@ -15,6 +15,8 @@ import { realEstateProjectService } from '@/services/realEstateProjectService';
 import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
+import Zoom from '@/lib/Zoom';
+import Image from 'next/image';
 
 interface Props {
   open: boolean;
@@ -23,14 +25,68 @@ interface Props {
   reload: () => Promise<void>;
 }
 
-type MainTab = 'general' | 'content' | 'pricing' | 'partner' | 'contact';
+type MainTab = 'img' | 'general' | 'content' | 'pricing' | 'partner' | 'contact' | 'amenities';
 
 type ContentTab = 'introduction' | 'description' | 'article';
-
+// --- 1. Cập nhật Component Upload để nhận và hiển thị số lượng file ---
+const FileUploadArea = ({
+  label,
+  multiple = false,
+  onChange,
+  fileCount = 0, // Thêm prop này
+}: {
+  label: string;
+  multiple?: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  fileCount?: number;
+}) => (
+  <div className="form-control w-full">
+    <label className="label pb-1 pt-0">
+      <span className="label-text flex w-full justify-between font-semibold text-slate-700">
+        {label}
+        {fileCount > 0 && <span className="text-xs font-bold text-green-600">Đã chọn: {fileCount} ảnh</span>}
+      </span>
+    </label>
+    <label
+      className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ${
+        fileCount > 0 ? 'border-green-500 bg-green-50/50' : 'border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5'
+      }`}
+    >
+      <div className="flex flex-col items-center justify-center pb-6 pt-5">
+        {fileCount > 0 ? (
+          // Hiển thị khi đã chọn file
+          <div className="animate-bounce-short text-center">
+            <FaCheckCircle className="mx-auto mb-2 text-3xl text-green-500" />
+            <p className="text-sm font-bold text-green-700">Đã chọn {fileCount} tệp tin</p>
+            <p className="mt-1 text-xs text-green-600">Click để thay đổi</p>
+          </div>
+        ) : (
+          // Hiển thị mặc định
+          <>
+            <FaCloudUploadAlt className="mb-2 text-3xl text-gray-400" />
+            <p className="mb-1 text-sm text-gray-500">
+              <span className="font-semibold">Click để tải ảnh</span>
+            </p>
+            <p className="text-xs text-gray-500">{multiple ? 'Chọn nhiều ảnh' : 'PNG, JPG (MAX. 2MB)'}</p>
+          </>
+        )}
+      </div>
+      <input type="file" className="hidden" accept="image/*" multiple={multiple} onChange={onChange} />
+    </label>
+  </div>
+);
 export default function RealEstateProjectModal({ open, editingItem, onClose, reload }: Props) {
   const { register, handleSubmit, reset, watch, setValue } = useForm<IRealEstateProject>();
 
-  const [mainTab, setMainTab] = useState<MainTab>('general');
+  // State lưu FileList gốc (để đếm số lượng file mới upload)
+  const [images, setImages] = useState<FileList | null>(null);
+  const [thumbnails, setThumbnails] = useState<FileList | null>(null);
+
+  // State lưu URL preview (để hiển thị ảnh)
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [previewThumbnails, setPreviewThumbnails] = useState<string[]>([]);
+
+  const [mainTab, setMainTab] = useState<MainTab>('img');
   const [contentTab, setContentTab] = useState<ContentTab>('introduction');
 
   useEscClose(open, onClose);
@@ -38,24 +94,76 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
   useEffect(() => {
     if (!editingItem) {
       reset({});
-      setMainTab('general');
-      setContentTab('introduction');
+      setPreviewImages([]);
+      setPreviewThumbnails([]);
+      setImages(null);
+      setThumbnails(null);
       return;
     }
 
     reset(editingItem);
-    setMainTab('general');
-    setContentTab('introduction');
+
+    setPreviewImages(editingItem.images ? [editingItem.images] : []);
+    setPreviewThumbnails(editingItem.thumbnails || []);
+
+    setImages(null);
+    setThumbnails(null);
   }, [editingItem, reset]);
 
-  const onSubmit: SubmitHandler<IRealEstateProject> = async (data) => {
-    if (editingItem?._id) {
-      await realEstateProjectService.update(editingItem._id, data);
-    } else {
-      await realEstateProjectService.create(data);
+const onSubmit = async (data: IRealEstateProject) => {
+  const formData = new FormData();
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (typeof value === 'string' && value.trim() !== '') {
+      formData.append(key, value);
     }
-    await reload();
-    onClose();
+  });
+
+  if (editingItem?.images && !images) {
+    formData.append('oldImages', editingItem.images);
+  }
+
+  if (images) {
+    Array.from(images).forEach((f) => formData.append('images', f));
+    editingItem?.images && formData.append('oldImages', editingItem.images);
+  }
+
+  if (editingItem?.thumbnails?.length && !thumbnails) {
+    editingItem.thumbnails.forEach((t) => formData.append('oldThumbnails', t));
+  }
+
+  if (thumbnails) {
+    Array.from(thumbnails).forEach((f) => formData.append('thumbnails', f));
+    editingItem?.thumbnails?.forEach((t) => formData.append('oldThumbnails', t));
+  }
+
+  if (editingItem?._id) {
+    await realEstateProjectService.update(editingItem._id, formData);
+  } else {
+    await realEstateProjectService.create(formData);
+  }
+
+  await reload();
+  onClose();
+};
+
+  const removeImage = (url: string) => setPreviewImages((prev) => prev.filter((u) => u !== url));
+  const removeThumbnails = (url: string) => setPreviewThumbnails((prev) => prev.filter((u) => u !== url));
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    setImages(files);
+    if (files?.length) {
+      setPreviewImages(Array.from(files).map((f) => URL.createObjectURL(f)));
+    }
+  };
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    setThumbnails(files);
+    if (files?.length) {
+      setPreviewThumbnails(Array.from(files).map((f) => URL.createObjectURL(f)));
+    }
   };
 
   if (!open) return null;
@@ -100,11 +208,13 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
           <div className="border-b px-6">
             <div className="flex gap-6 border-b">
               {[
+                ['img', 'Hình ảnh'],
                 ['general', 'Thông tin'],
                 ['content', 'Nội dung'],
-                ['pricing', 'Bảng giá & Tiện ích'],
+                ['pricing', 'Bảng giá'],
                 ['partner', 'Đối tác'],
                 ['contact', 'Liên hệ'],
+                ['amenities', 'Tiện ích'],
               ].map(([key, label]) => {
                 const active = mainTab === key;
 
@@ -127,6 +237,64 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
           {/* Body */}
           <div className="flex-1 overflow-y-auto p-6">
             <form id="real-estate-project-form" onSubmit={handleSubmit(onSubmit)}>
+              {mainTab === 'img' && (
+                <div>
+                  {/* --- Main Image Upload --- */}
+                  <div>
+                    <FileUploadArea
+                      label="Ảnh đại diện (Cover)"
+                      onChange={handleImageChange}
+                      fileCount={images?.length || 0} // Truyền số lượng file vào đây
+                    />
+                    {previewImages.length > 0 && (
+                      <div className="mt-3 grid grid-cols-2 gap-3">
+                        {previewImages.map((url, i) => (
+                          <div key={i} className="group relative aspect-video overflow-hidden rounded-lg border bg-white shadow-sm">
+                            <Zoom>
+                              <Image src={url} alt="preview" fill unoptimized className="object-cover" />
+                            </Zoom>
+                            <button
+                              type="button"
+                              onClick={() => removeImage(url)}
+                              className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100"
+                            >
+                              <FaTimes size={10} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="divider my-0"></div>
+                  {/* --- Thumbnails Upload --- */}
+                  <div>
+                    <FileUploadArea
+                      label="Thư viện ảnh chi tiết"
+                      multiple
+                      onChange={handleThumbnailChange}
+                      fileCount={thumbnails?.length || 0} // Truyền số lượng file vào đây
+                    />
+                    {previewThumbnails.length > 0 && (
+                      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                        {previewThumbnails.map((url, i) => (
+                          <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border bg-white shadow-sm">
+                            <Zoom>
+                              <Image src={url} alt="thumb" fill unoptimized className="object-cover" />
+                            </Zoom>
+                            <button
+                              type="button"
+                              onClick={() => removeThumbnails(url)}
+                              className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100"
+                            >
+                              <FaTimes size={8} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               {mainTab === 'general' && (
                 <div className="space-y-4">
                   <InputForm {...register('name')} label="Tên dự án" bordered classNameLabel={classNameLabel} />
@@ -162,16 +330,13 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
                       </button>
                     ))}
                   </div>
-
                   {/* Editor */}
                   {contentTab === 'introduction' && (
                     <JoditEditorWrapper height={520} value={watch('introduction') || ''} onChange={(v) => setValue('introduction', v)} />
                   )}
-
                   {contentTab === 'description' && (
                     <JoditEditorWrapper height={520} value={watch('description') || ''} onChange={(v) => setValue('description', v)} />
                   )}
-
                   {contentTab === 'article' && (
                     <JoditEditorWrapper height={520} value={watch('article') || ''} onChange={(v) => setValue('article', v)} />
                   )}
@@ -182,7 +347,6 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
                 <div className="space-y-4">
                   <LabelForm title={'Bảng giá'} />
                   <JoditEditorWrapper height={300} value={watch('pricing') || ''} onChange={(v) => setValue('pricing', v)} />
-                  <TextareaForm {...register('amenities')} placeholder="Tiện ích" classNameLabel={classNameLabel} />
                 </div>
               )}
 
@@ -190,7 +354,10 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
                 <div className="space-y-4">
                   <InputForm {...register('investor')} label="Chủ đầu tư" bordered classNameLabel={classNameLabel} />
                   <InputForm {...register('partners')} label="Đối tác" bordered classNameLabel={classNameLabel} />
-                  <InputForm {...register('location')} label="Vị trí" bordered classNameLabel={classNameLabel} />
+                  <InputForm {...register('province')} label="Tỉnh/Thành phố" bordered classNameLabel={classNameLabel} />
+                  <InputForm {...register('district')} label="Quận/Huyện" bordered classNameLabel={classNameLabel} />
+                  <InputForm {...register('ward')} label="Phường/Xã" bordered classNameLabel={classNameLabel} />
+                  <InputForm {...register('address')} label="Địa chỉ cụ thể" bordered classNameLabel={classNameLabel} />
                 </div>
               )}
 
@@ -200,6 +367,12 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
                   <InputForm {...register('email')} label="Email" bordered classNameLabel={classNameLabel} />
                   <InputForm {...register('zalo')} label="Zalo" bordered classNameLabel={classNameLabel} />
                   <TextareaForm {...register('message')} placeholder="Link Message" classNameLabel={classNameLabel} />
+                </div>
+              )}
+
+              {mainTab === 'amenities' && (
+                <div className="space-y-4">
+                  <TextareaForm {...register('amenities')} placeholder="Tiện ích" classNameLabel={classNameLabel} />
                 </div>
               )}
             </form>

@@ -25,7 +25,9 @@ export const realEstateProjectService = {
   },
 
   async getBySlug(slug: string): Promise<IRealEstateProject | null> {
-    const res = await fetch(getServerApiUrl(`api/real-estate-project/slug/${slug}`), { cache: 'no-store' });
+    const res = await fetch(getServerApiUrl(`api/real-estate-project/slug/${slug}`), {
+      cache: 'no-store',
+    });
 
     if (!res.ok) return null;
 
@@ -33,11 +35,13 @@ export const realEstateProjectService = {
     return data?.project ?? null;
   },
 
-  async create(payload: Partial<IRealEstateProject>) {
+  // =========================
+  // MULTIPART (UPLOAD IMAGE)
+  // =========================
+  async create(payload: FormData) {
     const res = await fetch(getServerApiUrl('api/real-estate-project'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: payload,
     });
 
     if (!res.ok) {
@@ -48,11 +52,10 @@ export const realEstateProjectService = {
     return res.json();
   },
 
-  async update(id: string, payload: Partial<IRealEstateProject>) {
+  async update(id: string, payload: FormData) {
     const res = await fetch(getServerApiUrl(`api/real-estate-project/${id}`), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: payload,
     });
 
     if (!res.ok) {
