@@ -1,15 +1,18 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { MdLocationPin, MdArrowForward } from 'react-icons/md';
+
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-import { FaImage } from 'react-icons/fa';
-import { IoMdExpand } from 'react-icons/io';
-import { MdLocationPin } from 'react-icons/md';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { slugify } from '@/lib/slugify';
-import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 import { usePrefetchRentalPost } from '@/hooks/usePrefetchRentalPost';
+import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 import imageRepresent from '../../public/image-represent';
+import { AiOutlineColumnWidth } from 'react-icons/ai';
+import { useMemo } from 'react';
+import { IoMdExpand } from 'react-icons/io';
 
 interface Props {
   salePosts: IRentalPostAdmin[];
@@ -18,97 +21,228 @@ interface Props {
   businessSpacePosts: IRentalPostAdmin[];
 }
 
-export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, businessSpacePosts }: Props) {
+interface PostCardProps {
+  post: IRentalPostAdmin;
+}
+
+// SUB-COMPONENT: REFINED POST CARD
+export const PostCard = ({ post }: PostCardProps) => {
   const { prefetchById } = usePrefetchRentalPost();
 
+  const thumbnail = useMemo(() => post.images?.[0] || imageRepresent.Fallback, [post.images]);
+
+  const slug = useMemo(() => slugify(post.title), [post.title]);
+
+  const priceDisplay = useMemo(() => `${formatCurrency(post.price)} ${post.priceUnit}`, [post.price, post.priceUnit]);
+
+  const pricePerM2 = useMemo(() => {
+    if (typeof post.pricePerM2 !== 'number') return null;
+    if (post.pricePerM2 <= 0) return null;
+    return post.pricePerM2;
+  }, [post.pricePerM2]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      className="group relative flex flex-col overflow-hidden bg-white transition-all duration-500 hover:shadow-2xl"
+    >
+      {/* Media */}
+      <Link href={`/${slug}/${post._id}`} onClick={() => prefetchById(post._id)} className="relative aspect-[4/3] w-full overflow-hidden">
+        <Image
+          src={thumbnail}
+          alt={post.title}
+          fill
+          unoptimized
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 33vw, 20vw"
+          className="object-cover transition-transform duration-1000 group-hover:scale-110"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+        <div className="absolute left-1 top-1 z-10 flex flex-wrap gap-1">
+          {post.propertyType && (
+            <span className="bg-neutral-900/80 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white backdrop-blur-sm">
+              {post.propertyType}
+            </span>
+          )}
+          {post.locationType && (
+            <span className="bg-white/90 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-neutral-800 backdrop-blur-sm">
+              {post.locationType}
+            </span>
+          )}
+        </div>
+
+        <div className="absolute right-1 top-1 z-20">
+          <FavoriteBtn post={post} />
+        </div>
+
+        {post.area && (
+          <div className="absolute bottom-1 left-1 z-10">
+            <div className="flex items-center gap-1.5 bg-white/10 px-2 py-1 text-[10px] font-medium text-white ring-1 ring-white/20 backdrop-blur-md">
+              <IoMdExpand size={12} />
+              <span>{post.area} m²</span>
+            </div>
+          </div>
+        )}
+      </Link>
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col p-2">
+        <div className="mb-2 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-neutral-400">
+          <MdLocationPin className="text-primary/70" />
+          <span className="truncate">
+            {post.district}, {post.province}
+          </span>
+        </div>
+
+        <Link href={`/${slug}/${post._id}`} className="mb-3 block">
+          <h4 className="line-clamp-2 min-h-[2.8rem] text-[15px] font-medium leading-relaxed text-neutral-900 transition-colors group-hover:text-primary xl:text-base">
+            {post.title}
+          </h4>
+        </Link>
+
+        {post.width && post.length ? (
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-y border-neutral-50 py-3">
+            {post.width && post.length && (
+              <div className="flex items-center gap-1.5 text-neutral-500">
+                <AiOutlineColumnWidth size={14} className="text-neutral-300" />
+                <span className="text-[11px] font-light italic">
+                  {post.width} x {post.length}m
+                </span>
+              </div>
+            )}
+
+            {pricePerM2 !== null && <div className="text-[11px] font-medium text-neutral-400">~ {formatCurrency(pricePerM2)}/m²</div>}
+          </div>
+        ) : null}
+
+        {/* Footer */}
+        <div className="mt-auto flex items-center justify-between">
+          <div className="flex flex-col">
+            <div className="text-lg font-bold tracking-tight text-primary xl:text-xl">{priceDisplay}</div>
+          </div>
+
+          <Link
+            href={`/${slug}/${post._id}`}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-50 text-neutral-400 transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:shadow-lg group-hover:shadow-primary/20"
+          >
+            <MdArrowForward size={18} />
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// MAIN PAGE COMPONENT
+export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, businessSpacePosts }: Props) {
   const sections = [
-    { title: 'Bất động sản bán', link: '/bat-dong-san-ban', data: salePosts },
-    { title: 'Cho thuê căn hộ', link: '/can-ho', data: apartmentPosts },
-    { title: 'Nhà nguyên căn cho thuê', link: '/nha-nguyen-can', data: housePosts },
-    { title: 'Cho thuê mặt bằng - kinh doanh', link: '/mat-bang', data: businessSpacePosts },
+    { title: 'Bất động sản bán', subtitle: 'Sales Portfolio', link: '/bat-dong-san-ban', data: salePosts },
+    { title: 'Căn hộ dịch vụ', subtitle: 'Luxury Apartments', link: '/can-ho', data: apartmentPosts },
+    { title: 'Nhà nguyên căn', subtitle: 'Townhouses', link: '/nha-nguyen-can', data: housePosts },
+    { title: 'Mặt bằng kinh doanh', subtitle: 'Commercial Space', link: '/mat-bang', data: businessSpacePosts },
   ];
 
   return (
-    <div className="px-2 pt-mobile-padding-top xl:px-desktop-padding xl:pt-desktop-padding-top">
-      {sections.map((section) => {
-        if (!section.data.length) return null;
+    <div className="xl:pt-desktop-padding-top">
+      {/* HERO SECTION */}
+      <section className="relative h-[70vh] w-full overflow-hidden bg-neutral-900">
+        <Image
+          src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070"
+          alt="Hero"
+          fill
+          className="object-cover opacity-60"
+          priority
+        />
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-2 text-center text-white">
+          <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-4 text-sm font-light uppercase tracking-[0.5em]">
+            Định nghĩa không gian sống
+          </motion.span>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-8 text-4xl font-extralight tracking-tighter xl:text-7xl"
+          >
+            Tìm thấy<span className="font-sans font-semibold italic">Tổ ấm</span> lý tưởng
+          </motion.h1>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="flex w-full max-w-xl items-center bg-white/10 p-1 ring-1 ring-white/20 backdrop-blur-md"
+          >
+            <input
+              type="text"
+              placeholder="Nhập khu vực, dự án hoặc từ khóa..."
+              className="w-full bg-transparent px-6 py-4 text-sm outline-none placeholder:text-white/50"
+            />
+            <button className="bg-white px-8 py-4 text-xs font-bold uppercase tracking-widest text-neutral-900 transition-colors hover:bg-primary hover:text-white">
+              Tìm kiếm
+            </button>
+          </motion.div>
+        </div>
+      </section>
 
-        return (
-          <div key={section.title} className="pb-8 xl:mt-10">
-            {/* Header dạng trang tin */}
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-gray-900 xl:text-3xl">{section.title}</h2>
+      {/* QUICK NAV */}
+      <section className="relative z-10 mx-auto -mt-16 max-w-7xl px-2 xl:px-desktop-padding">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {sections.map((s, i) => (
+            <Link key={i} href={s.link} className="group bg-white p-6 shadow-xl transition-all hover:-translate-y-2">
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-primary">{s.subtitle}</p>
+              <p className="text-sm font-medium text-neutral-900 group-hover:underline">{s.title}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-              <Link href={section.link} className="text-sm font-semibold text-primary underline">
-                Xem tất cả
-              </Link>
+      {/* DYNAMIC SECTIONS */}
+      <div className="mx-auto max-w-[1600px] px-2 py-20 xl:px-desktop-padding">
+        {sections.map((section) => {
+          if (!section.data.length) return null;
+
+          return (
+            <div key={section.title} className="mb-24">
+              {/* Header Section */}
+              <div className="flex items-end justify-between border-b border-neutral-100 pb-6">
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-400">{section.subtitle}</span>
+                  <h2 className="mt-2 text-3xl font-light tracking-tighter text-neutral-900 xl:text-4xl">{section.title}</h2>
+                </div>
+                <Link href={section.link} className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neutral-900">
+                  Xem bộ sưu tập
+                  <MdArrowForward className="transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+
+              {/* Grid Layout */}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                {section.data.slice(0, 10).map((post) => (
+                  <PostCard key={post._id} post={post} />
+                ))}
+              </div>
             </div>
+          );
+        })}
+      </div>
 
-            {/* Grid kiểu bản tin BĐS */}
-            <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4 xl:gap-3 2xl:grid-cols-5">
-              {section.data.map((post) => {
-                const thumbnail = post.images?.[0] || `${imageRepresent.Fallback}`;
-                const totalImages = post.images?.length || 0;
-                const slug = slugify(post.title);
-
-                return (
-                  <Link
-                    key={post._id}
-                    onClick={() => prefetchById(post._id)}
-                    href={`/${slug}/${post._id}`}
-                    className="group card relative overflow-hidden rounded-md bg-base-100 shadow-md transition-all duration-300 xl:hover:-translate-y-2 xl:hover:shadow-xl"
-                  >
-                    {/* Thumbnail */}
-                    <figure className="relative aspect-[4/3] overflow-hidden">
-                      <Image
-                        src={thumbnail}
-                        alt={post.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        unoptimized
-                      />
-
-                      {totalImages > 0 && (
-                        <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-md bg-black/50 px-2 py-1 text-[10px] text-white backdrop-blur-sm">
-                          <FaImage size={12} /> {totalImages}
-                        </div>
-                      )}
-                      {/* FavoriteBtn */}
-                      <div className="absolute right-0 top-0">
-                        <FavoriteBtn post={post} />
-                      </div>
-                    </figure>
-
-                    {/* Nội dung */}
-                    <div className="card-body p-2">
-                      <h4 className="line-clamp-3 border-b border-primary pb-1 text-lg font-bold text-gray-900 transition-colors group-hover:text-primary">
-                        {post.title}
-                      </h4>
-                      <div className="mt-1 flex flex-col items-start justify-between gap-1 xl:flex-row xl:items-center">
-                        <div className="text-2xl font-bold text-primary">
-                          {formatCurrency(post.price)} {post.priceUnit}
-                        </div>
-
-                        <div className="inline-flex items-center text-sm text-gray-600">
-                          <IoMdExpand />
-                          <span>{post.area} m²</span>
-                        </div>
-                      </div>
-
-                      <p className="mt-1 line-clamp-2 inline-flex items-center text-gray-500">
-                        <MdLocationPin size={16} />
-                        <span className="text-sm">
-                          {post.district}, {post.province}
-                        </span>
-                      </p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+      {/* FOOTER CTA */}
+      <section className="bg-neutral-900 py-24 text-center text-white">
+        <div className="mx-auto max-w-3xl px-2">
+          <h3 className="mb-6 text-3xl font-light tracking-tighter xl:text-5xl">Bạn cần ký gửi bất động sản?</h3>
+          <p className="mb-10 font-light text-neutral-400">
+            Chúng tôi giúp tài sản của bạn tiếp cận hàng nghìn khách hàng tiềm năng mỗi ngày thông qua hệ thống marketing chuyên nghiệp.
+          </p>
+          <Link
+            href="/lien-he-ky-gui"
+            className="inline-block border border-white/20 bg-white/5 px-12 py-5 text-xs font-bold uppercase tracking-[0.2em] transition-all hover:bg-white hover:text-neutral-900"
+          >
+            Bắt đầu ký gửi ngay
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
