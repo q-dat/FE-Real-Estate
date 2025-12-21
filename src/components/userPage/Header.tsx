@@ -116,7 +116,7 @@ export default function Header() {
                 </Link>
 
                 <Link
-                  href="/tu-van-tim-nha"
+                  href="/lien-he-ky-gui"
                   className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-white bg-primary p-1 text-white transition-all duration-200 hover:scale-105"
                 >
                   <LuHandshake size={24} />
@@ -140,7 +140,7 @@ export default function Header() {
                 </Link>
 
                 <Link
-                  href="/tu-van-tim-nha"
+                  href="/lien-he-ky-gui"
                   className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-white bg-primary p-2 text-white"
                 >
                   <LuHandshake size={30} />
