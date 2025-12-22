@@ -99,8 +99,8 @@ export default function AdminStatusModal({ initialStatus, initialPostType, onSel
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t bg-gray-50 px-5 py-3">
-          <button onClick={handleClear} className="text-xs font-semibold text-red-500 hover:text-red-700">
+        <div className="flex items-center justify-between border-t bg-primary px-5 py-3">
+          <button onClick={handleClear} className="text-xs font-semibold text-white hover:text-red-700">
             Xoá chọn
           </button>
           <div className="w-32">

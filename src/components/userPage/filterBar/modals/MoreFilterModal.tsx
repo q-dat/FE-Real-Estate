@@ -73,7 +73,7 @@ export default function MoreFilterModal({ initialValues, onSelect, onClose }: Mo
     onClose();
   };
 
-  // UI Components 
+  // UI Components
   const CounterRow = ({ label, value, setter }: { label: string; value: number; setter: React.Dispatch<React.SetStateAction<number>> }) => (
     <div className="flex items-center justify-between border-b border-dashed border-gray-100 py-3 last:border-0">
       <span className="text-sm font-medium text-gray-700">{label}</span>
@@ -84,7 +84,7 @@ export default function MoreFilterModal({ initialValues, onSelect, onClose }: Mo
         >
           <Minus size={14} />
         </button>
-        <span className="w-6 text-center text-sm font-semibold">{value > 0 ? value : 'Bất kỳ'}</span>
+        <span className="w-full whitespace-nowrap text-center text-sm font-semibold">{value > 0 ? value : 'Bất kỳ'}</span>
         <button onClick={() => updateCount(setter, value, 1)} className="btn btn-circle btn-xs border-gray-300 bg-white hover:bg-gray-100">
           <Plus size={14} />
         </button>
@@ -123,7 +123,7 @@ export default function MoreFilterModal({ initialValues, onSelect, onClose }: Mo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-2" onClick={handleClickOutside}>
-      <div ref={modalRef} className="animate-in fade-in zoom-in flex max-h-[85vh] w-full max-w-xl flex-col rounded-2xl bg-white shadow-xl">
+      <div ref={modalRef} className="animate-in fade-in zoom-in flex max-h-[75vh] w-full max-w-xl flex-col rounded-2xl bg-white shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b p-4">
           <h5 className="text-lg font-bold uppercase text-gray-800">Bộ lọc nâng cao</h5>
@@ -137,7 +137,7 @@ export default function MoreFilterModal({ initialValues, onSelect, onClose }: Mo
           {/* Cấu trúc */}
           <div>
             <h6 className="mb-2 text-sm font-bold uppercase text-gray-800">Cấu trúc</h6>
-            <div className="rounded-xl border border-gray-100 bg-gray-50/50 px-4">
+            <div className="rounded-xl border border-gray-100 bg-primary-lighter px-4">
               <CounterRow label="Số phòng ngủ" value={bedroom} setter={setBedroom} />
               <CounterRow label="Số phòng vệ sinh (WC)" value={toilet} setter={setToilet} />
               <CounterRow label="Số tầng" value={floor} setter={setFloor} />
@@ -176,8 +176,8 @@ export default function MoreFilterModal({ initialValues, onSelect, onClose }: Mo
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between rounded-b-2xl border-t bg-gray-50 p-4">
-          <button onClick={handleReset} className="text-sm font-medium text-gray-500 underline decoration-dotted hover:text-gray-800">
+        <div className="flex items-center justify-between rounded-b-2xl border-t bg-primary p-4">
+          <button onClick={handleReset} className="text-sm font-medium text-white decoration-dotted hover:text-gray-800">
             Đặt lại tất cả
           </button>
           <div className="flex gap-3">
