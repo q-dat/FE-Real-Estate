@@ -50,6 +50,8 @@ const rentalPostAdminService = {
       rentalPosts?: IRentalPostAdmin[];
     };
 
+    console.log('API', apiUrl);
+
     const list: IRentalPostAdmin[] = data.rentalPosts ?? [];
 
     // Nếu không có filter (tức là lấy toàn bộ danh sách gốc), ta mới update Cache

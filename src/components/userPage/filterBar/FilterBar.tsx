@@ -1,12 +1,14 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, RefreshCcw } from 'lucide-react';
+import { ChevronDown, RefreshCcw, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import LocationModal from './modals/LocationModal';
 import PriceModal from './modals/PriceModal';
 import AreaModal from './modals/AreaModal';
 import FilterResetModal from './modals/FilterResetModal';
 import PropertyTypeModal from './modals/PropertyTypeModal';
+import MoreFilterModal from './modals/MoreFilterModal';
+import AdminStatusModal from './modals/AdminStatusModal';
 // Đã xóa: import { getPriceParamsFromLabel, PriceRangeKey } from '@/constants/priceRanges';
 
 interface FilterValues {
@@ -25,6 +27,17 @@ interface FilterValues {
   displayPrice?: string;
   displayArea?: string;
   location?: string;
+
+  bedroomNumber?: number;
+  toiletNumber?: number;
+  floorNumber?: number;
+  direction?: string;
+  furnitureStatus?: string;
+  legalStatus?: string;
+  locationType?: string;
+
+  status?: string;
+  postType?: string;
 }
 
 // Interface của dữ liệu nhận từ PriceModal
@@ -102,6 +115,23 @@ export default function FilterBar() {
     setActiveModal(null);
   };
 
+  const handleMoreFilter = (data: any) => {
+    setFilters((prev) => ({
+      ...prev,
+      ...data, // Spread các field bedroom, direction... vào state
+    }));
+    // Lưu count vào state riêng nếu cần hiển thị Badge
+    setActiveModal(null);
+  };
+
+  const handleAdminFilter = (data: any) => {
+    setFilters((prev) => ({
+      ...prev,
+      status: data.status,
+      postType: data.postType,
+    }));
+    setActiveModal(null);
+  };
   useEffect(() => {
     // 1. Tạo danh sách các key KHÔNG muốn đưa lên URL
     const excludedKeys: (keyof FilterValues)[] = ['displayPrice', 'displayArea', 'location'];
@@ -158,6 +188,35 @@ export default function FilterBar() {
             <p className={`w-20 truncate text-start text-sm font-bold text-red-600 xl:w-auto`}>{typeLabel}</p>
           </button>
         )}
+        {/* Nút Bộ lọc khác */}
+        <button
+          className={`rounded-[10px] border px-2 py-0.5 text-sm font-medium transition-colors ${
+            // Check nếu có filter nâng cao thì highlight
+            filters.bedroomNumber || filters.direction ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-50 bg-white text-gray-600'
+          }`}
+          onClick={() => setActiveModal('more')}
+        >
+          <p className="inline-flex h-10 items-center gap-1">
+            <SlidersHorizontal size="16px" />
+            Bộ lọc khác
+            {/* Hiển thị dot đỏ nếu có filter active */}
+            {(filters.bedroomNumber || filters.direction) && <span className="ml-1 h-2 w-2 rounded-full bg-red-500"></span>}
+          </p>
+        </button>
+
+        {/* Nút Admin Status (Chỉ hiện nếu là trang Admin) */}
+        <button
+          className={`rounded-[10px] border px-2 py-0.5 text-sm font-medium ${
+            filters.status ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-50 bg-white text-gray-600'
+          }`}
+          onClick={() => setActiveModal('admin')}
+        >
+          <p className="inline-flex h-10 items-center gap-1">
+            <ShieldCheck size="16px" />
+            Trạng thái
+          </p>
+        </button>
+
         {/* Các nút Filter động */}
         {[
           { key: 'location', label: 'Khu vực' },
@@ -193,6 +252,21 @@ export default function FilterBar() {
           </p>
         </button>
       </div>
+      {activeModal === 'more' && (
+        <MoreFilterModal
+          initialValues={filters} // Truyền filters hiện tại vào để hiển thị lại
+          onSelect={handleMoreFilter}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+      {activeModal === 'admin' && (
+        <AdminStatusModal
+          initialStatus={filters.status}
+          initialPostType={filters.postType}
+          onSelect={handleAdminFilter}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
       {activeModal === 'type' && <PropertyTypeModal onSelect={() => handleSelectType} onClose={() => setActiveModal(null)} />}
       {activeModal === 'location' && <LocationModal onSelect={handleSelectLocation} onClose={() => setActiveModal(null)} />}
       {activeModal === 'price' && <PriceModal onSelect={handleSelectPrice} onClose={() => setActiveModal(null)} />}
