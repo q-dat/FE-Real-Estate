@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Button } from 'react-daisyui';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaPen, FaCheckCircle, FaCloudUploadAlt, FaTimes } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';

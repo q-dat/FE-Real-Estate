@@ -9,7 +9,7 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import { slugify } from '@/lib/slugify';
 import { usePrefetchRentalPost } from '@/hooks/usePrefetchRentalPost';
 import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
-import imageRepresent from '../../public/image-represent';
+import imageRepresent from '../../../public/image-represent';
 import { AiOutlineColumnWidth } from 'react-icons/ai';
 import { useMemo } from 'react';
 import { IoMdExpand } from 'react-icons/io';

@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from 'react-daisyui';
 import { FaTrashAlt } from 'react-icons/fa';

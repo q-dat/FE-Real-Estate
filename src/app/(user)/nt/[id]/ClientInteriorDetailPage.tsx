@@ -3,7 +3,6 @@ import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 import { PropertyGallery } from '@/components/userPage/rental/detail/PropertyGallery';
 import { IInterior } from '@/types/type/interiors/interiors';
 import { mapInteriorImages } from '@/utils/mapInteriorImages';
-import { FaHashtag } from 'react-icons/fa';
 
 interface Props {
   interior: IInterior;

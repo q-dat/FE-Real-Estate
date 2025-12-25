@@ -9,11 +9,11 @@ import { IoShareSocial } from 'react-icons/io5';
 import { GiHouse, GiPencilRuler, GiStarsStack } from 'react-icons/gi';
 import { BsBuildingFillUp } from 'react-icons/bs';
 import { SiGooglemaps } from 'react-icons/si';
-import { images } from '../../../../public/images';
+import { images } from '../../../../../public/images';
 
 // Import Types & Components
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-import { PropertyGallery } from '../../../components/userPage/rental/detail/PropertyGallery';
+import { PropertyGallery } from '../../../../components/userPage/rental/detail/PropertyGallery';
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 import DownloadImagesButton from '@/components/userPage/rental/detail/DownloadImagesButton';
