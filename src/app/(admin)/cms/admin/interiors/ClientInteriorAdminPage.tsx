@@ -59,7 +59,7 @@ export default function ClientInteriorAdminPage({ interiors: initialInteriors, c
   return (
     <div className="w-full">
       {/* Header Sticky & Glassmorphism */}
-      <div className="sticky top-0 z-30 mb-8 mt-4 flex items-center justify-between rounded-md border border-white/50 bg-white/80 px-6 py-4 shadow-sm backdrop-blur-xl transition-all">
+      <div className="sticky top-0 flex items-center justify-between rounded-md border border-white/50 bg-white/80 shadow-sm backdrop-blur-xl transition-all">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-bold text-slate-800 xl:text-2xl">
             <FaLayerGroup className="text-primary" /> Quản lý nội thất
@@ -70,7 +70,7 @@ export default function ClientInteriorAdminPage({ interiors: initialInteriors, c
         <Button
           size="sm"
           color="primary"
-          className="gap-2 rounded-xl shadow-lg shadow-primary/30 hover:scale-105"
+          className="gap-2 rounded-xl shadow-lg shadow-primary/30 xl:hover:scale-105"
           onClick={() => {
             setEditingItem(null);
             setOpenModal(true);
@@ -100,7 +100,7 @@ export default function ClientInteriorAdminPage({ interiors: initialInteriors, c
                 setEditingItem(it);
                 setOpenModal(true);
               }}
-              className="group relative flex cursor-pointer flex-col overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10"
+              className="group relative flex cursor-pointer flex-col overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm transition-all duration-300 xl:hover:-translate-y-1 xl:hover:shadow-xl xl:hover:shadow-primary/10"
             >
               {/* Image Section */}
               <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
@@ -138,7 +138,7 @@ export default function ClientInteriorAdminPage({ interiors: initialInteriors, c
                       setEditingItem(it);
                       setOpenModal(true);
                     }}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-blue-600 shadow-lg hover:bg-blue-50"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-blue-600 shadow-lg xl:hover:bg-blue-50"
                     title="Chỉnh sửa"
                   >
                     <FaPen size={12} />
@@ -148,7 +148,7 @@ export default function ClientInteriorAdminPage({ interiors: initialInteriors, c
                       e.stopPropagation();
                       handleDelete(it._id);
                     }}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-red-500 shadow-lg hover:bg-red-50"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-red-500 shadow-lg xl:hover:bg-red-50"
                     title="Xóa"
                   >
                     <FaTrashAlt size={12} />

@@ -53,12 +53,12 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
     // Tối ưu responsive: Bỏ scrollbar-hide, thay bằng scrollbar-thin để tốt hơn cho UX trên desktop
     <div className="w-full">
       {/* Header */}
-      <div className="mb-6 mt-6 flex items-center justify-between border-b-2 border-primary/20 pb-4">
+      <div className="flex items-center justify-between border-b-2 border-primary/20 pb-4">
         <h1 className="flex items-center gap-3 text-xl font-bold text-gray-800 xl:text-2xl">Quản lý Bài đăng Cho thuê</h1>
         <Button
           size="sm"
           color="primary"
-          className="flex items-center gap-2 rounded-lg font-semibold shadow-md transition hover:shadow-lg"
+          className="flex items-center gap-2 rounded-lg font-semibold shadow-md transition xl:hover:shadow-lg"
           onClick={() => {
             setEditingPost(null);
             setOpenModal(true);
@@ -84,7 +84,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
           return (
             <div
               key={post._id}
-              className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl"
+              className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 xl:hover:shadow-xl"
             >
               {/* Ảnh - Giữ nguyên logic click để chỉnh sửa */}
               <div
@@ -132,7 +132,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                       setEditingPost(post);
                       setOpenModal(true);
                     }}
-                    className="line-clamp-2 cursor-pointer text-base font-semibold text-gray-900 transition-colors duration-200 hover:text-primary"
+                    className="line-clamp-2 cursor-pointer text-base font-semibold text-gray-900 transition-colors duration-200 xl:hover:text-primary"
                   >
                     {post.title}
                   </h2>
@@ -173,7 +173,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                       e.stopPropagation(); // Ngăn chặn mở modal chỉnh sửa
                       handleDelete(post._id);
                     }}
-                    className="btn-square text-white transition-colors duration-200 hover:bg-red-600"
+                    className="btn-square text-white transition-colors duration-200 xl:hover:bg-red-600"
                   >
                     <FaTrashAlt size={12} />
                   </Button>

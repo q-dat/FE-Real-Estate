@@ -43,7 +43,7 @@ export default function ClientInteriorCategoryPage({ categories: initial }: Prop
 
   return (
     <div className="w-full">
-      <div className="mb-5 mt-10 flex items-center justify-between border-b pb-3">
+      <div className="flex items-center justify-between border-b">
         <h1 className="text-lg font-semibold xl:text-xl">Quản lý danh mục</h1>
 
         <Button
@@ -68,7 +68,7 @@ export default function ClientInteriorCategoryPage({ categories: initial }: Prop
               setEditingItem(it);
               setOpenModal(true);
             }}
-            className="group flex cursor-pointer flex-col justify-between rounded-xl border bg-white p-4 shadow-sm transition hover:bg-primary hover:text-white"
+            className="group flex cursor-pointer flex-col justify-between rounded-xl border bg-white p-4 shadow-sm transition xl:hover:bg-primary xl:hover:text-white"
           >
             <div>
               <h2 className="mb-1 text-base font-semibold">{it.name}</h2>

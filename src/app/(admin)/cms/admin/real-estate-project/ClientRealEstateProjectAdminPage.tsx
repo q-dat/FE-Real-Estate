@@ -41,7 +41,7 @@ export default function ClientRealEstateProjectAdminPage({ projects: initial }: 
   return (
     <div className="w-full">
       {/* Header */}
-      <div className="sticky top-0 z-30 mb-6 flex items-center justify-between rounded-md bg-white/80 px-6 py-4 shadow backdrop-blur">
+      <div className="sticky top-0 flex items-center justify-between rounded-md bg-white/80 shadow backdrop-blur">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-bold">
             <FaBuilding className="text-primary" /> Quản lý dự án BĐS
@@ -65,7 +65,7 @@ export default function ClientRealEstateProjectAdminPage({ projects: initial }: 
         {projects.map((p) => (
           <div
             key={p._id}
-            className="group relative rounded-md border bg-white p-4 shadow hover:shadow-lg"
+            className="group relative rounded-md border bg-white p-4 shadow xl:hover:shadow-lg"
             onClick={() => {
               setEditingItem(p);
               setOpenModal(true);

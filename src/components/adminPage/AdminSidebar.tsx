@@ -1,39 +1,170 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ADMIN_MENU, IMenuItem } from '@/configs/admin-menu.config';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Menu } from 'react-daisyui';
+import { HiChevronDown } from 'react-icons/hi2';
+import { ADMIN_MENU, IMenuItem, ISubMenuItem } from '@/configs/admin-menu.config';
+import Image from 'next/image';
 
-export default function AdminSidebar() {
-  const pathname = usePathname();
+// --- Types ---
+interface SidebarItemProps {
+  item: IMenuItem;
+  pathname: string;
+  isExpanded: boolean;
+  onSelect: () => void;
+}
+
+// --- Sidebar Item Component ---
+const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps) => {
+  const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+  const hasSubmenu = !!item.submenu && item.submenu.length > 0;
+  const isActive = pathname === item.path || (hasSubmenu && item.submenu?.some((sub) => pathname === sub.path));
+  const Icon = item.icon;
 
   return (
-    <aside className="h-full w-72 border-r bg-base-100 py-6">
-      <div className="mb-10 px-6">
-        <h2 className="text-2xl font-bold tracking-tight text-primary">CMS ADMIN</h2>
-        <p className="mt-1 text-xs uppercase tracking-widest text-base-content/50">Management System</p>
+    <div className="relative mb-1 px-3" onMouseEnter={() => isExpanded && setIsSubmenuOpen(true)} onMouseLeave={() => setIsSubmenuOpen(false)}>
+      <Link
+        href={hasSubmenu ? '#' : item.path}
+        onClick={(e) => {
+          if (hasSubmenu) {
+            e.preventDefault();
+            if (isExpanded) setIsSubmenuOpen(!isSubmenuOpen);
+          } else {
+            onSelect(); // Thu nhỏ sidebar khi click vào link thường
+          }
+        }}
+        className={`group relative flex h-12 items-center rounded-xl transition-all duration-300 ${
+          isExpanded ? 'justify-between px-4' : 'justify-center px-0'
+        } ${
+          isActive ? 'bg-primary/10 text-primary shadow-[inset_0_0_20px_rgba(var(--p),0.05)]' : 'text-slate-400 hover:bg-white/5 hover:text-slate-100'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <Icon className={`flex-shrink-0 text-xl transition-colors duration-300 ${isActive ? 'text-primary' : 'group-hover:text-primary'}`} />
+          {isExpanded && (
+            <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="whitespace-nowrap font-medium tracking-tight">
+              {item.title}
+            </motion.span>
+          )}
+        </div>
+
+        {hasSubmenu && isExpanded && (
+          <motion.div animate={{ rotate: isSubmenuOpen ? 180 : 0 }} className="text-xs">
+            <HiChevronDown strokeWidth={2} />
+          </motion.div>
+        )}
+
+        {isActive && (
+          <motion.div
+            layoutId="active-pill"
+            className="absolute inset-0 rounded-xl border border-primary/20 bg-primary/5"
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          />
+        )}
+      </Link>
+
+      {/* Submenu Area */}
+      <AnimatePresence>
+        {hasSubmenu && isSubmenuOpen && isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-1 flex flex-col gap-1 pl-11 pr-2">
+              {item.submenu?.map((sub: ISubMenuItem) => (
+                <Link
+                  key={sub.path}
+                  href={sub.path}
+                  onClick={onSelect}
+                  className={`py-2 text-sm transition-all hover:translate-x-1 ${
+                    pathname === sub.path ? 'font-semibold text-primary' : 'text-slate-500 hover:text-slate-200'
+                  }`}
+                >
+                  {sub.title}
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// --- Main Sidebar Component ---
+export default function AdminSidebar() {
+  const pathname = usePathname();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Cấu hình variants cho animation width
+  const sidebarVariants = {
+    collapsed: { width: 80 },
+    expanded: { width: 288 },
+  };
+
+  return (
+    <motion.aside
+      initial="collapsed"
+      animate={isExpanded ? 'expanded' : 'collapsed'}
+      variants={sidebarVariants}
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
+      transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+      className="sticky top-0 h-screen border-r border-white/5 bg-[#020617] shadow-2xl"
+    >
+      <div className="z-[999999] flex h-full flex-col overflow-hidden">
+        {/* Logo Section */}
+        <div className="flex h-24 items-center overflow-hidden px-4">
+          <div className={`flex items-center gap-4 ${!isExpanded && 'mx-auto'}`}>
+            <div className="relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-primary shadow-[0_0_20px_rgba(var(--p),0.3)]">
+              <div className="h-4 w-4 rotate-45 animate-ping rounded-sm bg-white" />
+            </div>
+            {isExpanded && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <h1 className="whitespace-nowrap text-lg font-bold tracking-wider text-white">NGUONNHAGIARE</h1>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
+                  <span className="text-[10px] font-bold uppercase text-slate-500">Online</span>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4 scrollbar-hide">
+          <div className={`mb-4 px-6 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'h-0 opacity-0'}`}>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600">Menu</span>
+          </div>
+
+          <Menu className="p-0">
+            {ADMIN_MENU.map((item) => (
+              <SidebarItem key={item.path} item={item} pathname={pathname} isExpanded={isExpanded} onSelect={() => setIsExpanded(false)} />
+            ))}
+          </Menu>
+        </div>
+
+        {/* Footer Card */}
+        <Link target="_blank" href="https://zalo.me/0333133050" className="p-4">
+          <div
+            className={`relative flex items-center gap-3 overflow-hidden rounded-2xl bg-white/5 p-3 ring-1 ring-white/10 ${!isExpanded && 'justify-center'}`}
+          >
+            <div className="h-9 w-9 flex-shrink-0 rounded-full bg-primary/20 p-0.5">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Man" alt="Avatar" className="h-full w-full rounded-full object-cover" />
+            </div>
+            {isExpanded && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="overflow-hidden">
+                <p className="truncate text-xs font-bold uppercase text-white">Hỗ trợ kĩ thuật</p>
+                <p className="whitespace-nowrap text-[10px] text-slate-500">0333.133.050 - Quốc Đạt</p>
+              </motion.div>
+            )}
+          </div>
+        </Link>
       </div>
-
-      <Menu className="gap-1 px-2">
-        {ADMIN_MENU.map((item: IMenuItem) => {
-          const isActive = pathname.startsWith(item.path);
-          const Icon = item.icon;
-
-          return (
-            <Menu.Item key={item.path}>
-              <Link
-                href={item.path}
-                className={`flex items-center gap-3 rounded-lg px-4 py-3 transition-all duration-200 ${
-                  isActive ? 'bg-primary font-medium text-primary-content shadow-md' : 'hover:bg-base-200 active:scale-95'
-                }`}
-              >
-                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                <span>{item.title}</span>
-              </Link>
-            </Menu.Item>
-          );
-        })}
-      </Menu>
-    </aside>
+    </motion.aside>
   );
 }
