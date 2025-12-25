@@ -51,23 +51,23 @@ export const ADMIN_MENU: IMenuItem[] = [
       },
       {
         title: 'Mua bán nhà đất',
-        path: '/cms/admin/rental-post-admin?categoryCode=0',
+        path: '/cms/admin/rental-post-admin/0',
       },
       {
         title: 'Căn hộ cho thuê',
-        path: '/cms/admin/rental-post-admin?categoryCode=1',
+        path: '/cms/admin/rental-post-admin/1',
       },
       {
         title: 'Nhà nguyên căn',
-        path: '/cms/admin/rental-post-admin?categoryCode=2',
+        path: '/cms/admin/rental-post-admin/2',
       },
       {
         title: 'Cho thuê mặt bằng',
-        path: '/cms/admin/rental-post-admin?categoryCode=3',
+        path: '/cms/admin/rental-post-admin/3',
       },
       // {
       //   title: 'Bài đăng đã ẩn',
-      //   path: '/cms/admin/rental-post-admin?categoryCode=4',
+      //   path: '/cms/admin/rental-post-admin/4',
       // },
     ],
   },
