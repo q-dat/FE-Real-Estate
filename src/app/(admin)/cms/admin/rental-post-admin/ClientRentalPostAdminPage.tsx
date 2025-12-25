@@ -51,7 +51,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
 
   return (
     // Tối ưu responsive: Bỏ scrollbar-hide, thay bằng scrollbar-thin để tốt hơn cho UX trên desktop
-    <div className="min-h-screen bg-white px-4 pt-mobile-padding-top text-black xl:px-8 xl:pt-desktop-padding-top">
+    <div className="w-full">
       {/* Header */}
       <div className="mb-6 mt-6 flex items-center justify-between border-b-2 border-primary/20 pb-4">
         <h1 className="flex items-center gap-3 text-xl font-bold text-gray-800 xl:text-2xl">Quản lý Bài đăng Cho thuê</h1>

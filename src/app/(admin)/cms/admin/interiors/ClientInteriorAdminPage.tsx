@@ -1,9 +1,9 @@
 'use client';
 import { useState } from 'react';
-import { Button, Badge } from 'react-daisyui'; // Thêm Badge
+import { Button, Badge } from 'react-daisyui';
 import Image from 'next/image';
 import { FaPlus, FaPen, FaTrashAlt, FaImages, FaLayerGroup } from 'react-icons/fa';
-import { motion } from 'framer-motion'; // Thêm animation
+import { motion } from 'framer-motion';
 import DeleteModal from '../DeleteModal';
 import { IInterior } from '@/types/type/interiors/interiors';
 import { interiorService } from '@/services/interiorsService';
@@ -57,7 +57,7 @@ export default function ClientInteriorAdminPage({ interiors: initialInteriors, c
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 px-3 pb-20 pt-mobile-padding-top text-slate-800 xl:px-6 xl:pt-desktop-padding-top">
+    <div className="w-full">
       {/* Header Sticky & Glassmorphism */}
       <div className="sticky top-0 z-30 mb-8 mt-4 flex items-center justify-between rounded-md border border-white/50 bg-white/80 px-6 py-4 shadow-sm backdrop-blur-xl transition-all">
         <div>

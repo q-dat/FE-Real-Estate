@@ -42,7 +42,7 @@ export default function ClientInteriorCategoryPage({ categories: initial }: Prop
   };
 
   return (
-    <div className="min-h-screen bg-white px-2 pt-mobile-padding-top text-black xl:px-4 xl:pt-desktop-padding-top">
+    <div className="w-full">
       <div className="mb-5 mt-10 flex items-center justify-between border-b pb-3">
         <h1 className="text-lg font-semibold xl:text-xl">Quản lý danh mục</h1>
 

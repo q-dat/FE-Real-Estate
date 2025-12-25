@@ -39,7 +39,7 @@ export default function ClientRealEstateProjectAdminPage({ projects: initial }: 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 px-3 pb-20 pt-mobile-padding-top xl:px-6 xl:pt-desktop-padding-top">
+    <div className="w-full">
       {/* Header */}
       <div className="sticky top-0 z-30 mb-6 flex items-center justify-between rounded-md bg-white/80 px-6 py-4 shadow backdrop-blur">
         <div>
