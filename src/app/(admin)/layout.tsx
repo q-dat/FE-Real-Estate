@@ -5,51 +5,59 @@ import AdminNavbar from '@/components/adminPage/AdminNavbar';
 import AdminSidebar from '@/components/adminPage/AdminSidebar';
 import { useEffect, useState } from 'react';
 import { Drawer } from 'react-daisyui';
+import { useRouter } from 'next/navigation';
+import { authService } from '@/services/auth.service';
 
-type ServerStatus = 'booting' | 'ready';
+type Status = 'booting' | 'ready' | 'unauthorized';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [status, setStatus] = useState<Status>('booting');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [serverStatus, setServerStatus] = useState<ServerStatus>('booting');
 
   useEffect(() => {
     let cancelled = false;
 
-    const checkServer = async () => {
+    const checkAuth = async () => {
       try {
-        const res = await fetch('/api/health', {
-          cache: 'no-store',
-        });
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No token');
 
-        if (!res.ok) throw new Error('Health check failed');
+        const res = await authService.me(token);
+
+        if (res.data.role !== 'admin') {
+          throw new Error('Not admin');
+        }
 
         if (!cancelled) {
-          setServerStatus('ready');
+          setStatus('ready');
         }
       } catch {
         if (!cancelled) {
-          setTimeout(checkServer, 1500);
+          setStatus('unauthorized');
         }
       }
     };
 
-    checkServer();
+    checkAuth();
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [router]);
 
-  // 👉 Render loading tĩnh trước
-  if (serverStatus !== 'ready') {
+  if (status === 'booting') {
     return <AdminBootLoading />;
   }
 
-  // 👉 Server đã sẵn sàng → render admin UI
+  if (status === 'unauthorized') {
+    router.replace('/login');
+    return null;
+  }
+
   return (
     <Drawer open={isSidebarOpen} onClickOverlay={() => setIsSidebarOpen(false)} side={<AdminSidebar />}>
       <div className="flex min-h-screen bg-slate-50">
-        {/* Sidebar desktop */}
         <div className="hidden xl:block">
           <AdminSidebar />
         </div>

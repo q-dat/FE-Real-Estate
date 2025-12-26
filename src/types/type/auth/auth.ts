@@ -35,3 +35,12 @@ export interface ProfileResponse {
     zaloNumber?: string;
   };
 }
+export interface MeResponse {
+  message: string;
+  data: {
+    id: string;
+    email: string;
+    role: 'admin' | 'user';
+    avatar?: string;
+  };
+}

@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth.service';
@@ -15,14 +16,15 @@ export default function LoginPage() {
 
       const res = await authService.login({ email, password });
 
-      if (!res?.data?.token) {
+      if (!res.data?.token) {
         throw new Error('Token không tồn tại');
       }
 
+      // Lưu token
       localStorage.setItem('token', res.data.token);
 
-      alert('Đăng nhập thành công');
-      router.push('/profile');
+      // Chỉ vào CMS admin
+      router.replace('/cms/admin/dashboard');
     } catch (error: unknown) {
       const err = error as Error;
       alert(err.message || 'Đăng nhập thất bại');
@@ -34,8 +36,8 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="card w-full max-w-md bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="text-xl font-semibold">Đăng nhập</h2>
+        <div className="card-body space-y-4">
+          <h2 className="text-xl font-semibold">Đăng nhập CMS</h2>
 
           <input className="input input-bordered w-full" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
 

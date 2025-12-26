@@ -1,9 +1,21 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { LoginPayload, RegisterPayload, UpdateProfilePayload, AuthResponse, ProfileResponse } from '@/types/type/auth/auth';
+import { LoginPayload, RegisterPayload, UpdateProfilePayload, AuthResponse, ProfileResponse, MeResponse } from '@/types/type/auth/auth';
 
 const apiUrl = getServerApiUrl('api/auth');
 
 export const authService = {
+  me: async (token: string): Promise<MeResponse> => {
+    const res = await fetch(`${apiUrl}/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    });
+
+    if (!res.ok) throw await res.json();
+    return res.json();
+  },
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
     const res = await fetch(`${apiUrl}/register`, {
       method: 'POST',
