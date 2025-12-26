@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import AdminBootLoading from '@/components/adminPage/AdminBootLoading';
 import AdminLayout from './layout';

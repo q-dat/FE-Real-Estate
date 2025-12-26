@@ -22,12 +22,12 @@ const AdminBootLoading: React.FC = () => {
       <div className="relative z-10 flex w-full flex-col items-center px-6">
         {/* Brand Header với hiệu ứng Tracking */}
         <div className="mb-12 text-center">
-          <h1 className="animate-tracking-in-expand text-4xl font-black tracking-[0.3em] text-white xl:text-6xl">
+          <h1 className="animate-tracking-in-expand text-2xl font-black tracking-[0.3em] text-white xl:text-6xl">
             NGUONNHA<span className="italic text-primary">GIARE</span>
           </h1>
           <div className="mt-4 flex items-center justify-center gap-2">
             <span className="h-px w-8 bg-slate-800" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-primary/60">System Protocol v4.0</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-primary/60">System Protocol v1.0</span>
             <span className="h-px w-8 bg-slate-800" />
           </div>
         </div>
@@ -89,7 +89,7 @@ const AdminBootLoading: React.FC = () => {
       </div>
 
       {/* Footer Meta */}
-      <div className="absolute bottom-10 flex w-full justify-center gap-8 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600">
+      <div className="absolute bottom-10 flex w-full flex-col items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600 xl:flex-row xl:gap-5">
         <span>Cloud Computing</span>
         <span>Secure Auth</span>
         <span>Node Cluster</span>
