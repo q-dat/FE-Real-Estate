@@ -14,6 +14,7 @@ import Zoom from '@/lib/Zoom';
 import { interiorService } from '@/services/interiorsService';
 import { IInterior } from '@/types/type/interiors/interiors';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
+import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
 
 interface Props {
   open: boolean;
@@ -72,7 +73,7 @@ const FileUploadArea = ({
 );
 
 export default function InteriorModal({ open, onClose, editingItem, categories, reload }: Props) {
-  const { register, handleSubmit, reset } = useForm<IInterior>();
+  const { register, handleSubmit, reset, watch, setValue } = useForm<IInterior>();
 
   // State lưu FileList gốc (để đếm số lượng file mới upload)
   const [images, setImages] = useState<FileList | null>(null);
@@ -140,8 +141,9 @@ export default function InteriorModal({ open, onClose, editingItem, categories, 
 
       formData.append('category', categoryId);
       formData.append('name', data.name);
-      formData.append('description', data.description || '');
       formData.append('status', data.status || '');
+      formData.append('description', data.description || '');
+      formData.append('content', data.content || '');
 
       if (editingItem?.images && !images) formData.append('oldImages', editingItem.images);
       if (images) {
@@ -251,6 +253,8 @@ export default function InteriorModal({ open, onClose, editingItem, categories, 
                     placeholder="VD: Mới, Hot..."
                     bordered
                   />
+
+                  <JoditEditorWrapper height={520} value={watch('content') || ''} onChange={(v) => setValue('content', v)} />
                 </div>
 
                 {/* Column 2: Images */}

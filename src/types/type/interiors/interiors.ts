@@ -8,4 +8,5 @@ export interface IInterior {
   thumbnails?: string[];
   status?: string;
   description?: string;
+  content?: string;
 }

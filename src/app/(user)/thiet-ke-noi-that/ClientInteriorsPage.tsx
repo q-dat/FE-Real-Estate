@@ -105,6 +105,13 @@ const InteriorCard = ({ item, idx }: { item: IInterior; idx: number }) => {
               </div>
             </div>
           )}
+
+          <div
+            dangerouslySetInnerHTML={{
+              __html: item?.content || '',
+            }}
+            className="text-base font-light text-default"
+          ></div>
         </div>
       </Link>
     </motion.article>
