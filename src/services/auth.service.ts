@@ -1,10 +1,10 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { LoginPayload, RegisterPayload, UpdateProfilePayload } from '@/types/type/auth/auth';
+import { LoginPayload, RegisterPayload, UpdateProfilePayload, AuthResponse, ProfileResponse } from '@/types/type/auth/auth';
 
 const apiUrl = getServerApiUrl('api/auth');
 
 export const authService = {
-  register: async (payload: RegisterPayload) => {
+  register: async (payload: RegisterPayload): Promise<AuthResponse> => {
     const res = await fetch(`${apiUrl}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -15,7 +15,7 @@ export const authService = {
     return res.json();
   },
 
-  login: async (payload: LoginPayload) => {
+  login: async (payload: LoginPayload): Promise<AuthResponse> => {
     const res = await fetch(`${apiUrl}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -26,7 +26,43 @@ export const authService = {
     return res.json();
   },
 
-  updateProfile: async (payload: UpdateProfilePayload, token: string) => {
+  verifyEmail: async (email: string, otp: string) => {
+    const res = await fetch(`${apiUrl}/verify-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp }),
+    });
+
+    if (!res.ok) throw await res.json();
+    return res.json();
+  },
+
+  resetPassword: async (email: string) => {
+    const res = await fetch(`${apiUrl}/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok) throw await res.json();
+    return res.json();
+  },
+
+  changePassword: async (oldPassword: string, newPassword: string, token: string) => {
+    const res = await fetch(`${apiUrl}/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ oldPassword, newPassword }),
+    });
+
+    if (!res.ok) throw await res.json();
+    return res.json();
+  },
+
+  updateProfile: async (payload: UpdateProfilePayload, token: string): Promise<ProfileResponse> => {
     const formData = new FormData();
 
     if (payload.avatar) formData.append('avatar', payload.avatar);
@@ -39,6 +75,16 @@ export const authService = {
         Authorization: `Bearer ${token}`,
       },
       body: formData,
+    });
+
+    if (!res.ok) throw await res.json();
+    return res.json();
+  },
+  confirmResetPassword: async (email: string, otp: string, newPassword: string) => {
+    const res = await fetch(`${apiUrl}/confirm-reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp, newPassword }),
     });
 
     if (!res.ok) throw await res.json();
