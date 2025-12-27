@@ -20,29 +20,25 @@ export default function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
   return (
     <Navbar className="sticky top-0 z-[999999] w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">
       {/* LEFT SECTION: Mobile Toggle & Context Info */}
-      <Navbar.Start className="gap-4">
+      <Navbar.Start>
         <motion.div whileTap={{ scale: 0.9 }}>
-          <Button
-            shape="square"
-            color="ghost"
-            className="border-none text-slate-400 hover:bg-primary/10 hover:text-primary xl:hidden"
-            onClick={onMenuClick}
-          >
+          <Button shape="square" className="border-none text-slate-400 xl:hidden xl:hover:bg-primary/10 xl:hover:text-primary" onClick={onMenuClick}>
             <HiBars3BottomLeft size={24} />
           </Button>
         </motion.div>
 
         <div className="hidden flex-col md:flex">
-          <div className="flex items-center gap-2">
-            <HiOutlineCommandLine className="text-primary/60" size={16} />
-            <motion.h2 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="text-sm font-bold tracking-tight text-white">
-              Hệ thống quản trị
-            </motion.h2>
-          </div>
           <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            <span>Nguồn Nhà Giá Rẻ</span>
+            <span>Hệ thống quản trị</span>
             <span className="h-1 w-1 rounded-full bg-green-500/50 shadow-[0_0_5px_rgba(34,197,94,0.5)]" />
             <span className="text-slate-400">Đang hoạt động</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <HiOutlineCommandLine className="text-primary" size={20} />
+            <motion.h2 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="text-3xl font-bold tracking-tight text-white">
+              {/* {title} */}
+            </motion.h2>
           </div>
         </div>
       </Navbar.Start>
@@ -67,10 +63,10 @@ export default function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
       </Navbar.Center>
 
       {/* RIGHT SECTION: Notifications & Profile */}
-      <Navbar.End className="gap-3">
+      <Navbar.End>
         {/* Notifications */}
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Button shape="circle" color="ghost" className="relative border-none text-slate-400 hover:bg-white/5 hover:text-primary">
+          <Button shape="circle" className="relative w-10 border-none text-slate-400 xl:hover:bg-white/5 xl:hover:text-primary">
             <Indicator>
               <HiOutlineBell size={22} />
               <span className="badge badge-primary badge-xs absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse border-none shadow-[0_0_8px_rgba(var(--p),0.6)]" />
@@ -78,11 +74,11 @@ export default function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
           </Button>
         </motion.div>
 
-        <div className="mx-2 h-6 w-[1px] bg-white/10" />
+        <div className="mx-1 h-6 w-[1px] bg-white/10" />
 
         {/* User Dropdown */}
         <Dropdown vertical="bottom" end>
-          <Dropdown.Toggle color="ghost" className="flex items-center gap-3 rounded-2xl border-none px-3 transition-all hover:bg-white/5">
+          <Dropdown.Toggle className="flex w-fit items-center gap-3 rounded-2xl border-none transition-all xl:w-full xl:hover:bg-white/5">
             <div className="hidden text-right sm:block">
               <p className="text-xs font-bold leading-tight text-white">Admin</p>
               <p className="text-[10px] font-medium uppercase tracking-tighter text-primary/70">Administrator</p>
@@ -91,7 +87,7 @@ export default function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
               <Avatar
                 src="https://api.dicebear.com/7.x/avataaars/svg?seed=Man"
                 size="xs"
-                className="rounded-xl ring-2 ring-primary/20 transition-all hover:ring-primary/50"
+                className="rounded-xl ring-2 ring-primary/20 transition-all xl:hover:ring-primary/50"
               />
               <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#020617] bg-green-500" />
             </div>
@@ -108,19 +104,19 @@ export default function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
             </div>
 
             <div className="space-y-1 px-1">
-              <Dropdown.Item className="group rounded-lg py-2.5 text-sm font-medium text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
+              <Dropdown.Item className="group rounded-lg py-2.5 text-sm font-medium text-slate-400 transition-all xl:hover:bg-primary/10 xl:hover:text-primary">
                 <HiOutlineUserCircle size={18} className="transition-transform group-hover:scale-110" />
                 Thông tin hồ sơ
               </Dropdown.Item>
 
-              <Dropdown.Item className="group rounded-lg py-2.5 text-sm font-medium text-slate-400 transition-all hover:bg-primary/10 hover:text-primary">
+              <Dropdown.Item className="group rounded-lg py-2.5 text-sm font-medium text-slate-400 transition-all xl:hover:bg-primary/10 xl:hover:text-primary">
                 <HiOutlineCog6Tooth size={18} className="transition-transform duration-500 group-hover:rotate-90" />
                 Cấu hình hệ thống
               </Dropdown.Item>
 
               <div className="my-2 h-[1px] bg-white/5" />
 
-              <Dropdown.Item className="group rounded-lg py-2.5 text-sm font-semibold text-error/80 transition-all hover:bg-error/10 hover:text-error">
+              <Dropdown.Item className="group rounded-lg py-2.5 text-sm font-semibold text-error/80 transition-all xl:hover:bg-error/10 xl:hover:text-error">
                 <HiOutlineArrowRightOnRectangle size={18} className="transition-transform group-hover:translate-x-1" />
                 Thoát ứng dụng
               </Dropdown.Item>

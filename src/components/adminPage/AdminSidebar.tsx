@@ -120,7 +120,7 @@ export default function AdminSidebar() {
         {/* Logo Section */}
         <div className="flex h-24 items-center overflow-hidden px-4">
           <div className={`flex items-center gap-4 ${!isExpanded && 'mx-auto'}`}>
-            <div className="relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-primary shadow-[0_0_20px_rgba(var(--p),0.3)]">
+            <div className="relative hidden h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-primary shadow-[0_0_20px_rgba(var(--p),0.3)] xl:flex">
               <div className="h-4 w-4 rotate-45 animate-ping rounded-sm bg-white" />
             </div>
             {isExpanded && (
@@ -137,8 +137,8 @@ export default function AdminSidebar() {
 
         {/* Navigation */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4 scrollbar-hide">
-          <div className={`mb-4 px-6 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'h-0 opacity-0'}`}>
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600">Menu</span>
+          <div className="mb-4 px-6 transition-opacity duration-300">
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white">Menu</span>
           </div>
 
           <Menu className="p-0">
@@ -149,9 +149,9 @@ export default function AdminSidebar() {
         </div>
 
         {/* Footer Card */}
-        <Link target="_blank" href="https://zalo.me/0333133050" className="p-4">
+        <Link target="_blank" href="https://zalo.me/0333133050" className="p-2">
           <div
-            className={`relative flex items-center gap-3 overflow-hidden rounded-2xl bg-white/5 p-3 ring-1 ring-white/10 ${!isExpanded && 'justify-center'}`}
+            className={`relative flex items-center gap-3 overflow-hidden rounded-2xl bg-white/5 p-1 ring-1 ring-white/10 ${!isExpanded && 'justify-center'}`}
           >
             <div className="h-9 w-9 flex-shrink-0 rounded-full bg-primary/20 p-0.5">
               <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Man" alt="Avatar" className="h-full w-full rounded-full object-cover" />
