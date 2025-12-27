@@ -8,6 +8,8 @@ import RentalPostAdminModal from './RentalPostAdminModal';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { formatCurrency } from '@/utils/formatCurrency';
 import DeleteModal from '../DeleteModal';
+import { GiPadlock } from 'react-icons/gi';
+import AdminInternalModal from './AdminInternalModal';
 
 interface Props {
   posts: IRentalPostAdmin[];
@@ -21,7 +23,10 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   // Modal Xoá
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
+  // Modal Nội bộ Admin
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [internalPost, setInternalPost] = useState<IRentalPostAdmin | null>(null);
+  // Hàm tải lại danh sách bài đăng
   const reload = async () => {
     // Tối ưu: Chỉ fetch lại dữ liệu cần thiết.
     // Nếu API có pagination/cache, cần xem xét thêm logic đó.
@@ -164,25 +169,42 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                   >
                     {post.status}
                   </span>
+                  <div className="space-x-2">
+                    {/* Nút xem nội bộ admin */}
+                    <Button
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setInternalPost(post);
+                        setInternalOpen(true);
+                      }}
+                      className="btn-square bg-black text-white transition-colors duration-200 xl:hover:bg-primary"
+                    >
+                      <GiPadlock size={12} />
+                    </Button>
 
-                  {/* Nút Xóa riêng biệt */}
-                  <Button
-                    size="sm"
-                    color="error"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Ngăn chặn mở modal chỉnh sửa
-                      handleDelete(post._id);
-                    }}
-                    className="btn-square text-white transition-colors duration-200 xl:hover:bg-red-600"
-                  >
-                    <FaTrashAlt size={12} />
-                  </Button>
+                    {/* Nút Xóa riêng biệt */}
+                    <Button
+                      size="sm"
+                      color="error"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Ngăn chặn mở modal chỉnh sửa
+                        handleDelete(post._id);
+                      }}
+                      className="btn-square text-white transition-colors duration-200 xl:hover:bg-red-600"
+                    >
+                      <FaTrashAlt size={12} />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Modal Nội bộ Admin */}
+      <AdminInternalModal open={internalOpen} onClose={() => setInternalOpen(false)} post={internalPost} reload={reload} />
 
       {/* Modal Chỉnh sửa / Thêm mới */}
       <RentalPostAdminModal open={openModal} onClose={() => setOpenModal(false)} editingPost={editingPost} categories={categories} reload={reload} />
