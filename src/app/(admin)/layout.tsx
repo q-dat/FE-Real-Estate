@@ -1,11 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Drawer } from 'react-daisyui';
+
 import AdminBootLoading from '@/components/adminPage/AdminBootLoading';
 import AdminNavbar from '@/components/adminPage/AdminNavbar';
 import AdminSidebar from '@/components/adminPage/AdminSidebar';
-import { useEffect, useState } from 'react';
-import { Drawer } from 'react-daisyui';
-import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth.service';
 
 type Status = 'booting' | 'ready' | 'unauthorized';
@@ -18,15 +19,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     let cancelled = false;
 
-    const checkAuth = async () => {
+    const init = async () => {
       try {
+        /* Check server health */
+        const healthRes = await fetch('/api/health', { cache: 'no-store' });
+        if (!healthRes.ok) throw new Error('Server not ready');
+
+        /* Check Auth */
         const token = localStorage.getItem('token');
         if (!token) throw new Error('No token');
 
-        const res = await authService.me(token);
+        const meRes = await authService.me(token);
 
-        if (res.data.role !== 'admin') {
-          throw new Error('Not admin');
+        if (!['admin', 'super_admin'].includes(meRes.data.role)) {
+          throw new Error('Forbidden');
         }
 
         if (!cancelled) {
@@ -39,22 +45,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }
     };
 
-    checkAuth();
+    init();
 
     return () => {
       cancelled = true;
     };
-  }, [router]);
+  }, []);
 
+  /* Loading */
   if (status === 'booting') {
     return <AdminBootLoading />;
   }
 
+  /* Unauthorized */
   if (status === 'unauthorized') {
     router.replace('/login');
     return null;
   }
 
+  /* Ready */
   return (
     <Drawer open={isSidebarOpen} onClickOverlay={() => setIsSidebarOpen(false)} side={<AdminSidebar />}>
       <div className="flex min-h-screen bg-slate-50">
