@@ -1,9 +1,7 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Drawer } from 'react-daisyui';
-
 import AdminBootLoading from '@/components/adminPage/AdminBootLoading';
 import AdminNavbar from '@/components/adminPage/AdminNavbar';
 import AdminSidebar from '@/components/adminPage/AdminSidebar';
@@ -19,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     let cancelled = false;
 
-    const init = async () => {
+    const checkHealth = async () => {
       try {
         /* Check server health */
         const healthRes = await fetch('/api/health', { cache: 'no-store' });
@@ -45,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }
     };
 
-    init();
+    checkHealth();
 
     return () => {
       cancelled = true;
