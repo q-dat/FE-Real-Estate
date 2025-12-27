@@ -7,16 +7,16 @@ import {
   HiOutlineChevronDown,
   HiOutlineArrowRightOnRectangle,
   HiOutlineCog6Tooth,
-  HiOutlineCommandLine,
 } from 'react-icons/hi2';
 import { Navbar, Button, Indicator, Dropdown, Avatar } from 'react-daisyui';
 import { motion } from 'framer-motion';
 
 interface AdminNavbarProps {
+  title: string;
   onMenuClick: () => void;
 }
 
-export default function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
+export default function AdminNavbar({ title, onMenuClick }: AdminNavbarProps) {
   return (
     <Navbar className="sticky top-0 z-[999999] w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">
       {/* LEFT SECTION: Mobile Toggle & Context Info */}
@@ -28,17 +28,16 @@ export default function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
         </motion.div>
 
         <div className="hidden flex-col md:flex">
-          <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            <span>Hệ thống quản trị</span>
+          <motion.h2
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-lg font-semibold uppercase tracking-tight text-white"
+          >
+            Quản Lý Danh Sách {title}
+          </motion.h2>
+          <div className="flex items-center gap-2 text-[10px] tracking-[0.2em] text-slate-500">
             <span className="h-1 w-1 rounded-full bg-green-500/50 shadow-[0_0_5px_rgba(34,197,94,0.5)]" />
-            <span className="text-slate-400">Đang hoạt động</span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <HiOutlineCommandLine className="text-primary" size={20} />
-            <motion.h2 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="text-3xl font-bold tracking-tight text-white">
-              {/* {title} */}
-            </motion.h2>
+            <span className="text-slate-400">Xin Chào, đây là trang Danh Sách {title}</span>
           </div>
         </div>
       </Navbar.Start>
