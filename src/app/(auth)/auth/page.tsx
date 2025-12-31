@@ -7,9 +7,12 @@ import { authService } from '@/services/auth.service';
 import { clsx } from 'clsx';
 import { CyberBackground } from '@/components/auth/motion/CyberBackground';
 import LoginBootLoading from '@/components/auth/LoginBootLoading';
+import Link from 'next/link';
 
 type AuthTab = 'login' | 'register';
 type Status = 'booting' | 'ready' | 'submitting';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function AuthPage() {
   const router = useRouter();
@@ -19,6 +22,9 @@ export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
+  const [touched, setTouched] = useState(false);
+
+  const isValidEmail = EMAIL_REGEX.test(email);
 
   // Boot logic (server health)
   useEffect(() => {
@@ -50,6 +56,7 @@ export default function AuthPage() {
 
     if (status !== 'ready') return;
     if (!email || !password) return;
+    if (!isValidEmail) return; // chặn API khi email sai
 
     try {
       setStatus('submitting');
@@ -93,7 +100,6 @@ export default function AuthPage() {
       >
         <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 shadow-2xl ring-1 ring-white/5 backdrop-blur-2xl">
           <div className="animate-border-flow pointer-events-none absolute -inset-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
-
           <div className="relative p-5 pt-10">
             {/* Header */}
             <div className="mb-5 space-y-2 text-center">
@@ -107,11 +113,11 @@ export default function AuthPage() {
               </motion.div>
 
               <h1 className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
-                {activeTab === 'login' ? 'Welcome Back' : 'Create Account'}
+                {activeTab === 'login' ? 'Chào mừng quay lại' : 'Tao tài khoản mới'}
               </h1>
 
               <p className="text-sm font-medium text-gray-400">
-                {activeTab === 'login' ? 'Enter your credentials to access.' : 'Start your digital journey today.'}
+                {activeTab === 'login' ? 'Nhập thông tin đăng nhập của bạn để truy cập.' : 'Bắt đầu hành trình kỹ thuật số của bạn ngay hôm nay.'}
               </p>
             </div>
 
@@ -147,10 +153,23 @@ export default function AuthPage() {
                   <input
                     type="email"
                     value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (!touched) setTouched(true);
+                    }}
+                    onBlur={() => setTouched(true)}
                     disabled={isDisabled}
-                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@work-email.com"
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-12 py-3.5 text-sm text-white outline-none focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 disabled:opacity-60"
+                    className={clsx(
+                      'w-full rounded-xl border bg-black/20 px-12 py-3.5 text-sm text-white shadow-inner outline-none transition-all',
+                      'border-white/10 focus:ring-4',
+                      isValidEmail
+                        ? 'focus:border-purple-500/50 focus:ring-purple-500/10'
+                        : touched
+                          ? 'border-red-500/40 focus:border-red-500 focus:ring-red-500/10'
+                          : 'focus:border-purple-500/50 focus:ring-purple-500/10',
+                      isDisabled && 'opacity-60'
+                    )}
                   />
                 </div>
 
@@ -164,7 +183,7 @@ export default function AuthPage() {
                     value={password}
                     disabled={isDisabled}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
+                    placeholder="Nhập mật khẩu của bạn"
                     className="w-full rounded-xl border border-white/10 bg-black/20 px-12 py-3.5 text-sm text-white outline-none focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 disabled:opacity-60"
                   />
                   <button
@@ -173,26 +192,40 @@ export default function AuthPage() {
                     disabled={isDisabled}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-500 hover:text-white disabled:opacity-40"
                   >
-                    {showPass ? 'HIDE' : 'SHOW'}
+                    {showPass ? 'Ẩn' : 'Hiện'}
                   </button>
                 </div>
+                {/* Forgot Password Link */}
+                {activeTab === 'login' && (
+                  <div className="flex justify-end">
+                    <Link href="/reset-password" className="text-xs font-medium text-gray-400 transition-colors hover:text-cyan-400">
+                      Quên mật khẩu?
+                    </Link>
+                  </div>
+                )}
               </div>
 
               {/* Submit */}
               <button
-                disabled={isDisabled}
+               disabled={isDisabled || !isValidEmail}
                 className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 py-3.5 font-bold text-white transition-all hover:from-cyan-500 hover:to-blue-500 disabled:opacity-60"
               >
                 {isSubmitting ? (
                   <span className="loading loading-spinner loading-sm" />
                 ) : (
                   <>
-                    <span className="relative z-10">{activeTab === 'login' ? 'Sign In' : 'Create Account'}</span>
+                    <span className="relative z-10">{activeTab === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'}</span>
                     <ArrowRight size={18} className="relative z-10 transition-transform group-hover:translate-x-1" />
                   </>
                 )}
               </button>
             </form>
+            {touched && !isValidEmail && <p className="pl-1 text-xs font-medium text-red-400">Email không đúng định dạng</p>}
+
+            {/* Footer */}
+            <div className="mt-8 text-center">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Nguonnhagiare.vn</p>
+            </div>
           </div>
         </div>
       </motion.div>
