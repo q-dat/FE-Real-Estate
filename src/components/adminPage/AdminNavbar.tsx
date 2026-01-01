@@ -3,13 +3,14 @@ import {
   HiBars3BottomLeft,
   HiOutlineBell,
   HiOutlineMagnifyingGlass,
-  HiOutlineUserCircle,
   HiOutlineChevronDown,
   HiOutlineArrowRightOnRectangle,
   HiOutlineCog6Tooth,
+  HiOutlineUserCircle,
 } from 'react-icons/hi2';
 import { Navbar, Button, Indicator, Dropdown, Avatar } from 'react-daisyui';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 interface AdminNavbarProps {
   title: string;
@@ -17,6 +18,13 @@ interface AdminNavbarProps {
 }
 
 export default function AdminNavbar({ title, onMenuClick }: AdminNavbarProps) {
+  const router = useRouter();
+
+  const onLogout = () => {
+    localStorage.removeItem('token');
+    router.replace('/login');
+  };
+
   return (
     <Navbar className="sticky top-0 z-[999999] w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">
       {/* LEFT SECTION: Mobile Toggle & Context Info */}
@@ -103,20 +111,23 @@ export default function AdminNavbar({ title, onMenuClick }: AdminNavbarProps) {
             </div>
 
             <div className="space-y-1 px-1">
-              <Dropdown.Item className="group rounded-lg py-2.5 text-sm font-medium text-slate-400 transition-all xl:hover:bg-primary/10 xl:hover:text-primary">
-                <HiOutlineUserCircle size={18} className="transition-transform group-hover:scale-110" />
+              <Dropdown.Item className="group rounded-lg py-2.5 text-sm text-slate-400 xl:hover:bg-primary/10 xl:hover:text-primary">
+                <HiOutlineUserCircle size={18} />
                 Thông tin hồ sơ
               </Dropdown.Item>
 
-              <Dropdown.Item className="group rounded-lg py-2.5 text-sm font-medium text-slate-400 transition-all xl:hover:bg-primary/10 xl:hover:text-primary">
-                <HiOutlineCog6Tooth size={18} className="transition-transform duration-500 group-hover:rotate-90" />
+              <Dropdown.Item className="group rounded-lg py-2.5 text-sm text-slate-400 xl:hover:bg-primary/10 xl:hover:text-primary">
+                <HiOutlineCog6Tooth size={18} />
                 Cấu hình hệ thống
               </Dropdown.Item>
 
-              <div className="my-2 h-[1px] bg-white/5" />
+              <div className="my-2 h-px bg-white/5" />
 
-              <Dropdown.Item className="group rounded-lg py-2.5 text-sm font-semibold text-error/80 transition-all xl:hover:bg-error/10 xl:hover:text-error">
-                <HiOutlineArrowRightOnRectangle size={18} className="transition-transform group-hover:translate-x-1" />
+              <Dropdown.Item
+                onClick={onLogout}
+                className="group rounded-lg py-2.5 text-sm font-semibold text-error/80 xl:hover:bg-error/10 xl:hover:text-error"
+              >
+                <HiOutlineArrowRightOnRectangle size={18} />
                 Thoát ứng dụng
               </Dropdown.Item>
             </div>
