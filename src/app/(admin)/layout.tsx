@@ -8,7 +8,7 @@ import AdminSidebar from '@/components/adminPage/AdminSidebar';
 import { authService } from '@/services/auth.service';
 import { ADMIN_PAGE_TITLES } from '@/configs/adminPageTitles';
 
-type Status = 'booting' | 'ready' | 'unauthorized';
+type Status = 'booting' | 'ready' | 'unauthorized' | 'forbidden';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -30,23 +30,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const healthRes = await fetch('/api/health', { cache: 'no-store' });
         if (!healthRes.ok) throw new Error('Server not ready');
 
-        /* Check Auth */
         const token = localStorage.getItem('token');
-        if (!token) throw new Error('No token');
+        if (!token) {
+          setStatus('unauthorized');
+          return;
+        }
 
         const meRes = await authService.me(token);
+        const role = meRes.data.role;
 
-        if (!['admin', 'super_admin'].includes(meRes.data.role)) {
-          throw new Error('Forbidden');
+        if (role === 'admin') {
+          if (!cancelled) setStatus('ready');
+          return;
         }
 
-        if (!cancelled) {
-          setStatus('ready');
-        }
+        // Đã login nhưng không đủ quyền
+        if (!cancelled) setStatus('forbidden');
       } catch {
-        if (!cancelled) {
-          setStatus('unauthorized');
-        }
+        if (!cancelled) setStatus('unauthorized');
       }
     };
 
@@ -65,6 +66,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   /* Unauthorized */
   if (status === 'unauthorized') {
     router.replace('/login');
+    return null;
+  }
+  /* Forbidden */
+  if (status === 'forbidden') {
+    router.replace('/');
     return null;
   }
 
