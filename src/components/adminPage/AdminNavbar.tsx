@@ -39,13 +39,13 @@ export default function AdminNavbar({ title, onMenuClick }: AdminNavbarProps) {
           <motion.h2
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-lg font-semibold uppercase tracking-tight text-white"
+            className="max-w-xsfont-semibold line-clamp-1 uppercase tracking-tight"
           >
-            Quản Lý Danh Sách {title}
+            <span className="text-xs text-white">Trang </span> <span className="text-lg font-black text-primary">{title}</span>
           </motion.h2>
-          <div className="flex items-center gap-2 text-[10px] tracking-[0.2em] text-slate-500">
+          <div className="flex items-center gap-2 text-[8px] tracking-[0.2em] text-slate-500">
             <span className="h-1 w-1 rounded-full bg-green-500/50 shadow-[0_0_5px_rgba(34,197,94,0.5)]" />
-            <span className="text-slate-400">Xin Chào, đây là trang Danh Sách {title}</span>
+            <span className="line-clamp-1 text-slate-400">Xin Chào, đây là trang Danh Sách {title}</span>
           </div>
         </div>
       </Navbar.Start>
