@@ -86,8 +86,8 @@ function VerifyContent() {
                   maxLength={6}
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))} // Chỉ cho nhập số
-                  placeholder="• • • • • •"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 py-4 pl-4 pr-4 text-center font-mono text-2xl font-bold tracking-[0.5em] text-white shadow-inner outline-none transition-all placeholder:tracking-[0.5em] placeholder:text-gray-700 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10"
+                  placeholder="••••••"
+                  className="w-full rounded-xl border border-white/10 bg-black/20 p-4 text-center font-mono text-2xl font-bold tracking-[0.5em] text-white shadow-inner outline-none transition-all placeholder:tracking-[0.5em] placeholder:text-gray-700 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10"
                 />
               </div>
             </div>

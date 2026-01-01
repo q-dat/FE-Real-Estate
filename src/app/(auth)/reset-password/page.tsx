@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Mail, ArrowRight, KeyRound } from 'lucide-react';
 import { authService } from '@/services/auth.service';
@@ -9,20 +10,24 @@ import clsx from 'clsx';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function ResetPasswordPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState(false);
 
   const isValidEmail = EMAIL_REGEX.test(email);
 
-  const onSubmit = async () => {
-    if (loading) return;
-    if (!isValidEmail) return; // chặn tuyệt đối
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loading || !isValidEmail) return;
 
     try {
       setLoading(true);
       await authService.resetPassword(email);
-      alert('OTP đặt lại mật khẩu đã được gửi');
+
+      // Flow chuẩn: sang confirm reset + gán email
+      router.push(`/confirm-reset-password?email=${encodeURIComponent(email)}`);
     } finally {
       setLoading(false);
     }
@@ -60,7 +65,7 @@ export default function ResetPasswordPage() {
             </div>
 
             {/* Form */}
-            <div className="space-y-6">
+            <form onSubmit={onSubmit} className="space-y-6">
               {/* Email */}
               <div className="group relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-purple-400">
@@ -91,7 +96,7 @@ export default function ResetPasswordPage() {
 
               {/* Submit */}
               <button
-                onClick={onSubmit}
+                type="submit"
                 disabled={loading || !isValidEmail}
                 className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 py-3.5 font-bold text-white shadow-[0_0_20px_-5px_rgba(168,85,247,0.4)] transition-all duration-300 hover:from-purple-500 hover:to-pink-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
@@ -105,7 +110,8 @@ export default function ResetPasswordPage() {
                 )}
                 <div className="absolute inset-0 z-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
               </button>
-            </div>
+            </form>
+
             {touched && !isValidEmail && <p className="pl-1 text-xs font-medium text-red-400">Email không đúng định dạng</p>}
 
             {/* Footer */}
