@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { authService } from '@/services/auth.service';
+import { requireAdminToken } from '@/services/shared/adminAuth.client';
 
 export default function ProfilePage() {
   const [avatar, setAvatar] = useState<File | null>(null);
@@ -9,7 +10,7 @@ export default function ProfilePage() {
   const [zaloNumber, setZaloNumber] = useState('');
 
   const onSubmit = async () => {
-    const token = localStorage.getItem('token') || '';
+    const token = requireAdminToken();
 
     await authService.updateProfile(
       {

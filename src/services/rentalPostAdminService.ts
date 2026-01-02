@@ -1,6 +1,7 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import { getWithFallback } from './shared/getWithFallback';
+import { adminFetch } from './shared/adminFetch.client';
 
 // Type Definitions ---
 type CacheState = {
@@ -17,6 +18,39 @@ const cache: CacheState = {
 };
 
 const rentalPostAdminService = {
+  
+  /** Lấy danh sách bài đăng của admin hiện tại */
+  async getMyPosts(params?: Record<string, string | number | undefined>): Promise<IRentalPostAdmin[]> {
+    let apiUrl = getServerApiUrl('api/rental-posts/me');
+
+    if (params) {
+      const query = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          query.set(key, String(value));
+        }
+      });
+      if (query.toString()) {
+        apiUrl += `?${query.toString()}`;
+      }
+    }
+
+    const res = await adminFetch(apiUrl, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      throw new Error(`Admin getMyPosts failed: ${res.status}`);
+    }
+
+    const data = (await res.json()) as {
+      rentalPosts?: IRentalPostAdmin[];
+    };
+
+    return data.rentalPosts ?? [];
+  },
+
   /**
    * Lấy danh sách bài đăng.
    * - Logic: Luôn fetch "no-store" để lấy dữ liệu mới nhất từ DB.

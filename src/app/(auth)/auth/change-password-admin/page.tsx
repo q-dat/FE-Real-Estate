@@ -6,6 +6,7 @@ import { Lock, ShieldCheck, ArrowRight } from 'lucide-react';
 import { authService } from '@/services/auth.service';
 import { CyberBackground } from '@/components/auth/motion/CyberBackground';
 import clsx from 'clsx';
+import { requireAdminToken } from '@/services/shared/adminAuth.client';
 
 export default function ChangePasswordPage() {
   const [oldPassword, setOldPassword] = useState('');
@@ -18,7 +19,7 @@ export default function ChangePasswordPage() {
     e.preventDefault();
     if (!isValid || loading) return;
 
-    const token = localStorage.getItem('token') || '';
+    const token = requireAdminToken();
 
     try {
       setLoading(true);

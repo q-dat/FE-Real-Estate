@@ -7,6 +7,7 @@ import AdminNavbar from '@/components/adminPage/AdminNavbar';
 import AdminSidebar from '@/components/adminPage/AdminSidebar';
 import { authService } from '@/services/auth.service';
 import { ADMIN_PAGE_TITLES } from '@/configs/adminPageTitles';
+import { requireAdminToken } from '@/services/shared/adminAuth.client';
 
 type Status = 'booting' | 'ready' | 'unauthorized' | 'forbidden';
 
@@ -30,7 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const healthRes = await fetch('/api/health', { cache: 'no-store' });
         if (!healthRes.ok) throw new Error('Server not ready');
 
-        const token = localStorage.getItem('token');
+          const token = requireAdminToken();
         if (!token) {
           setStatus('unauthorized');
           return;

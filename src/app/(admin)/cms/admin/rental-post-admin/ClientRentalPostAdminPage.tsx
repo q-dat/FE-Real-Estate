@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from 'react-daisyui';
 import { FaImages, FaPlus, FaPen, FaTrashAlt } from 'react-icons/fa';
 import Image from 'next/image';
@@ -26,11 +26,18 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   // Modal Nội bộ Admin
   const [internalOpen, setInternalOpen] = useState(false);
   const [internalPost, setInternalPost] = useState<IRentalPostAdmin | null>(null);
+  useEffect(() => {
+    if (initialPosts.length === 0) {
+      console.log('RentalPostAdminPage: No initial posts, reloading...');
+      reload();
+    }
+  }, []);
+
   // Hàm tải lại danh sách bài đăng
   const reload = async () => {
     // Tối ưu: Chỉ fetch lại dữ liệu cần thiết.
     // Nếu API có pagination/cache, cần xem xét thêm logic đó.
-    const data = await rentalPostAdminService.getAll();
+    const data: IRentalPostAdmin[] = await rentalPostAdminService.getMyPosts();
     // Đảm bảo kiểu dữ liệu: TypeScript
     setPosts(Array.isArray(data) ? data : []);
   };
