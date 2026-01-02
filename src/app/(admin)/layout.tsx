@@ -8,6 +8,7 @@ import AdminSidebar from '@/components/adminPage/AdminSidebar';
 import { authService } from '@/services/auth.service';
 import { ADMIN_PAGE_TITLES } from '@/configs/adminPageTitles';
 import { requireAdminToken } from '@/services/shared/adminAuth.client';
+import { MeResponse } from '@/types/type/auth/auth';
 
 type Status = 'booting' | 'ready' | 'unauthorized' | 'forbidden';
 
@@ -17,6 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const [status, setStatus] = useState<Status>('booting');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [user, setUser] = useState<MeResponse['data'] | null>(null);
 
   const title = useMemo(() => {
     return ADMIN_PAGE_TITLES[pathname] || 'Admin Panel';
@@ -31,7 +33,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const healthRes = await fetch('/api/health', { cache: 'no-store' });
         if (!healthRes.ok) throw new Error('Server not ready');
 
-          const token = requireAdminToken();
+        const token = requireAdminToken();
         if (!token) {
           setStatus('unauthorized');
           return;
@@ -41,7 +43,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const role = meRes.data.role;
 
         if (role === 'admin') {
-          if (!cancelled) setStatus('ready');
+          if (!cancelled) {
+            setUser(meRes.data);
+            setStatus('ready');
+          }
           return;
         }
 
@@ -84,7 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <div className="flex flex-1 flex-col">
-          <AdminNavbar title={title} onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+          <AdminNavbar title={title} user={user!} onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
           <main className="flex-1 px-2 py-4">
             <div className="w-full">{children}</div>

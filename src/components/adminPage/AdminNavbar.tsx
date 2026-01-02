@@ -3,7 +3,6 @@ import {
   HiBars3BottomLeft,
   HiOutlineBell,
   HiOutlineMagnifyingGlass,
-  HiOutlineChevronDown,
   HiOutlineArrowRightOnRectangle,
   HiOutlineCog6Tooth,
   HiOutlineUserCircle,
@@ -11,13 +10,15 @@ import {
 import { Navbar, Button, Indicator, Dropdown, Avatar } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { MeResponse } from '@/types/type/auth/auth';
 
 interface AdminNavbarProps {
   title: string;
   onMenuClick: () => void;
+  user: MeResponse['data'];
 }
 
-export default function AdminNavbar({ title, onMenuClick }: AdminNavbarProps) {
+export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarProps) {
   const router = useRouter();
 
   const onLogout = () => {
@@ -87,26 +88,24 @@ export default function AdminNavbar({ title, onMenuClick }: AdminNavbarProps) {
         <Dropdown vertical="bottom" end>
           <Dropdown.Toggle className="flex w-fit items-center gap-3 rounded-2xl border-none transition-all xl:w-full xl:hover:bg-white/5">
             <div className="hidden text-right sm:block">
-              <p className="text-xs font-bold leading-tight text-white">Admin</p>
-              <p className="text-[10px] font-medium uppercase tracking-tighter text-primary/70">Administrator</p>
+              <p className="truncate text-xs font-bold text-white">{user?.email.split('@')[0]}</p>
+              <p className="text-[10px] font-medium uppercase tracking-tighter text-primary/70">{user?.role || ''}</p>
             </div>
             <div className="relative">
               <Avatar
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Man"
+                src={user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Man'}
                 size="xs"
                 className="rounded-xl ring-2 ring-primary/20 transition-all xl:hover:ring-primary/50"
               />
-              <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#020617] bg-green-500" />
             </div>
-            <HiOutlineChevronDown size={12} className="text-slate-500" />
           </Dropdown.Toggle>
 
           <Dropdown.Menu className="animate-in fade-in zoom-in mt-4 w-64 rounded-2xl border border-white/10 bg-[#0f172a]/95 p-2 shadow-2xl ring-1 ring-white/5 backdrop-blur-xl duration-200">
             <div className="mb-2 flex items-center gap-3 rounded-xl bg-primary/5 px-4 py-3">
-              <Avatar src="https://api.dicebear.com/7.x/avataaars/svg?seed=Man" size="xs" className="rounded-lg" />
+              <Avatar src={user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Man'} size="xs" className="rounded-lg" />
               <div className="overflow-hidden">
-                <p className="truncate text-xs font-bold text-white">Điểu Quốc Đạt</p>
-                <p className="truncate text-[10px] text-slate-500">dat.pro@enterprise.com</p>
+                <p className="truncate text-xs font-bold text-white">{user?.email.split('@')[0]}</p>
+                <p className="truncate text-[10px] text-slate-500">{user?.email || '-'}</p>
               </div>
             </div>
 
