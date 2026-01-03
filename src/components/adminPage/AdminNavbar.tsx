@@ -11,6 +11,7 @@ import { Navbar, Button, Indicator, Dropdown, Avatar } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { MeResponse } from '@/types/type/auth/auth';
+import Link from 'next/link';
 
 interface AdminNavbarProps {
   title: string;
@@ -88,8 +89,8 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
         <Dropdown vertical="bottom" end>
           <Dropdown.Toggle className="flex w-fit items-center gap-3 rounded-2xl border-none transition-all xl:w-full xl:hover:bg-white/5">
             <div className="hidden text-right sm:block">
-              <p className="truncate text-xs font-bold text-white">{user?.email.split('@')[0]}</p>
-              <p className="text-[10px] font-medium uppercase tracking-tighter text-primary/70">{user?.role || ''}</p>
+              <p className="truncate text-xs font-bold text-white">{user?.profile.displayName}</p>
+              <p className="text-[10px] font-medium uppercase tracking-tighter text-primary/70">{user?.profile.username}</p>
             </div>
             <div className="relative">
               <Avatar
@@ -104,16 +105,18 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
             <div className="mb-2 flex items-center gap-3 rounded-xl bg-primary/5 px-4 py-3">
               <Avatar src={user?.profile.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Man'} size="xs" className="rounded-lg" />
               <div className="overflow-hidden">
-                <p className="truncate text-xs font-bold text-white">{user?.email.split('@')[0]}</p>
+                <p className="truncate text-xs font-bold text-white">{user?.profile.displayName}</p>
                 <p className="truncate text-[10px] text-slate-500">{user?.email || '-'}</p>
               </div>
             </div>
 
             <div className="space-y-1 px-1">
-              <Dropdown.Item className="group rounded-lg py-2.5 text-sm text-slate-400 xl:hover:bg-primary/10 xl:hover:text-primary">
-                <HiOutlineUserCircle size={18} />
-                Thông tin hồ sơ
-              </Dropdown.Item>
+              <Link target="_blank" href={'/profile'}>
+                <Dropdown.Item className="group rounded-lg py-2.5 text-sm text-slate-400 xl:hover:bg-primary/10 xl:hover:text-primary">
+                  <HiOutlineUserCircle size={18} />
+                  Thông tin hồ sơ
+                </Dropdown.Item>
+              </Link>
 
               <Dropdown.Item className="group rounded-lg py-2.5 text-sm text-slate-400 xl:hover:bg-primary/10 xl:hover:text-primary">
                 <HiOutlineCog6Tooth size={18} />
