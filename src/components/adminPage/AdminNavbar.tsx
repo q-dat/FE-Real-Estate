@@ -11,7 +11,6 @@ import { Navbar, Button, Indicator, Dropdown, Avatar } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { MeResponse } from '@/types/type/auth/auth';
-import Link from 'next/link';
 
 interface AdminNavbarProps {
   title: string;
@@ -111,12 +110,14 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
             </div>
 
             <div className="space-y-1 px-1">
-              <Link target="_blank" href={'/profile'}>
-                <Dropdown.Item className="group rounded-lg py-2.5 text-sm text-slate-400 xl:hover:bg-primary/10 xl:hover:text-primary">
-                  <HiOutlineUserCircle size={18} />
-                  Thông tin hồ sơ
-                </Dropdown.Item>
-              </Link>
+              <Dropdown.Item
+                target="_blank"
+                href={'/profile'}
+                className="group rounded-lg py-2.5 text-sm text-slate-400 xl:hover:bg-primary/10 xl:hover:text-primary"
+              >
+                <HiOutlineUserCircle size={18} />
+                Thông tin hồ sơ
+              </Dropdown.Item>
 
               <Dropdown.Item className="group rounded-lg py-2.5 text-sm text-slate-400 xl:hover:bg-primary/10 xl:hover:text-primary">
                 <HiOutlineCog6Tooth size={18} />
