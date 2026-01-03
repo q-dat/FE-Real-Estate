@@ -93,7 +93,7 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
             </div>
             <div className="relative">
               <Avatar
-                src={user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Man'}
+                src={user?.profile.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Man'}
                 size="xs"
                 className="rounded-xl ring-2 ring-primary/20 transition-all xl:hover:ring-primary/50"
               />
@@ -102,7 +102,7 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
 
           <Dropdown.Menu className="animate-in fade-in zoom-in mt-4 w-64 rounded-2xl border border-white/10 bg-[#0f172a]/95 p-2 shadow-2xl ring-1 ring-white/5 backdrop-blur-xl duration-200">
             <div className="mb-2 flex items-center gap-3 rounded-xl bg-primary/5 px-4 py-3">
-              <Avatar src={user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Man'} size="xs" className="rounded-lg" />
+              <Avatar src={user?.profile.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Man'} size="xs" className="rounded-lg" />
               <div className="overflow-hidden">
                 <p className="truncate text-xs font-bold text-white">{user?.email.split('@')[0]}</p>
                 <p className="truncate text-[10px] text-slate-500">{user?.email || '-'}</p>
