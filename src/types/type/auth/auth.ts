@@ -59,6 +59,17 @@ export interface MeResponse {
     id: string;
     email: string;
     role: 'admin' | 'user';
-    profile: { avatar?: string };
+    profile: {
+      avatar?: string;
+      displayName?: string;
+      username?: string;
+      aboutMe?: string;
+      instagram?: string;
+      messenger?: string;
+      facebook?: string;
+      viberNumber?: string;
+      phoneNumber?: string;
+      zaloNumber?: string;
+    };
   };
 }
