@@ -9,7 +9,6 @@ import {
   FiSave,
   FiGrid,
   FiSettings,
-  FiChevronRight,
   FiMail,
   FiLink,
   FiMessageSquare,
@@ -18,9 +17,10 @@ import {
 } from 'react-icons/fi';
 import { SiZalo, SiViber, SiMessenger } from 'react-icons/si';
 import { authService } from '@/services/auth.service';
-import { requireAdminToken } from '@/services/shared/adminAuth.client';
+import { getAdminToken, requireAdminToken } from '@/services/shared/adminAuth.client';
 import { MeResponse } from '@/types/type/auth/auth';
 import { Button } from 'react-daisyui';
+import { useRouter } from 'next/navigation';
 
 // Interface chuẩn mực, không dùng any
 interface ProfileFormData {
@@ -35,17 +35,17 @@ interface ProfileFormData {
   viberNumber: string;
 }
 
-const DEMO_POSTS = [
-  {},
-  // {
-  //   id: '1',
-  //   title: '...',
-  //   description: '...',
-  //   image: '...',
-  //   date: '...',
-  //   tag: '...',
-  // },
-];
+// const DEMO_POSTS = [
+//   {},
+//   {
+//     id: '1',
+//     title: '...',
+//     description: '...',
+//     image: '...',
+//     date: '...',
+//     tag: '...',
+//   },
+// ];
 
 export default function AdvancedProfilePage() {
   const [activeTab, setActiveTab] = useState<'feed' | 'edit'>('feed');
@@ -66,13 +66,22 @@ export default function AdvancedProfilePage() {
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
+  const router = useRouter();
+
   useEffect(() => {
     const fetchProfile = async () => {
+      const token = getAdminToken();
+
+      // Guard: chưa login → redirect
+      if (!token) {
+        router.replace('/login');
+        return;
+      }
+
       try {
-        const token = requireAdminToken();
-        if (!token) return;
         const res: MeResponse = await authService.me(token);
         const { id, email, profile } = res.data;
+
         setUserMeta({ id, email });
         setFormData({
           displayName: profile.displayName || '',
@@ -85,15 +94,20 @@ export default function AdvancedProfilePage() {
           zaloNumber: profile.zaloNumber || '',
           viberNumber: profile.viberNumber || '',
         });
-        if (profile.avatar) setAvatarPreview(profile.avatar);
-      } catch (err) {
-        console.error(err);
+
+        if (profile.avatar) {
+          setAvatarPreview(profile.avatar);
+        }
+      } catch {
+        // Token hết hạn / invalid
+        router.replace('/login');
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchProfile();
-  }, []);
+  }, [router]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -155,9 +169,9 @@ export default function AdvancedProfilePage() {
           <div className="mt-6 flex-1 text-center xl:mb-4 xl:text-left">
             <h1 className="text-4xl font-black text-white">{formData.displayName || 'The Executive'}</h1>
             <div className="mt-2 flex flex-wrap justify-center gap-4 xl:justify-start">
-              <span className="badge badge-primary badge-outline font-mono text-[10px] tracking-widest">@{formData.username || 'admin'}</span>
+              <span className="badge badge-primary badge-outline font-mono text-[10px] tracking-widest">@{formData.username || 'username'}</span>
               <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
-                <FiMail size={12} /> {userMeta.email}
+                <FiMail size={12} /> {userMeta.email || 'email'}
               </span>
             </div>
           </div>
