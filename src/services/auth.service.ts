@@ -73,13 +73,28 @@ export const authService = {
     if (!res.ok) throw await res.json();
     return res.json();
   },
-
   updateProfile: async (payload: UpdateProfilePayload, token: string): Promise<ProfileResponse> => {
     const formData = new FormData();
 
-    if (payload.avatar) formData.append('avatar', payload.avatar);
-    if (payload.phoneNumber) formData.append('phoneNumber', payload.phoneNumber);
-    if (payload.zaloNumber) formData.append('zaloNumber', payload.zaloNumber);
+    // avatar upload riêng
+    if (payload.profile.avatar) {
+      formData.append('avatar', payload.profile.avatar);
+    }
+
+    // profile fields
+    const profile = payload.profile;
+
+    if (profile.displayName) formData.append('displayName', profile.displayName);
+    if (profile.username) formData.append('username', profile.username);
+    if (profile.aboutMe) formData.append('aboutMe', profile.aboutMe);
+
+    if (profile.instagram) formData.append('instagram', profile.instagram);
+    if (profile.messenger) formData.append('messenger', profile.messenger);
+    if (profile.facebook) formData.append('facebook', profile.facebook);
+
+    if (profile.phoneNumber) formData.append('phoneNumber', profile.phoneNumber);
+    if (profile.zaloNumber) formData.append('zaloNumber', profile.zaloNumber);
+    if (profile.viberNumber) formData.append('viberNumber', profile.viberNumber);
 
     const res = await fetch(`${apiUrl}/profile`, {
       method: 'PUT',
@@ -89,7 +104,10 @@ export const authService = {
       body: formData,
     });
 
-    if (!res.ok) throw await res.json();
+    if (!res.ok) {
+      throw await res.json();
+    }
+
     return res.json();
   },
   confirmResetPassword: async (email: string, otp: string, newPassword: string) => {

@@ -9,9 +9,18 @@ export interface LoginPayload {
 }
 
 export interface UpdateProfilePayload {
-  avatar?: File;
-  phoneNumber?: string;
-  zaloNumber?: string;
+  profile: {
+    avatar?: File;
+    displayName?: string;
+    username?: string;
+    aboutMe?: string;
+    instagram?: string;
+    messenger?: string;
+    facebook?: string;
+    viberNumber?: string;
+    phoneNumber?: string;
+    zaloNumber?: string;
+  };
 }
 
 export interface AuthResponse {
@@ -20,7 +29,7 @@ export interface AuthResponse {
     id: string;
     email: string;
     role: 'admin' | 'user';
-    avatar?: string;
+    profile: { avatar?: string };
     token?: string;
   };
 }
@@ -30,9 +39,18 @@ export interface ProfileResponse {
   data: {
     id: string;
     email: string;
-    avatar?: string;
-    phoneNumber?: string;
-    zaloNumber?: string;
+    profile: {
+      avatar?: string;
+      displayName?: string;
+      username?: string;
+      aboutMe?: string;
+      instagram?: string;
+      messenger?: string;
+      facebook?: string;
+      viberNumber?: string;
+      phoneNumber?: string;
+      zaloNumber?: string;
+    };
   };
 }
 export interface MeResponse {
@@ -41,6 +59,6 @@ export interface MeResponse {
     id: string;
     email: string;
     role: 'admin' | 'user';
-    avatar?: string;
+    profile: { avatar?: string };
   };
 }
