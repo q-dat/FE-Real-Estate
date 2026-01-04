@@ -1,5 +1,4 @@
 'use client';
-
 import { requireAdminToken } from "./adminAuth.client";
 
 export async function adminFetch(url: string, options: RequestInit = {}): Promise<Response> {

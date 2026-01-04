@@ -1,3 +1,7 @@
+export interface AuthSession {
+  token: string;
+  role: 'user' | 'admin' | 'owner';
+}
 export interface RegisterPayload {
   email: string;
   password: string;

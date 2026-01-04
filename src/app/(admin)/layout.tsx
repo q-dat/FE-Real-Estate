@@ -12,6 +12,9 @@ import { MeResponse } from '@/types/type/auth/auth';
 
 type Status = 'booting' | 'ready' | 'unauthorized' | 'forbidden';
 
+const ADMIN_ROLES = ['admin', 'owner'] as const;
+type AdminRole = (typeof ADMIN_ROLES)[number];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -29,7 +32,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const checkHealth = async () => {
       try {
-        /* Check server health */
         const healthRes = await fetch('/api/health', { cache: 'no-store' });
         if (!healthRes.ok) throw new Error('Server not ready');
 
@@ -42,7 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const meRes = await authService.me(token);
         const role = meRes.data.role;
 
-        if (role === 'admin') {
+        if (ADMIN_ROLES.includes(role as AdminRole)) {
           if (!cancelled) {
             setUser(meRes.data);
             setStatus('ready');
@@ -50,7 +52,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           return;
         }
 
-        // Đã login nhưng không đủ quyền
         if (!cancelled) setStatus('forbidden');
       } catch {
         if (!cancelled) setStatus('unauthorized');
@@ -64,23 +65,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
   }, []);
 
-  /* Loading */
   if (status === 'booting') {
     return <AdminBootLoading />;
   }
 
-  /* Unauthorized */
   if (status === 'unauthorized') {
     router.replace('/login');
     return null;
   }
-  /* Forbidden */
+
   if (status === 'forbidden') {
     router.replace('/');
     return null;
   }
 
-  /* Ready */
   return (
     <Drawer open={isSidebarOpen} onClickOverlay={() => setIsSidebarOpen(false)} side={<AdminSidebar />}>
       <div className="flex min-h-screen bg-slate-50">

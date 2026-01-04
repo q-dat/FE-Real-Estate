@@ -1,6 +1,4 @@
-// app/auth/verify/page.tsx
 'use client';
-
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -15,8 +13,9 @@ function VerifyContent() {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [cooldown, setCooldown] = useState<number | null>(null);
+  const [emailVerified, setEmailVerified] = useState(false);
 
-  // Logic: Tự động lấy email từ URL khi trang load
   useEffect(() => {
     // Ưu tiên lấy từ standard query param (?email=...)
     const emailParam = searchParams.get('email');
@@ -41,6 +40,43 @@ function VerifyContent() {
       alert((error as Error).message);
     } finally {
       setLoading(false);
+    }
+  };
+  //
+  useEffect(() => {
+    if (!email) return;
+
+    authService.verifyEmailStatus(email).then((res) => {
+      if (res.emailVerified) {
+        setEmailVerified(true);
+        setCooldown(null);
+        return;
+      }
+
+      if (res.otpExists && typeof res.expiresIn === 'number') {
+        setCooldown(res.expiresIn);
+      } else {
+        setCooldown(null);
+      }
+    });
+  }, [email]);
+  useEffect(() => {
+    if (cooldown === null || cooldown <= 0) return;
+
+    const timer = setInterval(() => {
+      setCooldown((s) => (s !== null ? s - 1 : null));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  const onResend = async () => {
+    try {
+      setCooldown(120);
+      await authService.resendVerifyEmail(email);
+      alert('OTP mới đã được gửi.');
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
@@ -94,7 +130,7 @@ function VerifyContent() {
 
             {/* Action Button */}
             <button
-              disabled={loading || otp.length < 6}
+              disabled={emailVerified || loading || otp.length < 6}
               className="group relative flex w-full transform items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 py-3.5 font-bold text-white shadow-[0_0_20px_-5px_rgba(6,182,212,0.4)] transition-all duration-300 hover:from-cyan-500 hover:to-blue-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
@@ -112,10 +148,17 @@ function VerifyContent() {
 
           {/* Resend Link */}
           <div className="mt-6">
-            <p className="text-xs text-gray-500">
-              Didn't receive code?{' '}
-              <button className="font-semibold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline">Resend in 30s</button>
-            </p>
+            {emailVerified ? (
+              <p className="text-xs text-success">Email đã được xác thực.</p>
+            ) : cooldown !== null && cooldown > 0 ? (
+              <p className="text-xs text-gray-500">
+                Resend available in <span className="font-mono">{cooldown}s</span>
+              </p>
+            ) : (
+              <button onClick={onResend} className="text-xs font-semibold text-cyan-400 hover:underline">
+                Resend OTP
+              </button>
+            )}
           </div>
         </div>
       </motion.div>

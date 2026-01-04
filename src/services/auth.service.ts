@@ -16,12 +16,37 @@ export const authService = {
     if (!res.ok) throw await res.json();
     return res.json();
   },
+
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
     const res = await fetch(`${apiUrl}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+
+    if (!res.ok) throw await res.json();
+    return res.json();
+  },
+
+  resendVerifyEmail: async (email: string) => {
+    const res = await fetch(`${apiUrl}/resend-verify-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok) throw await res.json();
+    return res.json();
+  },
+
+  verifyEmailStatus: async (
+    email: string
+  ): Promise<{
+    emailVerified: boolean;
+    otpExists?: boolean;
+    expiresIn?: number;
+  }> => {
+    const res = await fetch(`${apiUrl}/verify-email/status?email=${encodeURIComponent(email)}`, { cache: 'no-store' });
 
     if (!res.ok) throw await res.json();
     return res.json();
@@ -73,6 +98,7 @@ export const authService = {
     if (!res.ok) throw await res.json();
     return res.json();
   },
+
   updateProfile: async (payload: UpdateProfilePayload, token: string): Promise<ProfileResponse> => {
     const formData = new FormData();
 
@@ -110,6 +136,7 @@ export const authService = {
 
     return res.json();
   },
+
   confirmResetPassword: async (email: string, otp: string, newPassword: string) => {
     const res = await fetch(`${apiUrl}/confirm-reset-password`, {
       method: 'POST',
