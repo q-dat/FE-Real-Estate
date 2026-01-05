@@ -10,13 +10,15 @@ import { formatCurrency } from '@/utils/formatCurrency';
 import DeleteModal from '../DeleteModal';
 import { GiPadlock } from 'react-icons/gi';
 import AdminInternalModal from './AdminInternalModal';
-
+import { useAdminAuth } from '@/context/AdminAuthContext';
 interface Props {
   posts: IRentalPostAdmin[];
   categories: { _id: string; name: string }[];
 }
 
 export default function ClientRentalPostAdminPage({ posts: initialPosts, categories }: Props) {
+  const { user } = useAdminAuth();
+  const userId = user.id;
   const [posts, setPosts] = useState<IRentalPostAdmin[]>(initialPosts);
   const [openModal, setOpenModal] = useState(false);
   const [editingPost, setEditingPost] = useState<IRentalPostAdmin | null>(null);
@@ -214,7 +216,14 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
       <AdminInternalModal open={internalOpen} onClose={() => setInternalOpen(false)} post={internalPost} reload={reload} />
 
       {/* Modal Chỉnh sửa / Thêm mới */}
-      <RentalPostAdminModal open={openModal} onClose={() => setOpenModal(false)} editingPost={editingPost} categories={categories} reload={reload} />
+      <RentalPostAdminModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        editingPost={editingPost}
+        categories={categories}
+        reload={reload}
+        authorId={userId}
+      />
 
       {/* Modal Xóa */}
       <DeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />

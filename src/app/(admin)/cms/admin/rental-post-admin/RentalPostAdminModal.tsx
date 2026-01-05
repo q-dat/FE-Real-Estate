@@ -9,12 +9,11 @@ import { District, IRentalPostAdmin, Province, Ward } from '@/types/type/rentalA
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import InputForm from '@/components/userPage/ui/form/InputForm';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
-// import CancelBtn from '@/components/userPage/ui/btn/CancelBtn'; // Loại bỏ
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { useEscClose } from '@/hooks/useEscClose';
 import Zoom from '@/lib/Zoom';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
-// import { FaPlus, FaPen } from 'react-icons/fa'; // Loại bỏ: Icons trong code nên được thay bằng `react-daisyui` hoặc được giữ lại một cách tối giản.
+import { FaUserCircle } from 'react-icons/fa';
 
 interface Props {
   open: boolean;
@@ -22,10 +21,11 @@ interface Props {
   editingPost: IRentalPostAdmin | null;
   categories: { _id: string; name: string }[];
   reload: () => Promise<void>;
+  authorId: string;
 }
 
-export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload }: Props) {
-  const { register, handleSubmit, reset, getValues, watch, setValue } = useForm<IRentalPostAdmin>();
+export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload, authorId }: Props) {
+  const { register, handleSubmit, reset, watch, setValue } = useForm<IRentalPostAdmin>();
   const [images, setImages] = useState<FileList | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [adminImages, setAdminImages] = useState<FileList | null>(null);
@@ -46,6 +46,15 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   // Tự động tính pricePerM2 = (price * multiplier) / area và cập nhật vào input pricePerM2
   const watchPrice = watch('price');
   const watchArea = watch('area');
+
+  useEffect(() => {
+    if (!editingPost) {
+      setValue('author', authorId, {
+        shouldValidate: true,
+        shouldDirty: false,
+      });
+    }
+  }, [authorId, editingPost, setValue]);
 
   useEffect(() => {
     const priceNum = Number(watchPrice);
@@ -220,13 +229,8 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
             {/* Form Container */}
             <div className="scrollbar-thumb-rounded-full relative max-h-[70vh] overflow-y-auto py-2 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300">
-              <form
-                id="rental-post-form"
-                onSubmit={handleSubmit(handleFormSubmit)}
-                // Chia cột, tối ưu padding
-                className="grid gap-x-6 gap-y-6 xl:grid-cols-2 2xl:grid-cols-3"
-              >
-                {/* 1. THÔNG TIN CƠ BẢN (Col-span-full) */}
+              <form id="rental-post-form" onSubmit={handleSubmit(handleFormSubmit)} className="grid gap-x-6 gap-y-6 xl:grid-cols-2 2xl:grid-cols-3">
+                {/* THÔNG TIN CƠ BẢN */}
                 <div className="col-span-full space-y-4 rounded-lg border border-gray-200 p-2 shadow-sm">
                   <h4 className="text-base font-bold text-gray-700">Thông tin Cơ bản</h4>
                   <div className="grid gap-4 xl:grid-cols-2">
@@ -270,7 +274,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   <TextareaForm {...register('description', { required: true })} placeholder="Mô tả chi tiết bài đăng..." rows={4} />
                 </div>
 
-                {/* 2. THÔNG TIN BẤT ĐỘNG SẢN (3 cột ở 2XL) */}
+                {/* THÔNG TIN BẤT ĐỘNG SẢN */}
                 <div className="col-span-full space-y-4 rounded-lg border border-gray-200 p-2 shadow-sm xl:col-span-2 2xl:col-span-3">
                   <h4 className="text-base font-bold text-gray-700">Thông tin Bất động sản</h4>
                   <div className="grid gap-4 xl:grid-cols-3">
@@ -315,7 +319,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   <TextareaForm {...register('amenities')} placeholder="Tiện ích (máy lạnh, chỗ để xe, v.v...)" rows={3} />
                 </div>
 
-                {/* 3. THÔNG SỐ (2 cột) */}
+                {/* THÔNG SỐ */}
                 <div className="col-span-full space-y-4 rounded-lg border border-gray-200 p-2 shadow-sm xl:col-span-2 2xl:col-span-3">
                   <h4 className="text-base font-bold text-gray-700">Diện tích và Kích thước</h4>
                   <div className="grid gap-4 xl:grid-cols-4">
@@ -367,7 +371,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   </div>
                 </div>
 
-                {/* 4. GIÁ CẢ */}
+                {/* GIÁ CẢ */}
                 <div className="col-span-full space-y-4 rounded-lg border border-gray-200 p-2 shadow-sm xl:col-span-2 2xl:col-span-3">
                   <h4 className="text-base font-bold text-gray-700">Thông tin Giá</h4>
                   <div className="grid gap-4 xl:grid-cols-3">
@@ -413,7 +417,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   </div>
                 </div>
 
-                {/* 5. ĐỊA CHỈ */}
+                {/* ĐỊA CHỈ */}
                 <div className="col-span-full space-y-4 rounded-lg border border-gray-200 p-2 shadow-sm xl:col-span-2 2xl:col-span-3">
                   <h4 className="text-base font-bold text-gray-700">Vị trí</h4>
                   <div className="grid gap-4 xl:grid-cols-3">
@@ -507,7 +511,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   />
                 </div>
 
-                {/* 6. THÔNG TIN LIÊN HỆ & MEDIA */}
+                {/* THÔNG TIN LIÊN HỆ & MEDIA */}
                 <div className="col-span-full space-y-4 rounded-lg border border-gray-200 p-2 shadow-sm xl:col-span-2 2xl:col-span-3">
                   <h4 className="text-base font-bold text-gray-700">Liên hệ & Media</h4>
                   <div className="grid gap-4 xl:grid-cols-3">
@@ -538,7 +542,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   </div>
                 </div>
 
-                {/* 7. QUẢN LÝ NỘI BỘ (2 cột) */}
+                {/* QUẢN LÝ NỘI BỘ */}
                 <div className="col-span-full space-y-4 rounded-lg border border-gray-200 p-2 shadow-sm xl:col-span-2 2xl:col-span-3">
                   <h4 className="text-base font-bold text-gray-700">Thông tin Nội bộ & Quản lý</h4>
                   <div className="grid gap-4 xl:grid-cols-3">
@@ -558,19 +562,11 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       bordered
                       required
                     />
-                    <InputForm
-                      classNameLabel={classNameLabel}
-                      {...register('author')}
-                      label="Người đăng tin"
-                      placeholder="admin"
-                      defaultValue="admin"
-                      bordered
-                    />
                   </div>
                   <TextareaForm {...register('adminNote')} placeholder="Ghi chú nội bộ cho admin..." rows={3} />
                 </div>
 
-                {/* 8. UPLOAD ẢNH (2 nhóm) */}
+                {/* UPLOAD ẢNH */}
                 <div className="col-span-full space-y-6 rounded-lg border border-gray-200 p-2 shadow-sm xl:col-span-2 2xl:col-span-3">
                   <h4 className="text-base font-bold text-gray-700">Quản lý Ảnh</h4>
 
@@ -582,18 +578,16 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       multiple
                       accept="image/*"
                       onChange={(e) => setAdminImages(e.target.files)}
-                      // Đổi `file-input-secondary` thành `file-input-info` hoặc màu khác phù hợp với admin
                       className="file-input file-input-bordered file-input-info w-full rounded-lg focus:outline-none"
                     />
                     {adminPreviewUrls.length > 0 && (
                       <div className="mt-3 grid grid-cols-3 gap-3 md:grid-cols-4 xl:grid-cols-10">
                         {adminPreviewUrls.map((url, i) => (
                           <div
-                            key={url + i} // Dùng url + index để đảm bảo key duy nhất
+                            key={url + i}
                             className="group relative aspect-square overflow-hidden rounded-lg border-2 border-gray-100 shadow-md transition hover:border-primary"
                           >
                             <Zoom>
-                              {/* Tối ưu Image component */}
                               <Image
                                 src={url}
                                 alt={`admin-preview-${i}`}
@@ -624,7 +618,6 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       multiple
                       accept="image/*"
                       onChange={(e) => setImages(e.target.files)}
-                      // Giữ nguyên `file-input-primary` cho ảnh public
                       className="file-input file-input-bordered file-input-primary w-full rounded-lg focus:outline-none"
                     />
                     {previewUrls.length > 0 && (
@@ -660,7 +653,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
               </form>
             </div>
 
-            {/* Footer: Sticky và UI hiện đại */}
+            {/* Footer*/}
             <div className="sticky bottom-0 z-10 flex justify-end gap-3 border-t border-gray-100 bg-white p-2 shadow-lg">
               <CancelBtn onClick={onClose} type="button" value="Hủy" />
 
