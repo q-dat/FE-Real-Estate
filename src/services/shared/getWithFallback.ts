@@ -1,4 +1,3 @@
-'use client';
 export async function getWithFallback<T extends { _id: string }>(
     id: string,
     getAll: () => Promise<T[]>,
