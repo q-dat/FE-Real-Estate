@@ -14,9 +14,10 @@ import { useAdminAuth } from '@/context/AdminAuthContext';
 interface Props {
   posts: IRentalPostAdmin[];
   categories: { _id: string; name: string }[];
+  categoryCode?: number;
 }
 
-export default function ClientRentalPostAdminPage({ posts: initialPosts, categories }: Props) {
+export default function ClientRentalPostAdminPage({ posts: initialPosts, categories, categoryCode }: Props) {
   const { user } = useAdminAuth();
   const userId = user.id;
   const [posts, setPosts] = useState<IRentalPostAdmin[]>(initialPosts);
@@ -28,18 +29,19 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   // Modal Nội bộ Admin
   const [internalOpen, setInternalOpen] = useState(false);
   const [internalPost, setInternalPost] = useState<IRentalPostAdmin | null>(null);
+
   useEffect(() => {
     if (initialPosts.length === 0) {
       console.log('RentalPostAdminPage: No initial posts, reloading...');
       reload();
     }
-  }, []);
+  }, [categoryCode]);
 
   // Hàm tải lại danh sách bài đăng
   const reload = async () => {
     // Tối ưu: Chỉ fetch lại dữ liệu cần thiết.
     // Nếu API có pagination/cache, cần xem xét thêm logic đó.
-    const data: IRentalPostAdmin[] = await rentalPostAdminService.getMyPosts();
+    const data: IRentalPostAdmin[] = await rentalPostAdminService.getMyPosts({ categoryCode });
     // Đảm bảo kiểu dữ liệu: TypeScript
     setPosts(Array.isArray(data) ? data : []);
   };
