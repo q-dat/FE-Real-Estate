@@ -13,6 +13,7 @@ import { AiOutlineColumnWidth } from 'react-icons/ai';
 import { useMemo } from 'react';
 import { IoMdExpand } from 'react-icons/io';
 import HerroBanner from '@/components/userPage/HerroBanner';
+import { LivingExperienceSection } from '@/components/userPage/LivingExperienceSection';
 
 interface Props {
   salePosts: IRentalPostAdmin[];
@@ -148,7 +149,8 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
   return (
     <div className="xl:pt-desktop-padding-top">
       {/* HERO SECTION */}
-    <HerroBanner/>
+      <HerroBanner />
+      <LivingExperienceSection />
 
       {/* QUICK NAV */}
       <section className="relative z-10 mx-auto -mt-16 max-w-7xl px-2 xl:px-desktop-padding">
