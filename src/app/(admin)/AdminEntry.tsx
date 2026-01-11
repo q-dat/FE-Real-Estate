@@ -13,11 +13,11 @@ export default function AdminEntry({ children }: { children: React.ReactNode }) 
 
     const pingServer = async () => {
       try {
-        const res = await fetch('/api/health', {
+        const healthRes = await fetch('/api/health', {
           cache: 'no-store',
         });
 
-        if (!res.ok) throw new Error('Health check failed');
+        if (!healthRes.ok) throw new Error('Health check failed');
 
         if (!cancelled) setStatus('ready');
       } catch {

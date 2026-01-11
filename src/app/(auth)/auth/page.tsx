@@ -32,8 +32,8 @@ export default function AuthPage() {
 
     const checkHealth = async () => {
       try {
-        const res = await fetch('/api/health', { cache: 'no-store' });
-        if (!res.ok) throw new Error();
+        const healthRes = await fetch('/api/health', { cache: 'no-store' });
+        if (!healthRes.ok) throw new Error();
 
         if (!cancelled) setStatus('ready');
       } catch {

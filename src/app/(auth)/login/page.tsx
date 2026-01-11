@@ -31,8 +31,8 @@ export default function LoginPage() {
 
     const checkHealth = async () => {
       try {
-        const res = await fetch('/api/health', { cache: 'no-store' });
-        if (!res.ok) throw new Error();
+        const healthRes = await fetch('/api/health', { cache: 'no-store' });
+        if (!healthRes.ok) throw new Error();
         if (!cancelled) setStatus('ready');
       } catch {
         if (!cancelled) setTimeout(checkHealth, 1500);
