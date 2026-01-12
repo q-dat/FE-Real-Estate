@@ -1,7 +1,8 @@
 'use client';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 interface LightboxProps {
@@ -10,21 +11,82 @@ interface LightboxProps {
   onClose: () => void;
 }
 
+const MAX_SCALE_LEVEL = 10;
+
 export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
   const [index, setIndex] = useState(initialIndex);
 
-  const next = useCallback(() => setIndex((i) => (i + 1) % images.length), [images.length]);
-  const prev = useCallback(() => setIndex((i) => (i - 1 + images.length) % images.length), [images.length]);
+  const [scaleLevel, setScaleLevel] = useState<number>(1); // 1 -> 10
+  const scale = scaleLevel;
+
+  const [rotation, setRotation] = useState<number>(0); // deg
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const resetTransform = useCallback(() => {
+    setScaleLevel(1);
+    setRotation(0);
+    setPos({ x: 0, y: 0 });
+  }, []);
+
+  const next = useCallback(() => {
+    setIndex((i) => (i + 1) % images.length);
+    resetTransform();
+  }, [images.length, resetTransform]);
+
+  const prev = useCallback(() => {
+    setIndex((i) => (i - 1 + images.length) % images.length);
+    resetTransform();
+  }, [images.length, resetTransform]);
+
+  const handleZoomClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (!containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+
+      const nextLevel = scaleLevel < MAX_SCALE_LEVEL ? scaleLevel + 1 : 1;
+
+      if (nextLevel === 1) {
+        resetTransform();
+        return;
+      }
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const ratio = nextLevel / scaleLevel;
+
+      setPos((prev) => ({
+        x: prev.x - (cx - centerX) * (ratio - 1),
+        y: prev.y - (cy - centerY) * (ratio - 1),
+      }));
+
+      setScaleLevel(nextLevel);
+    },
+    [scaleLevel, resetTransform]
+  );
 
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') next();
       if (e.key === 'ArrowLeft') prev();
       if (e.key === 'Escape') onClose();
+      if (e.key === 'r') setRotation((r) => (r + 90) % 360);
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
   }, [next, prev, onClose]);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   return (
     <AnimatePresence mode="wait">
@@ -33,9 +95,8 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        // onClick={onClose}
       >
-        {/* Close Button */}
+        {/* Close */}
         <button
           onClick={onClose}
           className="absolute right-2 top-10 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 xl:right-6 xl:top-6 xl:hover:scale-125"
@@ -44,12 +105,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
         </button>
 
         {/* Prev */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            prev();
-          }}
-        >
+        <button onClick={prev}>
           <FaChevronLeft
             size={30}
             className="absolute bottom-[8vh] left-[30vw] z-50 h-12 w-12 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition xl:left-6 xl:top-1/2 xl:hover:scale-125"
@@ -57,38 +113,67 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
         </button>
 
         {/* Next */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            next();
-          }}
-        >
+        <button onClick={next}>
           <FaChevronRight
             size={30}
             className="absolute bottom-[8vh] right-[30vw] z-50 h-12 w-12 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition xl:right-6 xl:top-1/2 xl:hover:scale-125"
           />
         </button>
 
+        {/* Image */}
         <motion.div
           key={index}
-          initial={{ opacity: 0, x: 150 }}
+          ref={containerRef}
+          initial={{ opacity: 0, x: 120 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -150 }}
-          transition={{ type: 'spring', stiffness: 280, damping: 25 }}
-          className="pointer-events-none relative z-0 h-screen w-screen" // <- thêm pointer-events-none
+          exit={{ opacity: 0, x: -120 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 25 }}
+          className="relative h-screen w-screen overflow-hidden"
         >
-          <Image src={images[index]} alt={`Hình ${index + 1}`} fill style={{ objectFit: 'contain' }} sizes="100vw" />
+          <motion.div
+            onClick={handleZoomClick}
+            drag={scale > 1}
+            dragElastic={0.08}
+            animate={{
+              scale,
+              rotate: rotation,
+              x: pos.x,
+              y: pos.y,
+            }}
+            transition={{ type: 'spring', stiffness: 180, damping: 24 }}
+            className="relative h-full w-full cursor-zoom-in"
+          >
+            <Image src={images[index]} alt={`Hình ${index + 1}`} fill sizes="100vw" className="object-contain" priority />
+          </motion.div>
         </motion.div>
 
-        {/* Counter + progress */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 space-y-3 text-center text-white">
-          <div className="rounded-full bg-white/10 px-6 py-2 text-lg backdrop-blur-xl">
-            {index + 1} / {images.length}
-          </div>
+        {/* Control Panel - Bottom Right */}
+        <div className="fixed bottom-1 right-1/2 z-50 flex items-center gap-2 rounded-xl bg-white/10 p-2 text-xs font-semibold text-white backdrop-blur-xl xl:bottom-2 xl:right-6">
+          <button
+            onClick={() => setScaleLevel((v) => Math.min(v + 1, MAX_SCALE_LEVEL))}
+            className="rounded-lg bg-white/10 px-2 py-1 hover:bg-white/20"
+          >
+            +
+          </button>
 
-          <div className="h-1 w-64 overflow-hidden rounded-full bg-white/20">
-            <motion.div className="h-full bg-white" animate={{ width: `${((index + 1) / images.length) * 100}%` }} transition={{ duration: 0.3 }} />
-          </div>
+          <div className="min-w-[36px] text-center">{scaleLevel}x</div>
+
+          <button onClick={() => setScaleLevel((v) => Math.max(v - 1, 1))} className="rounded-lg bg-white/10 px-2 py-1 hover:bg-white/20">
+            -
+          </button>
+
+          <button onClick={() => setRotation((r) => (r + 90) % 360)} className="rounded-lg bg-white/10 px-2 py-1 hover:bg-white/20">
+            ⟳ Xoay
+          </button>
+
+          <button onClick={resetTransform} className="rounded-lg bg-white/10 px-2 py-1 hover:bg-white/20">
+            reset
+          </button>
+        </div>
+
+        {/* Counter */}
+        <div className="pointer-events-none fixed bottom-[8vh] left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white xl:bottom-2">
+          {index + 1} / {images.length}
         </div>
       </motion.div>
     </AnimatePresence>

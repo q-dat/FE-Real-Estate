@@ -39,22 +39,22 @@ export function PropertyGallery({ images }: { images: string[] }) {
                 alt={`${index}`}
                 width={800}
                 height={600}
-                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                className="h-full w-full border border-primary-lighter rounded-md object-cover transition-transform duration-500 hover:scale-105"
               />
 
-              <div className="absolute inset-0 bg-black/40 opacity-0 transition group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-black/30 opacity-0 transition group-hover:opacity-100" />
 
               <p className="absolute bottom-4 left-4 text-sm text-white opacity-0 group-hover:opacity-100">Nhấn để xem chi tiết</p>
 
               {/* Show More Button trên ảnh cuối */}
               {index === 4 && !showAll && images.length > 5 && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowAll(true);
                     }}
-                    className="rounded-xl bg-white/10 px-6 py-4 text-3xl font-bold text-white backdrop-blur-md"
+                    className="rounded-xl bg-white/10 px-4 py-2 text-3xl font-bold text-white backdrop-blur-md"
                   >
                     +{images.length - 5}
                   </button>

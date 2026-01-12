@@ -17,6 +17,8 @@ import { PropertyGallery } from '../../../../components/userPage/rental/detail/P
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 import DownloadImagesButton from '@/components/userPage/rental/detail/DownloadImagesButton';
+import { useAdminRole } from '@/hooks/useAdminRole';
+import AdminPostInternalSection from '@/components/userPage/rental/detail/AdminPostInternalSection';
 
 interface Props {
   post: IRentalPostAdmin;
@@ -217,6 +219,7 @@ const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
 
 // MAIN PAGE
 export default function ClientRentalPostDetailPage({ post }: Props) {
+  const { isAdmin, loading } = useAdminRole();
   const imagesRental = useMemo(() => post?.images || [], [post?.images]);
   const youtubeId = post?.youtubeLink?.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/)?.[1];
   const encodedAddress = encodeURIComponent(`${post?.address}, ${post?.district}, ${post?.province}`);
@@ -392,6 +395,8 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
           </div>
         </div>
       </div>
+      {/* Admin internal section */}
+      {!loading && isAdmin && <AdminPostInternalSection adminNote={post.adminNote} adminImages={post.adminImages} />}
     </main>
   );
 }
