@@ -148,7 +148,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
         </motion.div>
 
         {/* Control Panel - Bottom Right */}
-        <div className="fixed bottom-1 right-1/2 z-50 flex items-center gap-2 rounded-xl bg-white/10 p-2 text-xs font-semibold text-white backdrop-blur-xl xl:bottom-2 xl:right-6">
+        <div className="fixed bottom-2 right-2 z-50 flex items-center gap-2 rounded-xl bg-white/10 p-2 text-xs font-semibold text-white backdrop-blur-xl xl:right-6">
           <button
             onClick={() => setScaleLevel((v) => Math.min(v + 1, MAX_SCALE_LEVEL))}
             className="rounded-lg bg-white/10 px-2 py-1 hover:bg-white/20"
