@@ -16,7 +16,6 @@ import DownloadImagesButton from '@/components/userPage/rental/detail/DownloadIm
 import { useAdminRole } from '@/hooks/useAdminRole';
 import AdminPostInternalSection from '@/components/userPage/rental/detail/AdminPostInternalSection';
 import AuthorProfileCard from '../../../../components/userPage/rental/detail/AuthorProfileCard';
-import { MdSecurity } from 'react-icons/md';
 
 interface Props {
   post: IRentalPostAdmin;
@@ -214,9 +213,9 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
   const encodedAddress = encodeURIComponent(`${post?.address}, ${post?.district}, ${post?.province}`);
 
   return (
-    <main className="w-full px-2 pt-mobile-padding-top xl:pt-desktop-padding-top">
+    <main className="w-full bg-white px-2 pt-mobile-padding-top xl:pt-desktop-padding-top">
       <Breadcrumbs label={post.title} />
-      <div className="bg-white text-black xl:px-desktop-padding">
+      <div className="text-black xl:px-desktop-padding">
         <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
           {/* LEFT COLUMN (Main Content) - 8/12 */}
           <div className="flex flex-col gap-6 xl:col-span-8">
@@ -321,16 +320,11 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
               <AuthorProfileCard author={post.author} />
 
               {/* Safety Card (Functional & Warning) */}
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
-                <div className="flex items-start gap-3">
-                  <MdSecurity className="mt-1 text-xl text-amber-600" />
-                  <div>
-                    <p className="text-sm font-bold text-amber-800">Lưu ý an toàn</p>
-                    <p className="mt-1 text-xs leading-relaxed text-amber-700/80">
-                      KHÔNG đóng phí đặt cọc khi chưa xem nhà. Kiểm tra kỹ giấy tờ pháp lý (Sổ đỏ/Sổ hồng) và CMND/CCCD chính chủ trước khi giao dịch.
-                    </p>
-                  </div>
-                </div>
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-2 shadow-sm">
+                <p className="text-sm font-bold text-amber-800">Lưu ý an toàn</p>
+                <p className="mt-1 text-xs leading-relaxed text-amber-700/80">
+                  KHÔNG đóng phí đặt cọc khi chưa xem nhà. Kiểm tra kỹ giấy tờ pháp lý (Sổ đỏ/Sổ hồng) và CMND/CCCD chính chủ trước khi giao dịch.
+                </p>
               </div>
 
               {/* Feedback*/}

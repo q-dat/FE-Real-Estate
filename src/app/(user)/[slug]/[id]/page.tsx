@@ -18,7 +18,6 @@ export async function generateMetadata({ params }: PageProps) {
 
   const post = await rentalPostAdminService.getFallback(id);
 
-
   if (!post) {
     return {
       title: 'Không tìm thấy sản phẩm - 7Teck.vn',
@@ -64,7 +63,7 @@ export default async function RentalPostPage({ params }: PageProps) {
   return (
     <>
       <StructuredData data={jsonLd} />
-      <ClientRentalPostDetailPage post={post} />;
+      <ClientRentalPostDetailPage post={post} />
     </>
   );
 }

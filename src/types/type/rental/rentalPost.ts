@@ -1,4 +1,4 @@
-import { IRentalAuthor } from '../rentalAuthor/rentalAuthor';
+import { IRentalAuthor } from '../rentalAdmin/rentalAdmin';
 import { IRentalCategory } from '../rentalCategory/rentalCategory';
 
 /**

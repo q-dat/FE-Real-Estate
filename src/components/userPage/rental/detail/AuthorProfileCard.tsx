@@ -2,160 +2,126 @@
 import React, { useMemo } from 'react';
 import Image from 'next/image';
 import { Button } from 'react-daisyui';
-import { FaPhoneAlt, FaFacebookF, FaInstagram, FaFacebookMessenger, FaViber, FaCheckCircle } from 'react-icons/fa';
+import { FaPhoneAlt, FaFacebookF, FaInstagram, FaFacebookMessenger, FaViber } from 'react-icons/fa';
 import { IRentalAuthor } from '@/types/type/rentalAdmin/rentalAdmin';
 import { formatPhoneNumber } from '@/utils/formatPhoneNumber';
 import { images } from '../../../../../public/images';
+import { HiCheckBadge } from 'react-icons/hi2';
 
 interface Props {
   author?: IRentalAuthor;
 }
 
 export default function AuthorProfileCard({ author }: Props) {
-  // 1. Validation Logic: Fail fast nếu không có dữ liệu
   if (!author || !author.profile) return null;
 
   const { profile } = author;
-
-  // 2. Data Preparation: Xử lý dữ liệu trước khi render (Performance)
   const displayName = profile.displayName || 'Người đăng';
   const username = profile.username || 'user';
-  const avatarUrl = profile.avatar || '/images/default-avatar.png'; // Fallback image
+  const avatarUrl = profile.avatar || '/images/default-avatar.png';
 
-  // Memoize số điện thoại để tránh tính toán lại không cần thiết khi re-render
   const formattedPhone = useMemo(() => formatPhoneNumber(profile.phoneNumber), [profile.phoneNumber]);
 
-  const hasSocials = profile.facebook || profile.instagram;
+  const secondaryAction = profile.viberNumber
+    ? { type: 'viber', link: `viber://chat?number=${profile.viberNumber}`, icon: <FaViber />, label: 'Viber' }
+    : profile.messenger
+      ? { type: 'messenger', link: profile.messenger, icon: <FaFacebookMessenger />, label: 'Messenger' }
+      : null;
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
-      <div className="flex items-start gap-2">
+    <div className="group relative w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-2 shadow-sm transition-all hover:border-blue-200 hover:shadow-md">
+      {/*  HEADER: Compact & Info */}
+      <div className="flex items-start gap-3">
+        {/* Avatar */}
         <div className="relative shrink-0">
-          <div className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-white shadow-sm ring-1 ring-slate-100">
-            <Image
-              src={avatarUrl}
-              alt={displayName}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-              sizes="64px"
-            />
+          <div className="relative h-12 w-12 overflow-hidden rounded-full border border-slate-100 shadow-sm">
+            <Image src={avatarUrl} alt={displayName} fill className="object-cover" sizes="48px" />
           </div>
-          <span className="absolute bottom-0 right-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500 shadow-sm" title="Online" />
+          <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border-2 border-white bg-green-500 ring-1 ring-white" />
         </div>
 
-        <div className="flex flex-col pt-1">
-          <div className="flex items-center gap-1.5">
-            <h3 className="text-lg font-bold text-slate-800">{displayName}</h3>
-            <FaCheckCircle className="text-sm text-blue-500" title="Đã xác thực" />
+        {/* Info & Socials Inline */}
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 className="flex items-center gap-px truncate text-sm font-bold text-slate-900">
+                {displayName}
+                <HiCheckBadge size={14} className="shrink-0 text-blue-500" title="Đã xác thực" />
+              </h3>
+              <p className="truncate text-[11px] text-slate-400">@{username}</p>
+            </div>
+
+            {/* Mini Social Icons Row */}
+            <div className="flex items-end gap-1.5">
+              <span className="text-[10px] font-semibold">Theo dõi</span>
+              {profile.facebook && <MiniSocialBtn href={profile.facebook} icon={<FaFacebookF />} color="text-blue-600 bg-blue-50" />}
+              {profile.instagram && <MiniSocialBtn href={profile.instagram} icon={<FaInstagram />} color="text-pink-600 bg-pink-50" />}
+            </div>
           </div>
-          <p className="text-xs font-medium text-slate-400">@{username}</p>
         </div>
       </div>
 
-      <div className="mt-4">
-        <div className="relative rounded-xl bg-slate-50 p-3">
+      {/* BIO: Minimal Text */}
+      {profile.aboutMe && (
+        <div className="relative mt-2 rounded-xl bg-slate-50 p-2">
           <span className="absolute -top-2 left-4 select-none text-4xl leading-none text-slate-200">“</span>
           <p className="relative z-10 line-clamp-3 text-sm italic leading-relaxed text-slate-600">
             {profile.aboutMe || 'Xin chào, tôi sẵn sàng hỗ trợ bạn tìm được căn hộ ưng ý nhất.'}
           </p>
         </div>
-      </div>
+      )}
 
-      <div className="mt-6 space-y-3">
+      {/* ACTIONS: Dense Grid */}
+      <div className="mt-2 flex flex-col gap-2">
+        {/* Nút Gọi: Full Width */}
         {profile.phoneNumber && (
           <a
             href={`tel:${profile.phoneNumber}`}
-            className="relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 py-3.5 text-white shadow-lg shadow-blue-500/25 transition-all hover:shadow-blue-500/40 active:scale-[0.98]"
+            className="group/btn relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 py-2.5 text-white shadow-blue-100 transition-all hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98]"
           >
-            <div className="animate-wiggle-more rounded-full bg-white/20 p-2">
-              <FaPhoneAlt className="h-4 w-4" />
-            </div>
-            <span className="text-lg font-bold tracking-wide">{formattedPhone}</span>
+            <FaPhoneAlt className="animate-wiggle text-sm" />
+            <span className="text-sm font-bold tracking-wide">{formattedPhone}</span>
           </a>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
+        {/* Zalo & Secondary */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Zalo */}
           {profile.zaloNumber && (
             <Button
+              size="sm"
               onClick={() => window.open(`https://zalo.me/${profile.zaloNumber}`, '_blank')}
-              className="flex h-11 items-center gap-2 border-blue-100 bg-blue-50 font-semibold text-blue-700 hover:border-blue-200 hover:bg-blue-100"
+              className="flex h-9 items-center gap-1.5 rounded-lg border-blue-100 bg-blue-50 px-2 text-xs font-bold text-blue-700 hover:border-blue-200 hover:bg-blue-100 focus:outline-none"
             >
-              <Image src={images.LogoZalo} width={25} height={25} alt="" /> Chat Zalo
+              <div className="relative h-5 w-5 shrink-0">
+                <Image src={images.LogoZalo} alt="Zalo" fill className="object-contain" />
+              </div>
+              Chat Zalo
             </Button>
           )}
 
-          {profile.viberNumber ? (
+          {/* Viber / Messenger */}
+          {secondaryAction && (
             <Button
-              onClick={() => window.open(`viber://chat?number=${profile.viberNumber}`, '_blank')}
-              className="flex h-11 items-center gap-2 border-purple-100 bg-purple-50 font-semibold text-purple-700 hover:border-purple-200 hover:bg-purple-100"
+              size="sm"
+              onClick={() => window.open(secondaryAction.link, '_blank')}
+              className={`flex h-9 items-center gap-1.5 rounded-lg border-slate-100 bg-slate-50 px-2 text-xs font-bold text-slate-700 hover:bg-slate-100 focus:outline-none`}
             >
-              <FaViber className="text-xl" />
-              Viber
+              <span className={secondaryAction.type === 'viber' ? 'text-purple-600' : 'text-blue-600'}>{secondaryAction.icon}</span>
+              {secondaryAction.label}
             </Button>
-          ) : (
-            profile.messenger && (
-              <Button
-                onClick={() => window.open(profile.messenger, '_blank')}
-                className="flex h-11 items-center gap-2 border-blue-100 bg-blue-50 font-semibold text-blue-600 hover:border-blue-200 hover:bg-blue-100"
-              >
-                <FaFacebookMessenger className="text-xl" />
-                Messenger
-              </Button>
-            )
           )}
         </div>
       </div>
-
-      {/* --- FOOTER: Social Links --- */}
-      {hasSocials && (
-        <>
-          <div className="my-4 flex items-center gap-2">
-            <div className="h-px flex-1 bg-slate-100"></div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-300">Socials</span>
-            <div className="h-px flex-1 bg-slate-100"></div>
-          </div>
-
-          <div className="flex justify-center gap-4">
-            {profile.facebook && (
-              <SocialIconLink
-                href={profile.facebook}
-                icon={<FaFacebookF />}
-                colorClass="text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white"
-                label="Facebook"
-              />
-            )}
-            {profile.instagram && (
-              <SocialIconLink
-                href={profile.instagram}
-                icon={<FaInstagram />}
-                colorClass="text-pink-600 bg-pink-50 hover:bg-pink-600 hover:text-white"
-                label="Instagram"
-              />
-            )}
-            {profile.messenger && !profile.viberNumber && (
-              <SocialIconLink
-                href={profile.messenger}
-                icon={<FaFacebookMessenger />}
-                colorClass="text-blue-500 bg-blue-50 hover:bg-blue-500 hover:text-white"
-                label="Messenger"
-              />
-            )}
-          </div>
-        </>
-      )}
-
-      <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
     </div>
   );
 }
 
-const SocialIconLink = ({ href, icon, colorClass, label }: { href: string; icon: React.ReactNode; colorClass: string; label: string }) => (
+const MiniSocialBtn = ({ href, icon, color }: { href: string; icon: React.ReactNode; color: string }) => (
   <a
     href={href}
     target="_blank"
-    rel="noopener noreferrer"
-    aria-label={label}
-    className={`flex h-10 w-10 items-center justify-center rounded-full text-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${colorClass}`}
+    className={`flex h-6 w-6 items-center justify-center rounded-md border border-primary-lighter text-xs transition-transform hover:-translate-y-0.5 ${color}`}
   >
     {icon}
   </a>
