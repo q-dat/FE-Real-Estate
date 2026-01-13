@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button } from 'react-daisyui';
 import { FaImages, FaPlus, FaPen, FaTrashAlt } from 'react-icons/fa';
 import Image from 'next/image';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { IRentalAuthor, IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
 import RentalPostAdminModal from './RentalPostAdminModal';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { formatCurrency } from '@/utils/formatCurrency';
@@ -19,7 +19,9 @@ interface Props {
 
 export default function ClientRentalPostAdminPage({ posts: initialPosts, categories, categoryCode }: Props) {
   const { user } = useAdminAuth();
-  const userId = user.id;
+  const authorRef: IRentalAuthor = {
+    _id: user.id,
+  };
   const [posts, setPosts] = useState<IRentalPostAdmin[]>(initialPosts);
   const [openModal, setOpenModal] = useState(false);
   const [editingPost, setEditingPost] = useState<IRentalPostAdmin | null>(null);
@@ -224,7 +226,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
         editingPost={editingPost}
         categories={categories}
         reload={reload}
-        authorId={userId}
+        authorId={authorRef}
       />
 
       {/* Modal Xóa */}

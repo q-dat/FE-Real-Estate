@@ -104,22 +104,6 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
           <FaTimes size={24} />
         </button>
 
-        {/* Prev */}
-        <button onClick={prev}>
-          <FaChevronLeft
-            size={30}
-            className="absolute bottom-[8vh] left-[30vw] z-50 h-12 w-12 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition xl:left-6 xl:top-1/2 xl:hover:scale-125"
-          />
-        </button>
-
-        {/* Next */}
-        <button onClick={next}>
-          <FaChevronRight
-            size={30}
-            className="absolute bottom-[8vh] right-[30vw] z-50 h-12 w-12 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white transition xl:right-6 xl:top-1/2 xl:hover:scale-125"
-          />
-        </button>
-
         {/* Image */}
         <motion.div
           key={index}
@@ -147,8 +131,28 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
           </motion.div>
         </motion.div>
 
+        {/* Prev */}
+        <button onClick={prev}>
+          <FaChevronLeft
+            size={30}
+            className="absolute bottom-4 left-4 z-50 h-12 w-12 rounded-full bg-white/10 p-2 text-white transition xl:left-6 xl:top-1/2 xl:-translate-y-1/2 xl:hover:scale-125"
+          />
+        </button>
+
+        {/* Next */}
+        {/* Mobile */}
+        <button onClick={next} className="xl:pointer-events-none xl:hidden">
+          <FaChevronRight size={30} className="absolute bottom-4 left-24 z-50 h-12 w-12 rounded-full bg-white/10 p-2 text-white transition" />
+        </button>
+        {/* Desktop */}
+        <button onClick={next} className="hidden xl:block">
+          <FaChevronRight
+            size={30}
+            className="absolute z-50 h-12 w-12 rounded-full bg-white/10 p-2 text-white transition xl:right-6 xl:top-1/2 xl:-translate-y-1/2 xl:hover:scale-125"
+          />
+        </button>
         {/* Control Panel - Bottom Right */}
-        <div className="fixed bottom-2 right-2 z-50 flex items-center gap-2 rounded-xl bg-white/10 p-2 text-xs font-semibold text-white backdrop-blur-xl xl:right-6">
+        <div className="absolute bottom-4 right-4 z-50 flex items-center gap-2 rounded-xl bg-white/10 p-2 text-xs font-semibold text-white backdrop-blur-xl xl:right-6">
           <button
             onClick={() => setScaleLevel((v) => Math.min(v + 1, MAX_SCALE_LEVEL))}
             className="rounded-lg bg-white/10 px-2 py-1 hover:bg-white/20"
@@ -163,7 +167,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
           </button>
 
           <button onClick={() => setRotation((r) => (r + 90) % 360)} className="rounded-lg bg-white/10 px-2 py-1 hover:bg-white/20">
-            ⟳ Xoay
+            ⟳ Xoay (R)
           </button>
 
           <button onClick={resetTransform} className="rounded-lg bg-white/10 px-2 py-1 hover:bg-white/20">
@@ -172,7 +176,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
         </div>
 
         {/* Counter */}
-        <div className="pointer-events-none fixed bottom-[8vh] left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white xl:bottom-2">
+        <div className="pointer-events-none fixed bottom-20 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white xl:bottom-2">
           {index + 1} / {images.length}
         </div>
       </motion.div>

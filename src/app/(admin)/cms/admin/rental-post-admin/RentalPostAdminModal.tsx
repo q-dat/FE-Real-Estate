@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { MdClose } from 'react-icons/md';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { District, IRentalPostAdmin, Province, Ward } from '@/types/type/rentalAdmin/rentalAdmin';
+import { District, IRentalAuthor, IRentalPostAdmin, Province, Ward } from '@/types/type/rentalAdmin/rentalAdmin';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import InputForm from '@/components/userPage/ui/form/InputForm';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
@@ -13,7 +13,6 @@ import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { useEscClose } from '@/hooks/useEscClose';
 import Zoom from '@/lib/Zoom';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
-import { FaUserCircle } from 'react-icons/fa';
 
 interface Props {
   open: boolean;
@@ -21,7 +20,7 @@ interface Props {
   editingPost: IRentalPostAdmin | null;
   categories: { _id: string; name: string }[];
   reload: () => Promise<void>;
-  authorId: string;
+  authorId: IRentalAuthor;
 }
 
 export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload, authorId }: Props) {

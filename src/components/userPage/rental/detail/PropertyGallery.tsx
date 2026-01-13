@@ -8,6 +8,7 @@ export function PropertyGallery({ images }: { images: string[] }) {
   const [showAll, setShowAll] = useState(false);
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
+  const isSingle = images.length === 1;
 
   const visible = showAll ? images : images.slice(0, 5);
 
@@ -23,30 +24,35 @@ export function PropertyGallery({ images }: { images: string[] }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="grid h-[70vh] grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+          className={isSingle ? 'h-[70vh]' : 'grid h-[70vh] grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'}
         >
           {visible.map((src, index) => (
             <motion.div
               key={index}
               onClick={() => openBox(index)}
-              whileHover={{ scale: 1 }}
-              className={`group relative cursor-pointer overflow-hidden rounded-md ${
-                index === 0 ? 'col-span-1 row-span-2 xl:col-span-3 xl:row-span-2' : ''
-              }`}
+              className={
+                isSingle
+                  ? 'relative h-full w-full cursor-pointer overflow-hidden rounded-md'
+                  : `group relative cursor-pointer overflow-hidden rounded-md ${index === 0 ? 'col-span-1 row-span-2 xl:col-span-3 xl:row-span-2' : ''}`
+              }
             >
               <Image
                 src={src}
-                alt={`${index}`}
-                width={800}
-                height={600}
-                className="h-full w-full border border-primary-lighter rounded-md object-cover transition-transform duration-500 hover:scale-105"
+                alt={`image-${index}`}
+                fill
+                sizes="100vw"
+                priority={index === 0}
+                className="rounded-md border border-primary-lighter object-cover transition-transform duration-500 hover:scale-105"
               />
 
-              <div className="absolute inset-0 bg-black/30 opacity-0 transition group-hover:opacity-100" />
+              {!isSingle && (
+                <>
+                  <div className="absolute inset-0 bg-black/30 opacity-0 transition group-hover:opacity-100" />
+                  <p className="absolute bottom-4 left-4 text-sm text-white opacity-0 group-hover:opacity-100">Nhấn để xem chi tiết</p>
+                </>
+              )}
 
-              <p className="absolute bottom-4 left-4 text-sm text-white opacity-0 group-hover:opacity-100">Nhấn để xem chi tiết</p>
-
-              {/* Show More Button trên ảnh cuối */}
+              {/* Show more */}
               {index === 4 && !showAll && images.length > 5 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                   <button

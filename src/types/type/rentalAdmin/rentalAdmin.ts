@@ -1,5 +1,24 @@
 import { IRentalCategory } from '../rentalCategory/rentalCategory';
 
+export interface IRentalAuthorProfile {
+  avatar?: string;
+  displayName?: string;
+  username?: string;
+  aboutMe?: string;
+  instagram?: string;
+  messenger?: string;
+  facebook?: string;
+  viberNumber?: string;
+  phoneNumber?: string;
+  zaloNumber?: string;
+}
+
+export interface IRentalAuthor {
+  _id: string;
+  email?: string;
+  avatar?: string;
+  profile?: IRentalAuthorProfile;
+}
 export interface IRentalPostAdmin {
   _id: string; // id bài đăng (ObjectId)
   code: string; // mã bài đăng ngắn (vd: "POST-17234")
@@ -34,7 +53,7 @@ export interface IRentalPostAdmin {
   videoDescription?: string; // mô tả ngắn cho video
   postType: 'basic' | 'vip1' | 'vip2' | 'vip3' | 'highlight'; // loại tin
   status: 'active' | 'pending' | 'expired' | 'hidden'; // trạng thái tin
-  author?: string; // người đăng tin
+  author?: IRentalAuthor; // người đăng tin
   adminNote?: string; // ghi chú nội bộ cho admin
   adminImages?: string[]; // hình ảnh dành cho quản trị viên
   postedAt?: Date; // ngày đăng tin
