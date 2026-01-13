@@ -23,8 +23,6 @@ export interface IRentalPostAdmin {
   _id: string; // id bài đăng (ObjectId)
   code: string; // mã bài đăng ngắn (vd: "POST-17234")
   images: string[]; // danh sách ảnh
-  phoneNumbers?: string; // danh sách số điện thoại liên hệ
-  zaloLink?: string; // link Zalo liên hệ
   title: string; // tiêu đề bài đăng
   description: string; // mô tả chi tiết nội dung bài đăng
   category: IRentalCategory; // danh mục (liên kết đến bảng danh mục)

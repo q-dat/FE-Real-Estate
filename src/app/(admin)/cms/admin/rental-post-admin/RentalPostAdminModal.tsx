@@ -516,14 +516,6 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   <div className="grid gap-4 xl:grid-cols-3">
                     <InputForm
                       classNameLabel={classNameLabel}
-                      {...register('phoneNumbers')}
-                      label="Số điện thoại liên hệ"
-                      placeholder="Nhập số điện thoại"
-                      bordered
-                    />
-                    <InputForm classNameLabel={classNameLabel} {...register('zaloLink')} label="Link Zalo" placeholder="Nhập link Zalo" bordered />
-                    <InputForm
-                      classNameLabel={classNameLabel}
                       {...register('youtubeLink')}
                       label="Link Youtube"
                       placeholder="Nhập link Youtube"
