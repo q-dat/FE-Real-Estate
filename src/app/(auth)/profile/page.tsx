@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect, ChangeEvent } from 'react';
 import {
   FiUser,
@@ -14,6 +13,7 @@ import {
   FiMessageSquare,
   FiSmartphone,
   FiShare2,
+  FiArrowLeft, // [UPDATE] Import icon mũi tên
 } from 'react-icons/fi';
 import { SiZalo, SiViber, SiMessenger } from 'react-icons/si';
 import { authService } from '@/services/auth.service';
@@ -21,6 +21,7 @@ import { getAdminToken, requireAdminToken } from '@/services/shared/adminAuth.cl
 import { MeResponse } from '@/types/type/auth/auth';
 import { Button } from 'react-daisyui';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Interface chuẩn mực, không dùng any
 interface ProfileFormData {
@@ -140,6 +141,14 @@ export default function AdvancedProfilePage() {
       {/* Header Banner */}
       <div className="relative h-[180px] w-full bg-gradient-to-br from-blue-900/20 to-slate-950">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+
+        {/* [UPDATE] Home/Back Button */}
+        <Link
+          href="/"
+          className="absolute left-2 top-2 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all hover:border-primary hover:bg-primary hover:pl-3 hover:shadow-lg hover:shadow-primary/20"
+        >
+          <FiArrowLeft size={14} /> Trang chủ
+        </Link>
       </div>
 
       <div className="mx-auto max-w-6xl px-2 xl:px-0">
@@ -253,7 +262,7 @@ export default function AdvancedProfilePage() {
                         Chi tiết <FiChevronRight />
                       </button>
                     </div>
-                  </div>
+                </div>
                 ))} */}
               </div>
             ) : (
