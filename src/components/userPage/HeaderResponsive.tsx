@@ -9,8 +9,9 @@ import Image from 'next/image';
 import { images } from '../../../public/images';
 import { AiFillHeart } from 'react-icons/ai';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
+import { IoPerson } from 'react-icons/io5';
 
-// 🧩 Biến variants cho chữ (menu items)
+// Biến variants cho chữ (menu items)
 const textVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
@@ -55,6 +56,7 @@ export default function HeaderResponsive() {
           </Link>
         </div>
         <div className="flex items-center gap-3">
+          {/* Favorite */}
           <Link
             href="/yeu-thich"
             className="rounded-fulltransition-all relative flex items-center justify-center duration-200 hover:scale-105 hover:shadow-md"
@@ -70,6 +72,14 @@ export default function HeaderResponsive() {
               </span>
             )}
           </Link>
+          {/* Auth */}
+          <Link
+            href="/auth"
+            className="relative flex items-center justify-center rounded-full transition-all duration-200 hover:scale-105 hover:shadow-md"
+          >
+            <IoPerson size={20} className="text-white" />
+          </Link>
+          {/* Menu Button */}
           <button onClick={toggleMenu}>
             <FiMenu size={24} className="text-white" />
           </button>

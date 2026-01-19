@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, Lock } from 'lucide-react';
 import { authService } from '@/services/auth.service';
 import { CyberBackground } from '@/components/auth/motion/CyberBackground';
+import Link from 'next/link';
+import { FiArrowLeft } from 'react-icons/fi';
 
 function ConfirmResetContent() {
   const searchParams = useSearchParams();
@@ -124,6 +126,13 @@ function ConfirmResetContent() {
 export default function ConfirmResetPasswordPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center font-sans text-white">
+      {/* Home/Back */}
+      <Link
+        href="/"
+        className="absolute left-2 top-2 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all hover:border-primary hover:bg-primary hover:pl-3 hover:shadow-lg hover:shadow-primary/20"
+      >
+        <FiArrowLeft size={14} /> Trang chủ
+      </Link>
       <CyberBackground />
       <Suspense fallback={<div className="animate-pulse text-purple-500">Initializing Secure Channel...</div>}>
         <ConfirmResetContent />

@@ -7,6 +7,8 @@ import { authService } from '@/services/auth.service';
 import { CyberBackground } from '@/components/auth/motion/CyberBackground';
 import clsx from 'clsx';
 import { requireAdminToken } from '@/services/shared/adminAuth.client';
+import Link from 'next/link';
+import { FiArrowLeft } from 'react-icons/fi';
 
 export default function ChangePasswordPage() {
   const [oldPassword, setOldPassword] = useState('');
@@ -34,6 +36,13 @@ export default function ChangePasswordPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center font-sans text-white">
+           {/* Home/Back */}
+      <Link
+        href="/"
+        className="absolute left-2 top-2 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all hover:border-primary hover:bg-primary hover:pl-3 hover:shadow-lg hover:shadow-primary/20"
+      >
+        <FiArrowLeft size={14} /> Trang chủ
+      </Link>
       <CyberBackground />
 
       <motion.div

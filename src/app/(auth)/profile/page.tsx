@@ -142,7 +142,7 @@ export default function AdvancedProfilePage() {
       <div className="relative h-[180px] w-full bg-gradient-to-br from-blue-900/20 to-slate-950">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
 
-        {/* [UPDATE] Home/Back Button */}
+        {/* Home/Back */}
         <Link
           href="/"
           className="absolute left-2 top-2 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all hover:border-primary hover:bg-primary hover:pl-3 hover:shadow-lg hover:shadow-primary/20"

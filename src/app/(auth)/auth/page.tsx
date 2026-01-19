@@ -8,6 +8,7 @@ import { clsx } from 'clsx';
 import { CyberBackground } from '@/components/auth/motion/CyberBackground';
 import LoginBootLoading from '@/components/auth/LoginBootLoading';
 import Link from 'next/link';
+import { FiArrowLeft } from 'react-icons/fi';
 
 type AuthTab = 'login' | 'register';
 type Status = 'booting' | 'ready' | 'submitting';
@@ -91,6 +92,13 @@ export default function AuthPage() {
   // Auth UI
   return (
     <div className="relative flex min-h-screen items-center justify-center font-sans text-white">
+      {/* Home/Back */}
+      <Link
+        href="/"
+        className="absolute left-2 top-2 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all hover:border-primary hover:bg-primary hover:pl-3 hover:shadow-lg hover:shadow-primary/20"
+      >
+        <FiArrowLeft size={14} /> Trang chủ
+      </Link>
       <CyberBackground />
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -207,7 +215,7 @@ export default function AuthPage() {
 
               {/* Submit */}
               <button
-               disabled={isDisabled || !isValidEmail}
+                disabled={isDisabled || !isValidEmail}
                 className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 py-3.5 font-bold text-white transition-all hover:from-cyan-500 hover:to-blue-500 disabled:opacity-60"
               >
                 {isSubmitting ? (
