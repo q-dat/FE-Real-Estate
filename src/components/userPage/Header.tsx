@@ -15,6 +15,7 @@ import { IoPerson } from 'react-icons/io5';
 import { MeResponse } from '@/types/type/auth/auth';
 import { Avatar, Dropdown } from 'react-daisyui';
 import { HiOutlineArrowRightOnRectangle, HiOutlineUserCircle } from 'react-icons/hi2';
+import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 interface HeaderProps {
   user: MeResponse['data'];
 }
@@ -22,7 +23,7 @@ interface HeaderProps {
 export default function Header({ user }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  // const { favoriteCount } = useRentalFavorite();
+  const { favoriteCount } = useRentalFavorite();
 
   const controls = useAnimation();
   const [scrolled, setScrolled] = useState(false);
@@ -205,33 +206,41 @@ export default function Header({ user }: HeaderProps) {
                     </div>
                   )}
                 </div>
-                <Dropdown.Menu className="mt-2 min-w-[220px] max-w-[320px] rounded-lg border bg-white p-1.5 shadow-md">
+                <Dropdown.Menu className="mt-2 w-fit rounded-lg border bg-white p-1">
                   {/* Account info */}
-                  <div className="mb-1.5 flex items-start gap-2 rounded-md bg-gray-50 px-2 py-1.5">
-                    <Avatar src={user.profile?.avatar} size="xs" className="shrink-0 rounded-md" />
-
+                  <div className="mb-2 flex items-center gap-2">
+                    <Avatar src={user.profile?.avatar} size="xs" />
                     <div className="min-w-0 max-w-[160px]">
                       <p className="truncate text-xs font-semibold text-gray-800">{user.profile?.displayName}</p>
-
                       <p className="break-all text-[10px] leading-snug text-gray-500">{user.email}</p>
                     </div>
                   </div>
 
                   {/* Menu items */}
-                  <Dropdown.Item href="/profile" className="rounded-md px-2 py-1.5 text-xs hover:bg-primary/10">
-                    <HiOutlineUserCircle size={14} />
+                  <Dropdown.Item href="/profile" className="w-[200px] whitespace-nowrap rounded-md text-sm hover:bg-primary/10">
+                    <HiOutlineUserCircle size={16} />
                     Tài khoản
                   </Dropdown.Item>
 
-                  <Dropdown.Item href="/yeu-thich" className="rounded-md px-2 py-1.5 text-xs hover:bg-primary/10">
-                    <AiFillHeart size={13} />
-                    Yêu thích
+                  <Dropdown.Item href="/yeu-thich" className="w-[200px] whitespace-nowrap rounded-md text-sm hover:bg-primary/10">
+                    <AiFillHeart size={16} />
+                    Yêu thích{' '}
+                    <span>
+                      {favoriteCount > 0 && (
+                        <span className="ml-1 inline-block rounded-full bg-red-600 px-2 py-px text-[10px] font-semibold text-white">
+                          {favoriteCount}
+                        </span>
+                      )}
+                    </span>
                   </Dropdown.Item>
 
                   <div className="my-1 h-px bg-gray-100" />
 
-                  <Dropdown.Item onClick={onLogout} className="rounded-md px-2 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">
-                    <HiOutlineArrowRightOnRectangle size={14} />
+                  <Dropdown.Item
+                    onClick={onLogout}
+                    className="w-[200px] whitespace-nowrap rounded-md text-sm font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    <HiOutlineArrowRightOnRectangle size={16} />
                     Đăng xuất
                   </Dropdown.Item>
                 </Dropdown.Menu>
