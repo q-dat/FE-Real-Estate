@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
-const titleBase = 'Bất động sản TP.HCM - Mua bán, cho thuê, dữ liệu minh bạch • 12/2025';
+const titleBase = 'Nguồn Nhà Giá Rẻ - Bất động sản TP.HCM - Mua bán, cho thuê, dữ liệu minh bạch • Tháng 01/2026';
 const descriptionBase =
   'Nguonnhagiare.vn - Nền tảng dữ liệu bất động sản hiện đại, minh bạch và cập nhật liên tục. Hỗ trợ tìm kiếm nhanh, so sánh hiệu quả và ra quyết định chính xác về mua bán - cho thuê nhà đất tại TP.HCM.';
 

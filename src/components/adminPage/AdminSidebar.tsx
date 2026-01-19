@@ -99,22 +99,24 @@ const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps)
 const SidebarContent = ({ pathname, isExpanded, onSelect }: { pathname: string; isExpanded: boolean; onSelect: () => void }) => (
   <div className="z-[999999] flex h-full flex-col overflow-hidden">
     {/* Logo Section */}
-    <div className="hidden h-24 items-center overflow-hidden px-4 xl:flex">
-      <div className={`flex items-center gap-4 ${!isExpanded && 'mx-auto'}`}>
-        <div className="relative hidden h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-primary shadow-[0_0_20px_rgba(var(--p),0.3)] xl:flex">
-          <div className="h-4 w-4 rotate-45 animate-ping rounded-sm bg-white" />
+    <Link href="/" target="_blank" title='Về Trang Chủ'>
+      <div className="hidden h-24 items-center overflow-hidden px-4 xl:flex">
+        <div className={`flex items-center gap-4 ${!isExpanded && 'mx-auto'}`}>
+          <div className="relative hidden h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-primary shadow-[0_0_20px_rgba(var(--p),0.3)] xl:flex">
+            <div className="h-4 w-4 rotate-45 animate-ping rounded-sm bg-white" />
+          </div>
+          {isExpanded && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <h1 className="whitespace-nowrap text-lg font-bold tracking-wider text-white">NGUONNHAGIARE</h1>
+              <div className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
+                <span className="text-[10px] font-bold uppercase text-slate-500">Online</span>
+              </div>
+            </motion.div>
+          )}
         </div>
-        {isExpanded && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <h1 className="whitespace-nowrap text-lg font-bold tracking-wider text-white">NGUONNHAGIARE</h1>
-            <div className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
-              <span className="text-[10px] font-bold uppercase text-slate-500">Online</span>
-            </div>
-          </motion.div>
-        )}
       </div>
-    </div>
+    </Link>
 
     {/* Navigation */}
     <div className="flex-1 overflow-y-auto overflow-x-hidden pt-5 scrollbar-hide">

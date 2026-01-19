@@ -1,21 +1,28 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import clsx from 'clsx'; // tiện cho xử lý class động
 import { LuHandshake } from 'react-icons/lu';
 import { AiFillHeart } from 'react-icons/ai';
 import { TbHomeSearch } from 'react-icons/tb';
 import HeaderResponsive from './HeaderResponsive';
 import { menuItems } from '@/constants/menuItems';
-import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { motion, useAnimation } from 'framer-motion';
 import Image from 'next/image';
 import { images } from '../../../public/images';
+import { IoPerson } from 'react-icons/io5';
+import { MeResponse } from '@/types/type/auth/auth';
+import { Avatar, Dropdown } from 'react-daisyui';
+import { HiOutlineArrowRightOnRectangle, HiOutlineUserCircle } from 'react-icons/hi2';
+interface HeaderProps {
+  user: MeResponse['data'];
+}
 
-export default function Header() {
+export default function Header({ user }: HeaderProps) {
+  const router = useRouter();
   const pathname = usePathname();
-  const { favoriteCount } = useRentalFavorite();
+  // const { favoriteCount } = useRentalFavorite();
 
   const controls = useAnimation();
   const [scrolled, setScrolled] = useState(false);
@@ -34,6 +41,11 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [controls]);
+
+  const onLogout = () => {
+    localStorage.removeItem('token');
+    router.replace('/login');
+  };
 
   return (
     <header>
@@ -99,12 +111,8 @@ export default function Header() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-1">
-            {/* ======================  
-                LOGIC HIỂN THỊ BUTTON  
-                ====================== */}
-
-            {/* Khi scroll xuống → HIỆN nút lớn KHÔNG có chữ nhỏ */}
+          <div className="flex items-end gap-1">
+            {/* COMPACT */}
             {scrolled && (
               <>
                 <Link
@@ -124,8 +132,7 @@ export default function Header() {
                 </Link>
               </>
             )}
-
-            {/* Khi chưa scroll → HIỆN version đầy đủ (có chữ nhỏ) */}
+            {/* FULL */}
             {!scrolled && (
               <>
                 <Link
@@ -152,10 +159,89 @@ export default function Header() {
               </>
             )}
 
+            {/* Auth */}
+            {!user ? (
+              <Link
+                href="/auth"
+                className="flex h-[30px] w-[30px] items-center justify-center rounded-full border border-white bg-primary text-white transition-all duration-200 hover:scale-105 hover:shadow-md"
+              >
+                <IoPerson size={20} />
+              </Link>
+            ) : (
+              <Dropdown vertical="bottom" end>
+                <div tabIndex={0} className="cursor-pointer">
+                  {scrolled ? (
+                    /* COMPACT */
+                    <div className="flex items-center gap-1 rounded-md border border-white p-1 text-white transition-all hover:scale-105">
+                      <div className="relative h-6 w-6 overflow-hidden rounded-md">
+                        <Image
+                          src={user.profile?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}
+                          alt="User avatar"
+                          fill
+                          sizes="20px"
+                          className="object-cover"
+                          priority
+                        />
+                      </div>
+                      <p className="max-w-[70px] truncate text-xs font-bold uppercase leading-none">
+                        {user.profile?.displayName?.split(' ').slice(-1)[0] || user.profile?.username}
+                      </p>
+                    </div>
+                  ) : (
+                    /* FULL */
+                    <div className="flex items-center gap-1.5 rounded-md border border-white p-1 text-white transition-all hover:scale-105">
+                      <div className="relative h-10 w-10 overflow-hidden rounded-md">
+                        <Image
+                          src={user.profile?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}
+                          alt="User avatar"
+                          fill
+                          sizes="24px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-col leading-tight">
+                        <p className="line-clamp-3 max-w-[90px] text-xs font-bold uppercase">{user.profile?.displayName || user.profile?.username}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <Dropdown.Menu className="mt-2 min-w-[220px] max-w-[320px] rounded-lg border bg-white p-1.5 shadow-md">
+                  {/* Account info */}
+                  <div className="mb-1.5 flex items-start gap-2 rounded-md bg-gray-50 px-2 py-1.5">
+                    <Avatar src={user.profile?.avatar} size="xs" className="shrink-0 rounded-md" />
+
+                    <div className="min-w-0 max-w-[160px]">
+                      <p className="truncate text-xs font-semibold text-gray-800">{user.profile?.displayName}</p>
+
+                      <p className="break-all text-[10px] leading-snug text-gray-500">{user.email}</p>
+                    </div>
+                  </div>
+
+                  {/* Menu items */}
+                  <Dropdown.Item href="/profile" className="rounded-md px-2 py-1.5 text-xs hover:bg-primary/10">
+                    <HiOutlineUserCircle size={14} />
+                    Tài khoản
+                  </Dropdown.Item>
+
+                  <Dropdown.Item href="/yeu-thich" className="rounded-md px-2 py-1.5 text-xs hover:bg-primary/10">
+                    <AiFillHeart size={13} />
+                    Yêu thích
+                  </Dropdown.Item>
+
+                  <div className="my-1 h-px bg-gray-100" />
+
+                  <Dropdown.Item onClick={onLogout} className="rounded-md px-2 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">
+                    <HiOutlineArrowRightOnRectangle size={14} />
+                    Đăng xuất
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            )}
+
             {/* Favorites */}
-            <Link
+            {/* <Link
               href="/yeu-thich"
-              className="relative flex h-[30px] w-[30px] items-center justify-center rounded-full border border-red-300 bg-white transition-all duration-200 hover:scale-105 hover:shadow-md"
+              className="border- relative flex h-[30px] w-[30px] items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 hover:shadow-md"
             >
               <AiFillHeart
                 size={20}
@@ -167,7 +253,7 @@ export default function Header() {
                   {favoriteCount}
                 </span>
               )}
-            </Link>
+            </Link> */}
           </div>
         </div>
       </motion.nav>

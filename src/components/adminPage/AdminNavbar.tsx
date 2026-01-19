@@ -89,7 +89,7 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
           <Dropdown.Toggle className="flex w-fit items-center gap-3 rounded-2xl border-none transition-all xl:w-full xl:hover:bg-white/5">
             <div className="hidden text-right sm:block">
               <p className="truncate text-xs font-bold text-white">{user?.profile.displayName}</p>
-              <p className="text-[10px] font-medium uppercase tracking-tighter text-primary/70">{user?.profile.username}</p>
+              <p className="text-[10px] font-medium tracking-tighter text-primary/70">@{user?.profile.username}</p>
             </div>
             <div className="relative">
               <Avatar

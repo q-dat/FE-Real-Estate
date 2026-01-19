@@ -1,27 +1,51 @@
+'use client';
+import { useEffect, useState } from 'react';
 import ContactForm from '@/components/userPage/ContactForm';
-import FooterFC from '@/components/userPage/FooterFC';
 import Header from '@/components/userPage/Header';
+import FooterFC from '@/components/userPage/FooterFC';
 import { RentalFavoriteProvider } from '@/context/RentalFavoriteContext';
-import { homeMetadata } from '@/metadata/homeMetadata';
+import { MeResponse } from '@/types/type/auth/auth';
+import { authService } from '@/services/auth.service';
+import { UserAuthProvider } from '@/context/UserAuthContext';
 
-export const metadata = homeMetadata;
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<MeResponse['data'] | null>(null);
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchMe = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const res = await authService.me(token);
+        if (!cancelled) {
+          setUser(res.data);
+        }
+      } catch {
+        if (!cancelled) setUser(null);
+      }
+    };
+
+    fetchMe();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
-    <div>
-      <RentalFavoriteProvider>
+    <RentalFavoriteProvider>
+      <UserAuthProvider>
         <div className="flex min-h-screen flex-col bg-primary-white">
-          <Header />
-          <div className="flex-1 bg-primary-white selection:bg-primary selection:text-white xl:pt-0">{children}</div>
+          <Header user={user!} />
+          <main className="flex-1 bg-primary-white selection:bg-primary selection:text-white">{children}</main>
           {/* <NavBottom /> */}
           <ContactForm />
           <FooterFC />
         </div>
-      </RentalFavoriteProvider>
-    </div>
+      </UserAuthProvider>
+    </RentalFavoriteProvider>
   );
 }

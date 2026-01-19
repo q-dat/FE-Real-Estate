@@ -1,5 +1,8 @@
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import ClientHomePage from './ClientHomePage';
+import { homeMetadata } from '@/metadata/homeMetadata';
+
+export const metadata = homeMetadata;
 
 export default async function Home() {
   const [salePosts, apartmentPosts, housePosts, businessSpacePosts] = await Promise.all([
