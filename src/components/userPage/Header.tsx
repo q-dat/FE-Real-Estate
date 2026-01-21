@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import clsx from 'clsx'; // tiện cho xử lý class động
+import clsx from 'clsx';
 import { LuHandshake } from 'react-icons/lu';
 import { AiFillHeart } from 'react-icons/ai';
 import { TbHomeSearch } from 'react-icons/tb';
@@ -32,10 +32,10 @@ export default function Header({ user }: HeaderProps) {
     const handleScroll = () => {
       if (window.scrollY > 90) {
         setScrolled(true);
-        controls.start({ height: 70, transition: { duration: 0.25 } });
+        controls.start({ height: 90, transition: { duration: 0.25 } });
       } else {
         setScrolled(false);
-        controls.start({ height: 100, transition: { duration: 0.25 } });
+        controls.start({ height: 110, transition: { duration: 0.25 } });
       }
     };
 
@@ -60,7 +60,7 @@ export default function Header({ user }: HeaderProps) {
         <div
           className={clsx(
             'flex w-full flex-row items-center justify-between px-desktop-padding transition-all duration-300',
-            scrolled ? 'h-[70px]' : 'h-[100px]'
+            scrolled ? 'h-[90px]' : 'h-[110px]'
           )}
         >
           {/* Logo */}
@@ -69,6 +69,7 @@ export default function Header({ user }: HeaderProps) {
           </p> */}
           <Link href={'/'}>
             <Image
+              title="Nguồn Nhà Giá Rẻ"
               src={images.Logo}
               alt={'Logo'}
               width={60}
@@ -78,6 +79,7 @@ export default function Header({ user }: HeaderProps) {
           </Link>
           {/* Middle Navigation */}
           <div className="flex flex-col items-center justify-center gap-1">
+            {/* Menu */}
             <div className={clsx('flex flex-row items-center', scrolled ? 'gap-4' : 'gap-1')}>
               {menuItems.map((item) => {
                 const isActive = pathname === item.link;
@@ -96,7 +98,75 @@ export default function Header({ user }: HeaderProps) {
                 );
               })}
             </div>
+            {/* Contact */}
+            <div className="flex w-full items-center gap-4">
+              {/* Search Input */}
+              <div className="flex w-full items-center rounded-full bg-white/10 p-1 ring-1 ring-white/15 backdrop-blur-xl transition-all focus-within:bg-white/20 focus-within:ring-white/40">
+                <input
+                  placeholder="Tìm kiếm khu vực, dự án, phong cách sống"
+                  className={
+                    scrolled
+                      ? `h-6 flex-1 bg-transparent px-5 text-sm font-light text-white placeholder:text-white focus:outline-none`
+                      : `h-10 flex-1 bg-transparent px-5 text-sm font-light text-white placeholder:text-white focus:outline-none`
+                  }
+                />
+                <button
+                  className={
+                    scrolled
+                      ? `h-6 rounded-full bg-white px-8 text-[11px] font-semibold uppercase tracking-widest text-neutral-900 transition hover:bg-neutral-100`
+                      : `h-10 rounded-full bg-white px-8 text-[11px] font-semibold uppercase tracking-widest text-neutral-900 transition hover:bg-neutral-100`
+                  }
+                >
+                  Khám phá
+                </button>
+              </div>
+              {/* COMPACT */}
+              {scrolled && (
+                <>
+                  <Link
+                    href="/tu-van-tim-nha"
+                    className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-primary bg-white p-1 text-black transition-all duration-200 hover:scale-105"
+                  >
+                    <TbHomeSearch size={20} />
+                    {/* <p className="text-sm font-medium uppercase">Tìm nhà</p> */}
+                  </Link>
 
+                  <Link
+                    href="/lien-he-ky-gui"
+                    className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-white bg-primary p-1 text-white transition-all duration-200 hover:scale-105"
+                  >
+                    <LuHandshake size={20} />
+                    {/* <p className="text-sm font-medium uppercase">Kí gửi</p> */}
+                  </Link>
+                </>
+              )}
+              {/* FULL */}
+              {!scrolled && (
+                <>
+                  <Link
+                    href="/tu-van-tim-nha"
+                    className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-primary bg-white px-3 py-1 text-black"
+                  >
+                    <TbHomeSearch size={30} />
+                    <div className="flex flex-col">
+                      <p className="text-xs">Tư vấn</p>
+                      <p className="text-xs font-medium uppercase">Tìm nhà</p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/lien-he-ky-gui"
+                    className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-white bg-primary px-3 py-1 text-white"
+                  >
+                    <LuHandshake size={30} />
+                    <div className="flex flex-col">
+                      <p className="text-xs">Liên hệ</p>
+                      <p className="text-xs font-medium uppercase">Kí gửi</p>
+                    </div>
+                  </Link>
+                </>
+              )}
+            </div>
             {/* Middle line + menu2 hidden when scrolled */}
             {/* {!scrolled && <p className="h-px w-full bg-primary" />}
 
@@ -113,53 +183,6 @@ export default function Header({ user }: HeaderProps) {
 
           {/* Actions */}
           <div className="flex items-end gap-1">
-            {/* COMPACT */}
-            {scrolled && (
-              <>
-                <Link
-                  href="/tu-van-tim-nha"
-                  className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-primary bg-white p-1 text-black transition-all duration-200 hover:scale-105"
-                >
-                  <TbHomeSearch size={24} />
-                  <p className="text-sm font-bold uppercase">Tìm nhà</p>
-                </Link>
-
-                <Link
-                  href="/lien-he-ky-gui"
-                  className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-white bg-primary p-1 text-white transition-all duration-200 hover:scale-105"
-                >
-                  <LuHandshake size={24} />
-                  <p className="text-sm font-bold uppercase">Kí gửi</p>
-                </Link>
-              </>
-            )}
-            {/* FULL */}
-            {!scrolled && (
-              <>
-                <Link
-                  href="/tu-van-tim-nha"
-                  className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-primary bg-white p-2 text-black"
-                >
-                  <TbHomeSearch size={30} />
-                  <div className="flex flex-col">
-                    <p className="text-xs">Tư vấn</p>
-                    <p className="text-xs font-bold uppercase">Tìm nhà</p>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/lien-he-ky-gui"
-                  className="flex w-fit items-center justify-center gap-1 whitespace-nowrap rounded-md border border-white bg-primary p-2 text-white"
-                >
-                  <LuHandshake size={30} />
-                  <div className="flex flex-col">
-                    <p className="text-xs">Liên hệ</p>
-                    <p className="text-xs font-bold uppercase">Kí gửi</p>
-                  </div>
-                </Link>
-              </>
-            )}
-
             {/* Auth */}
             {!user ? (
               <Link
@@ -173,35 +196,21 @@ export default function Header({ user }: HeaderProps) {
                 <div tabIndex={0} className="cursor-pointer">
                   {scrolled ? (
                     /* COMPACT */
-                    <div className="flex items-center gap-1 rounded-md border border-white p-1 text-white transition-all hover:scale-105">
-                      <div className="relative h-6 w-6 overflow-hidden rounded-md">
-                        <Image
-                          src={user.profile?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}
-                          alt="User avatar"
-                          fill
-                          sizes="20px"
-                          className="object-cover"
-                          priority
-                        />
+                    <div className="flex items-center gap-1 rounded-md text-white transition-all hover:scale-105">
+                      <div className="relative h-14 w-14 overflow-hidden rounded-full border">
+                        <Avatar src={user.profile?.avatar} size="sm" />
                       </div>
-                      <p className="max-w-[70px] truncate text-xs font-bold uppercase leading-none">
-                        {user.profile?.displayName?.split(' ').slice(-1)[0] || user.profile?.username}
-                      </p>
                     </div>
                   ) : (
                     /* FULL */
-                    <div className="flex items-center gap-1.5 rounded-md border border-white p-1 text-white transition-all hover:scale-105">
-                      <div className="relative h-10 w-10 overflow-hidden rounded-md">
-                        <Image
-                          src={user.profile?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}
-                          alt="User avatar"
-                          fill
-                          sizes="24px"
-                          className="object-cover"
-                        />
+                    <div className="group flex items-center gap-3 rounded-md px-2 py-1 transition-colors hover:bg-white/10">
+                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/20">
+                        <Avatar src={user.profile?.avatar} size="sm" />
                       </div>
-                      <div className="flex flex-col leading-tight">
-                        <p className="line-clamp-3 max-w-[90px] text-xs font-bold uppercase">{user.profile?.displayName || user.profile?.username}</p>
+
+                      <div className="flex min-w-0 flex-col leading-tight">
+                        <p className="max-w-[140px] truncate text-xs font-semibold text-white">{user.profile?.displayName}</p>
+                        <p className="max-w-[140px] truncate text-[10px] text-white/60">Tài khoản</p>
                       </div>
                     </div>
                   )}

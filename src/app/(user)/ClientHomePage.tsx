@@ -146,16 +146,16 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
   ];
 
   return (
-    <div className="xl:pt-desktop-padding-top">
+    <div className="pt-mobile-padding-top xl:pt-desktop-padding-top">
       {/* HERO SECTION */}
       <HerroBanner />
       {/* <LivingExperienceSection /> */}
 
       {/* QUICK NAV */}
-      <section className="relative z-10 mx-auto -mt-16 max-w-7xl px-2 xl:px-desktop-padding">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <section className="relative z-10 mx-auto mt-10 max-w-7xl px-2 xl:-mt-5 xl:px-desktop-padding">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:gap-4">
           {sections.map((s, i) => (
-            <Link key={i} href={s.link} className="group bg-white p-6 shadow-xl transition-all hover:-translate-y-2">
+            <Link key={i} href={s.link} className="group rounded-sm bg-primary-lighter p-2 shadow-xl transition-all hover:-translate-y-2 xl:p-6">
               <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-primary">{s.subtitle}</p>
               <p className="text-sm font-medium text-neutral-900 group-hover:underline">{s.title}</p>
             </Link>
@@ -164,7 +164,7 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
       </section>
 
       {/* DYNAMIC SECTIONS */}
-      <div className="mx-auto max-w-[1600px] px-2 py-20 xl:px-desktop-padding">
+      <div className="mx-auto max-w-[1600px] px-2 py-10 xl:px-desktop-padding xl:py-20">
         {sections.map((section) => {
           if (!section.data.length) return null;
 
@@ -183,7 +183,7 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
               </div>
 
               {/* Grid Layout */}
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+              <div className="grid grid-cols-1 gap-2 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                 {section.data.slice(0, 10).map((post) => (
                   <PostCard key={post._id} post={post} />
                 ))}
