@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { images } from '../../../public/images';
 import { AiFillHeart } from 'react-icons/ai';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
-import { IoPerson } from 'react-icons/io5';
+import { IoPerson, IoShieldCheckmarkSharp } from 'react-icons/io5';
 import { MeResponse } from '@/types/type/auth/auth';
 import { HiOutlineArrowRightOnRectangle } from 'react-icons/hi2';
 
@@ -139,7 +139,9 @@ export default function HeaderResponsive({ user, onLogout }: HeaderResponsivePro
             >
               {/* Header Drawer */}
               <div className="flex items-center justify-between border-b bg-primary p-4 text-white">
-                <span className="text-lg font-semibold">Menu</span>
+                <span className="flex items-center gap-0.5 whitespace-nowrap text-sm font-semibold">
+                  Nguồn Nhà Giá Rẻ <IoShieldCheckmarkSharp className="text-green-400" />
+                </span>
                 <button onClick={toggleMenu}>
                   <FiX size={24} />
                 </button>

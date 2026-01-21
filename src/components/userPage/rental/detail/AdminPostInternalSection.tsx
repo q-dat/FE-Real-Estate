@@ -86,7 +86,7 @@ export default function AdminPostInternalSection({ adminNote, adminImages }: Pro
                   <div className="h-2 w-2 rounded-full bg-yellow-500" />
                   <div className="h-2 w-2 rounded-full bg-green-500" />
                 </div>
-                <pre className="whitespace-pre-wrap break-words font-sans selection:bg-primary selection:text-primary-content">{adminNote}</pre>
+                <pre className="whitespace-pre-wrap break-words font-sans">{adminNote}</pre>
               </div>
             </div>
           )}
