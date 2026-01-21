@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
-import clsx from 'clsx'; // tiện cho xử lý class động
+import clsx from 'clsx';
 import Link from 'next/link';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { menuItems } from '@/constants/menuItems';
@@ -10,6 +10,8 @@ import { images } from '../../../public/images';
 import { AiFillHeart } from 'react-icons/ai';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { IoPerson } from 'react-icons/io5';
+import { MeResponse } from '@/types/type/auth/auth';
+import { HiOutlineArrowRightOnRectangle } from 'react-icons/hi2';
 
 // Biến variants cho chữ (menu items)
 const textVariants: Variants = {
@@ -26,7 +28,12 @@ const textVariants: Variants = {
   }),
 };
 
-export default function HeaderResponsive() {
+interface HeaderResponsiveProps {
+  user: MeResponse['data'];
+  onLogout: () => void;
+}
+
+export default function HeaderResponsive({ user, onLogout }: HeaderResponsiveProps) {
   const { favoriteCount } = useRentalFavorite();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const toggleMenu = () => setIsMenuOpen((p) => !p);
@@ -73,12 +80,24 @@ export default function HeaderResponsive() {
             )}
           </Link>
           {/* Auth */}
-          <Link
-            href="/auth"
-            className="relative flex items-center justify-center rounded-full transition-all duration-200 hover:scale-105 hover:shadow-md"
-          >
-            <IoPerson size={20} className="text-white" />
-          </Link>
+          {!user ? (
+            <Link href="/auth" className="flex items-center justify-center rounded-full transition-all">
+              <IoPerson size={20} className="text-white" />
+            </Link>
+          ) : (
+            <Link href="/profile" className="flex items-center gap-2 rounded-full transition-all">
+              <div className="relative h-8 w-8 overflow-hidden rounded-full border border-white/20">
+                <Image
+                  src={user.profile?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}
+                  alt="avatar"
+                  fill
+                  sizes="32px"
+                  className="object-cover"
+                />
+              </div>
+            </Link>
+          )}
+
           {/* Menu Button */}
           <button onClick={toggleMenu}>
             <FiMenu size={24} className="text-white" />
@@ -127,7 +146,38 @@ export default function HeaderResponsive() {
               </div>
 
               {/* Navigation Links */}
-              <motion.nav className="flex flex-col gap-3 px-0 py-4 text-base text-gray-700" initial="hidden" animate="visible" exit="hidden">
+              <motion.nav className="flex flex-col gap-3 text-base text-gray-700" initial="hidden" animate="visible" exit="hidden">
+                {/* Account Section */}
+                <div className="border-b p-2">
+                  {!user ? (
+                    <Link href="/auth" onClick={toggleMenu} className="flex items-center gap-3 rounded-lg bg-primary px-4 py-3 text-white">
+                      <IoPerson size={20} />
+                      <span className="text-sm font-semibold">Đăng nhập / Đăng ký</span>
+                    </Link>
+                  ) : (
+                    <Link href="/profile" onClick={toggleMenu}>
+                      <div className="flex items-start gap-3">
+                        <div className="relative h-[60px] w-[60px] overflow-hidden rounded-full border">
+                          <Image
+                            src={user.profile?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}
+                            alt="avatar"
+                            fill
+                            sizes="50px"
+                            className="object-cover"
+                          />
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-xs text-red-700">@{user.profile?.username}</p>
+                          <p className="truncate text-lg font-semibold text-gray-900">{user.profile?.displayName}</p>
+                          <p className="truncate text-xs text-gray-500">{user.email}</p>
+                          <p className="truncate py-1 text-end text-xs text-blue-700 underline">Quản lý tài khoản </p>
+                        </div>
+                      </div>
+                    </Link>
+                  )}
+                </div>
+                {/* Menu Items */}
                 {menuItems.map((item, i) => (
                   <motion.div key={item.link} custom={i} variants={textVariants}>
                     <Link
@@ -146,6 +196,21 @@ export default function HeaderResponsive() {
                     </Link>
                   </motion.div>
                 ))}
+                {/* User Account Section */}
+                {user && (
+                  <div className="border-t p-2 text-sm">
+                    <button
+                      onClick={() => {
+                        onLogout();
+                        toggleMenu();
+                      }}
+                      className="flex w-full items-center gap-2 rounded-md font-semibold text-red-600 hover:bg-red-50"
+                    >
+                      <HiOutlineArrowRightOnRectangle size={18} />
+                      Đăng xuất
+                    </button>
+                  </div>
+                )}
               </motion.nav>
 
               {/* Optional Footer */}

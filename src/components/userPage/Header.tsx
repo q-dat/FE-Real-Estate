@@ -50,7 +50,7 @@ export default function Header({ user }: HeaderProps) {
 
   return (
     <header>
-      <HeaderResponsive />
+<HeaderResponsive user={user} onLogout={onLogout} />
 
       {/* Desktop Header */}
       <motion.nav
