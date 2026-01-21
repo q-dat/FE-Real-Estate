@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { LuHandshake } from 'react-icons/lu';
 import { AiFillHeart } from 'react-icons/ai';
@@ -16,12 +16,13 @@ import { MeResponse } from '@/types/type/auth/auth';
 import { Avatar, Dropdown } from 'react-daisyui';
 import { HiOutlineArrowRightOnRectangle, HiOutlineUserCircle } from 'react-icons/hi2';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
+import { useLogout } from '@/hooks/useLogout';
 interface HeaderProps {
   user: MeResponse['data'];
 }
 
 export default function Header({ user }: HeaderProps) {
-  const router = useRouter();
+  const onLogout = useLogout();
   const pathname = usePathname();
   const { favoriteCount } = useRentalFavorite();
 
@@ -43,14 +44,9 @@ export default function Header({ user }: HeaderProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [controls]);
 
-  const onLogout = () => {
-    localStorage.removeItem('token');
-    router.replace('/login');
-  };
-
   return (
     <header>
-<HeaderResponsive user={user} onLogout={onLogout} />
+      <HeaderResponsive user={user} onLogout={onLogout} />
 
       {/* Desktop Header */}
       <motion.nav

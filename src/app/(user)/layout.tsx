@@ -7,6 +7,7 @@ import { RentalFavoriteProvider } from '@/context/RentalFavoriteContext';
 import { MeResponse } from '@/types/type/auth/auth';
 import { authService } from '@/services/auth.service';
 import { UserAuthProvider } from '@/context/UserAuthContext';
+import { ACCESS_TOKEN_KEY } from '../(auth)';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<MeResponse['data'] | null>(null);
@@ -15,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     let cancelled = false;
 
     const fetchMe = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem(`${ACCESS_TOKEN_KEY}`);
       if (!token) return;
 
       try {

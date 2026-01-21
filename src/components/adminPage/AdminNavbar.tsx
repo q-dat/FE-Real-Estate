@@ -9,8 +9,8 @@ import {
 } from 'react-icons/hi2';
 import { Navbar, Button, Indicator, Dropdown, Avatar } from 'react-daisyui';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import { MeResponse } from '@/types/type/auth/auth';
+import { useLogout } from '@/hooks/useLogout';
 
 interface AdminNavbarProps {
   title: string;
@@ -19,12 +19,7 @@ interface AdminNavbarProps {
 }
 
 export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarProps) {
-  const router = useRouter();
-
-  const onLogout = () => {
-    localStorage.removeItem('token');
-    router.replace('/login');
-  };
+  const onLogout = useLogout();
 
   return (
     <Navbar className="sticky top-0 z-[999999] w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">

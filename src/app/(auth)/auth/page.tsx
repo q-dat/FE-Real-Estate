@@ -9,6 +9,7 @@ import { CyberBackground } from '@/components/auth/motion/CyberBackground';
 import LoginBootLoading from '@/components/auth/LoginBootLoading';
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
+import { ACCESS_TOKEN_KEY } from '..';
 
 type AuthTab = 'login' | 'register';
 type Status = 'booting' | 'ready' | 'submitting';
@@ -17,7 +18,6 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function AuthPage() {
   const router = useRouter();
-
   const [status, setStatus] = useState<Status>('booting');
   const [activeTab, setActiveTab] = useState<AuthTab>('login');
   const [email, setEmail] = useState('');
@@ -69,8 +69,8 @@ export default function AuthPage() {
           throw new Error('Token không tồn tại');
         }
 
-        localStorage.setItem('token', res.data.token);
-        router.replace('/cms/admin/dashboard');
+        localStorage.setItem(`${ACCESS_TOKEN_KEY}`, res.data.token);
+        router.replace('/');
       } else {
         await authService.register({ email, password });
         router.push(`/verify-email?email=${encodeURIComponent(email)}`);

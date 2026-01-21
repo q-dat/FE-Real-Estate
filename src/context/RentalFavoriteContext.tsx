@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Toastify } from '@/helper/Toastify';
 import { IRentalFavoriteLite, IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { FAVORITES_KEY } from '@/app';
 
 interface RentalFavoriteContextType {
   favorites: IRentalFavoriteLite[];
@@ -17,12 +18,12 @@ export function RentalFavoriteProvider({ children }: { children: React.ReactNode
   const toastRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('rentalFavorites');
+    const saved = localStorage.getItem(`${FAVORITES_KEY}`);
     if (saved) {
       try {
         setFavorites(JSON.parse(saved));
       } catch {
-        localStorage.removeItem('rentalFavorites');
+        localStorage.removeItem(`${FAVORITES_KEY}`);
       }
     }
   }, []);
@@ -52,7 +53,7 @@ export function RentalFavoriteProvider({ children }: { children: React.ReactNode
         toastRef.current = 'Đã thêm vào danh sách yêu thích.';
       }
 
-      localStorage.setItem('rentalFavorites', JSON.stringify(updated));
+      localStorage.setItem(`${FAVORITES_KEY}`, JSON.stringify(updated));
       return updated;
     });
 
@@ -65,7 +66,7 @@ export function RentalFavoriteProvider({ children }: { children: React.ReactNode
   const handleRemove = useCallback((id: string) => {
     setFavorites((prev) => {
       const updated = prev.filter((f) => f._id !== id);
-      localStorage.setItem('rentalFavorites', JSON.stringify(updated));
+      localStorage.setItem(`${FAVORITES_KEY}`, JSON.stringify(updated));
       Toastify('Đã xóa khỏi danh sách yêu thích.', 200);
       return updated;
     });

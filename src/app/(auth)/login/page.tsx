@@ -9,6 +9,7 @@ import { CyberBackground } from '@/components/auth/motion/CyberBackground';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
+import { ACCESS_TOKEN_KEY } from '..';
 
 type Status = 'booting' | 'ready' | 'submitting';
 type UserRole = 'user' | 'admin';
@@ -17,7 +18,6 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function LoginPage() {
   const router = useRouter();
-
   const [status, setStatus] = useState<Status>('booting');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,7 +59,7 @@ export default function LoginPage() {
       const token = loginRes.data?.token;
       if (!token) throw new Error('Token không tồn tại');
 
-      localStorage.setItem('token', token);
+      localStorage.setItem(`${ACCESS_TOKEN_KEY}`, token);
 
       const meRes = await authService.me(token);
       const role = meRes.data.role as UserRole;
@@ -81,7 +81,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center font-sans text-white">
-         {/* Home/Back */}
+      {/* Home/Back */}
       <Link
         href="/"
         className="absolute left-2 top-2 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all hover:border-primary hover:bg-primary hover:pl-3 hover:shadow-lg hover:shadow-primary/20"

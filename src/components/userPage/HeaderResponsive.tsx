@@ -179,6 +179,14 @@ export default function HeaderResponsive({ user, onLogout }: HeaderResponsivePro
                     </Link>
                   )}
                 </div>
+                {/* AdminManager */}
+                {user && (
+                  <div className="p-2 text-center">
+                    <Link href="/cms/admin/dashboard">
+                      <span>Quản lý Bài Đăng</span>
+                    </Link>
+                  </div>
+                )}
                 {/* Menu Items */}
                 {menuItems.map((item, i) => (
                   <motion.div key={item.link} custom={i} variants={textVariants}>
