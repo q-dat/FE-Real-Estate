@@ -135,14 +135,14 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
         <button onClick={prev}>
           <FaChevronLeft
             size={30}
-            className="absolute bottom-4 left-4 z-50 h-12 w-12 rounded-full bg-white/10 p-2 text-white transition xl:left-6 xl:top-1/2 xl:-translate-y-1/2 xl:hover:scale-125"
+            className="absolute bottom-2 left-2 z-50 h-12 w-12 rounded-full bg-white/10 p-2 text-white transition xl:left-6 xl:top-1/2 xl:-translate-y-1/2 xl:hover:scale-125"
           />
         </button>
 
         {/* Next */}
         {/* Mobile */}
         <button onClick={next} className="xl:pointer-events-none xl:hidden">
-          <FaChevronRight size={30} className="absolute bottom-4 left-24 z-50 h-12 w-12 rounded-full bg-white/10 p-2 text-white transition" />
+          <FaChevronRight size={30} className="absolute bottom-2 left-[70px] z-50 h-12 w-12 rounded-full bg-white/10 p-2 text-white transition" />
         </button>
         {/* Desktop */}
         <button onClick={next} className="hidden xl:block">
@@ -152,7 +152,7 @@ export function Lightbox({ images, initialIndex, onClose }: LightboxProps) {
           />
         </button>
         {/* Control Panel - Bottom Right */}
-        <div className="absolute bottom-4 right-4 z-50 flex items-center gap-2 rounded-xl bg-white/10 p-2 text-xs font-semibold text-white backdrop-blur-xl xl:right-6">
+        <div className="absolute bottom-2 right-2 z-50 flex items-center gap-2 rounded-xl bg-white/10 p-2 text-xs font-semibold text-white backdrop-blur-xl xl:right-6">
           <button
             onClick={() => setScaleLevel((v) => Math.min(v + 1, MAX_SCALE_LEVEL))}
             className="rounded-lg bg-white/10 px-2 py-1 hover:bg-white/20"
