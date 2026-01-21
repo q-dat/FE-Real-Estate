@@ -217,12 +217,12 @@ export default function Header({ user }: HeaderProps) {
                   </div>
 
                   {/* Menu items */}
-                  <Dropdown.Item href="/profile" className="w-[200px] whitespace-nowrap rounded-md text-sm hover:bg-primary/10">
+                  <Dropdown.Item href="/profile" className="w-[200px] whitespace-nowrap rounded-md text-sm text-black hover:bg-primary/10">
                     <HiOutlineUserCircle size={16} />
                     Tài khoản
                   </Dropdown.Item>
 
-                  <Dropdown.Item href="/yeu-thich" className="w-[200px] whitespace-nowrap rounded-md text-sm hover:bg-primary/10">
+                  <Dropdown.Item href="/yeu-thich" className="w-[200px] whitespace-nowrap rounded-md text-sm text-black hover:bg-primary/10">
                     <AiFillHeart size={16} />
                     Yêu thích{' '}
                     <span>
