@@ -247,7 +247,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-slate-900">Mô tả bất động sản</h2>
                 <div
-                  className="whitespace-pre-wrap break-words font-sans text-xs leading-5 text-slate-700 xl:text-base"
+                  className="whitespace-pre-wrap break-words font-sans text-sm leading-5 text-slate-700 xl:text-base"
                   dangerouslySetInnerHTML={{ __html: post?.description?.replace(/\n/g, '<br />') || 'Đang cập nhật...' }}
                 />
               </div>
