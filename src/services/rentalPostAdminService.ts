@@ -18,7 +18,6 @@ const cache: CacheState = {
 };
 
 const rentalPostAdminService = {
-  
   /** Lấy danh sách bài đăng của admin hiện tại */
   async getMyPosts(params?: Record<string, string | number | undefined>): Promise<IRentalPostAdmin[]> {
     let apiUrl = getServerApiUrl('api/rental-posts/me');
@@ -99,7 +98,24 @@ const rentalPostAdminService = {
 
     return list;
   },
+  /** Lấy chi tiết bài đăng theo mã code ngắn */
+  async getByCode(code: string): Promise<IRentalPostAdmin | null> {
+    if (!code) return null;
 
+    const apiUrl = getServerApiUrl(`api/rental-admin-posts?code=${encodeURIComponent(code)}`);
+
+    const res = await fetch(apiUrl, {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) return null;
+
+    const data = (await res.json()) as {
+      rentalPosts?: IRentalPostAdmin[];
+    };
+
+    return data.rentalPosts?.[0] ?? null;
+  },
   /**
    * Lấy chi tiết bài đăng.
    * - Ưu tiên 1: Lấy ngay từ RAM Cache (nếu người dùng vừa vào trang List xong).

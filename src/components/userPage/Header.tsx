@@ -1,7 +1,8 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { LuHandshake } from 'react-icons/lu';
 import { AiFillHeart } from 'react-icons/ai';
@@ -17,32 +18,48 @@ import { Avatar, Dropdown } from 'react-daisyui';
 import { HiOutlineArrowRightOnRectangle, HiOutlineUserCircle } from 'react-icons/hi2';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { useLogout } from '@/hooks/useLogout';
+
 interface HeaderProps {
   user: MeResponse['data'];
 }
 
+const CODE_REGEX = /^[A-Z0-9]{6,10}$/;
+
 export default function Header({ user }: HeaderProps) {
-  const onLogout = useLogout();
+  const router = useRouter();
   const pathname = usePathname();
+  const onLogout = useLogout();
   const { favoriteCount } = useRentalFavorite();
 
   const controls = useAnimation();
   const [scrolled, setScrolled] = useState(false);
+  const [keyword, setKeyword] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 90) {
-        setScrolled(true);
-        controls.start({ height: 90, transition: { duration: 0.25 } });
-      } else {
-        setScrolled(false);
-        controls.start({ height: 110, transition: { duration: 0.25 } });
-      }
+      const isScrolled = window.scrollY > 90;
+      setScrolled(isScrolled);
+      controls.start({
+        height: isScrolled ? 90 : 110,
+        transition: { duration: 0.25 },
+      });
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [controls]);
+
+  const handleSearch = useCallback(() => {
+    const value = keyword.trim().toUpperCase();
+    if (!value) return;
+
+    if (!CODE_REGEX.test(value)) {
+      return;
+    }
+
+    router.push(`/post/${value}`);
+    setKeyword('');
+  }, [keyword, router]);
 
   return (
     <header>
@@ -96,26 +113,30 @@ export default function Header({ user }: HeaderProps) {
             </div>
             {/* Contact */}
             <div className="flex w-full items-center gap-4">
-              {/* Search Input */}
-              <div className="flex w-full items-center rounded-full bg-white/10 p-1 ring-1 ring-white/15 backdrop-blur-xl transition-all focus-within:bg-white/20 focus-within:ring-white/40">
+              {/* Search */}
+              <div className="flex w-full items-center rounded-full bg-white/10 p-1 ring-1 ring-white/15 backdrop-blur-xl focus-within:bg-white/20">
                 <input
-                  placeholder="Tìm kiếm khu vực, dự án, phong cách sống"
-                  className={
-                    scrolled
-                      ? `h-6 flex-1 bg-transparent px-5 text-sm font-light text-white placeholder:text-white focus:outline-none`
-                      : `h-10 flex-1 bg-transparent px-5 text-sm font-light text-white placeholder:text-white focus:outline-none`
-                  }
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder="Nhập mã bài đăng (VD: 2802A1E)"
+                  className={clsx(
+                    'flex-1 bg-transparent px-5 text-sm text-white placeholder:text-white focus:outline-none',
+                    scrolled ? 'h-6' : 'h-10'
+                  )}
                 />
                 <button
-                  className={
-                    scrolled
-                      ? `h-6 rounded-full bg-white px-8 text-[11px] font-semibold uppercase tracking-widest text-neutral-900 transition hover:bg-neutral-100`
-                      : `h-10 rounded-full bg-white px-8 text-[11px] font-semibold uppercase tracking-widest text-neutral-900 transition hover:bg-neutral-100`
-                  }
+                  onClick={handleSearch}
+                  className={clsx(
+                    'rounded-full bg-white px-8 text-[11px] font-semibold uppercase tracking-widest text-neutral-900 hover:bg-neutral-100',
+                    scrolled ? 'h-6' : 'h-10'
+                  )}
                 >
-                  Khám phá
+                  Tìm kiếm
                 </button>
               </div>
+
+              {/* CTA */}
               {/* COMPACT */}
               {scrolled && (
                 <>
