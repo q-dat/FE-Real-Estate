@@ -1,0 +1,32 @@
+'use client';
+import { useState } from 'react';
+import { Badge } from 'react-daisyui';
+
+interface CopyCodeBadgeProps {
+  code: string;
+}
+
+export default function CopyCodeBadge({ code }: CopyCodeBadgeProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
+  };
+
+  return (
+    <div className="tooltip tooltip-top tooltip-primary w-fit" data-tip="Sao chép mã bài đăng">
+      <Badge
+        className="text-md cursor-pointer whitespace-nowrap border border-primary p-4 font-medium text-primary transition xl:hover:scale-110"
+        onClick={handleCopy}
+      >
+        {copied ? 'Đã sao chép' : `#${code}`}
+      </Badge>
+    </div>
+  );
+}

@@ -75,13 +75,15 @@ export default function AuthorProfileCard({ author }: Props) {
       <div className="mt-2 flex flex-col gap-2">
         {/* Nút Gọi: Full Width */}
         {profile.phoneNumber && (
-          <a
-            href={`tel:${profile.phoneNumber}`}
-            className="group/btn relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 py-2.5 text-white shadow-blue-100 transition-all hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98]"
-          >
-            <FaPhoneAlt className="animate-wiggle text-sm" />
-            <span className="text-sm font-bold tracking-wide">{formattedPhone}</span>
-          </a>
+          <div className="tooltip tooltip-top tooltip-primary" data-tip="Bấm để gọi ngay">
+            <a
+              href={`tel:${profile.phoneNumber}`}
+              className="group/btn relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 py-2.5 text-white shadow-blue-100 transition-all hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98]"
+            >
+              <FaPhoneAlt className="animate-wiggle text-sm" />
+              <span className="text-sm font-bold tracking-wide">{formattedPhone}</span>
+            </a>
+          </div>
         )}
 
         {/* Zalo & Secondary */}

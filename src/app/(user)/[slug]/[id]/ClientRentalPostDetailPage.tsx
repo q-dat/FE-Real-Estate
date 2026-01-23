@@ -16,6 +16,9 @@ import DownloadImagesButton from '@/components/userPage/rental/detail/DownloadIm
 import { useAdminRole } from '@/hooks/useAdminRole';
 import AdminPostInternalSection from '@/components/userPage/rental/detail/AdminPostInternalSection';
 import AuthorProfileCard from '../../../../components/userPage/rental/detail/AuthorProfileCard';
+import CopyCodeBadge from '@/components/userPage/ui/btn/CopyCodeBadge';
+import CopyUrlButton from '@/components/userPage/ui/btn/CopyUrlButton';
+import { slugify } from '@/lib/slugify';
 
 interface Props {
   post: IRentalPostAdmin;
@@ -24,15 +27,15 @@ interface Props {
 const getStatusColor = (type: IRentalPostAdmin['postType']) => {
   switch (type) {
     case 'highlight':
-      return 'error'; // Đỏ
+      return 'error';
     case 'vip1':
-      return 'warning'; // Vàng
+      return 'warning';
     case 'vip2':
-      return 'accent'; // Cam/Xanh lơ
+      return 'accent';
     case 'vip3':
-      return 'info'; // Xanh dương
+      return 'info';
     default:
-      return 'ghost'; // Xám
+      return 'ghost';
   }
 };
 
@@ -51,38 +54,36 @@ const getStatusLabel = (status: IRentalPostAdmin['postType']): string => {
 
 // New Modern Header Component
 const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
+  const slug = slugify(post.title);
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/${slug}/${post._id}`;
   return (
     <div className="mb-6">
       {/* Top Meta: Badges & Code */}
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-1 xl:gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge color={getStatusColor(post.postType)} className="whitespace-nowrap font-bold text-white shadow-sm">
+          <Badge color={getStatusColor(post.postType)} className="whitespace-nowrap border border-white px-3 py-4 font-medium text-white">
             {post.postType === 'highlight' && <GiStarsStack className="mr-1" />}
             {getStatusLabel(post.postType)}
           </Badge>
-          <Badge variant="outline" className="border-neutral-300 text-neutral-500">
-            #{post.code}
-          </Badge>
-          <span className="flex items-center text-xs text-neutral-400">
+
+          {/* <span className="flex items-center text-xs text-neutral-400">
             <FaClock className="mr-1" />
             {new Date(post.updatedAt).toLocaleDateString('vi-VN')}
-          </span>
+          </span> */}
         </div>
-        <div className="">
-          <div className="flex flex-row items-center justify-center gap-2">
-            <div className="w-full rounded-full border border-primary hover:scale-125">
-              {/* DownloadImages */}
-              <DownloadImagesButton images={post.images} filePrefix={post.code} />
-            </div>
-            {/* Share */}
-            <Button size="sm" shape="circle" className="text-blue-600 hover:scale-125">
-              <IoShareSocial size={20} />
-            </Button>
-            {/* Favorite */}
-            <div className="w-full rounded-full border border-primary hover:scale-125">
-              <FavoriteBtn post={post} size={24} color="text-primary" />
-            </div>
-          </div>
+        <div className="flex flex-row items-center justify-center gap-1 xl:gap-2">
+          {/* Copy Code */}
+          <CopyCodeBadge code={post.code} />
+          {/* DownloadImages */}
+          <DownloadImagesButton images={post.images} filePrefix={post.code} />
+          {/* Copy URL */}
+          <CopyUrlButton url={url} size="sm" />
+          {/* Share */}
+          <Button size="sm" shape="circle" className="text-blue-600 hover:scale-125">
+            <IoShareSocial size={20} />
+          </Button>
+          {/* Favorite */}
+          <FavoriteBtn post={post} size={24} color="text-primary" />
         </div>
       </div>
 
@@ -172,14 +173,14 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
 // Property Specs Grid (Clean & Minimal)
 const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
   const specs = [
-    { icon: <BsBuildingFillUp size={20} className="text-blue-500" />, label: 'Số tầng', value: post?.floorNumber },
-    { icon: <FaBed size={20} className="text-blue-500" />, label: 'Phòng ngủ', value: post?.bedroomNumber },
-    { icon: <FaShower size={20} className="text-blue-500" />, label: 'WC/Toilet', value: post?.toiletNumber },
-    { icon: <GiHouse size={20} className="text-blue-500" />, label: 'Loại BĐS', value: post?.propertyType },
-    { icon: <FaRulerHorizontal size={20} className="text-blue-500" />, label: 'Chiều ngang', value: post?.width ? `${post.width}m` : null },
-    { icon: <FaRulerVertical size={20} className="text-blue-500" />, label: 'Chiều dài', value: post?.length ? `${post.length}m` : null },
-    { icon: <FaTools size={20} className="text-blue-500" />, label: 'Nội thất', value: post?.furnitureStatus },
-    { icon: <GiPencilRuler size={20} className="text-blue-500" />, label: 'Pháp lý', value: post?.legalStatus },
+    { icon: <BsBuildingFillUp size={20} className="text-primary" />, label: 'Số tầng', value: post?.floorNumber },
+    { icon: <FaBed size={20} className="text-primary" />, label: 'Phòng ngủ', value: post?.bedroomNumber },
+    { icon: <FaShower size={20} className="text-primary" />, label: 'WC/Toilet', value: post?.toiletNumber },
+    { icon: <GiHouse size={20} className="text-primary" />, label: 'Loại BĐS', value: post?.propertyType },
+    { icon: <FaRulerHorizontal size={20} className="text-primary" />, label: 'Chiều ngang', value: post?.width ? `${post.width}m` : null },
+    { icon: <FaRulerVertical size={20} className="text-primary" />, label: 'Chiều dài', value: post?.length ? `${post.length}m` : null },
+    { icon: <FaTools size={20} className="text-primary" />, label: 'Nội thất', value: post?.furnitureStatus },
+    { icon: <GiPencilRuler size={20} className="text-primary" />, label: 'Pháp lý', value: post?.legalStatus },
   ];
 
   const validSpecs = specs.filter((s) => s.value && s.value !== '—' && s.value !== 0);

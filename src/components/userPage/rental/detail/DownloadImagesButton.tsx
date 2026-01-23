@@ -80,7 +80,7 @@ const DownloadImagesButton: React.FC<DownloadImagesButtonProps> = ({ images, fil
   const buttonIcon = completed ? <MdOutlineDownloadDone size={24} className="text-green-600" /> : <MdDownload size={24} className="text-blue-600" />;
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="flex w-full flex-col gap-2 rounded-full border border-primary xl:hover:scale-125">
       {/* Nút Tải xuống */}
       <button onClick={handleDownload} className="p-1" disabled={isDownloading || completed}>
         {isDownloading && <span className="loading loading-spinner loading-sm rounded-full"></span>}
