@@ -77,9 +77,6 @@ export default function Header({ user }: HeaderProps) {
           )}
         >
           {/* Logo */}
-          {/* <p className={clsx('font-black text-primary transition-all duration-300', scrolled ? 'text-2xl text-white' : 'text-2xl')}>
-            Nguonnhagiare.vn
-          </p> */}
           <Link href={'/'}>
             <Image
               title="Nguồn Nhà Giá Rẻ"
@@ -91,7 +88,7 @@ export default function Header({ user }: HeaderProps) {
             ></Image>
           </Link>
           {/* Middle Navigation */}
-          <div className="flex flex-col items-center justify-center gap-1">
+          <div className="flex flex-col items-center justify-center gap-2">
             {/* Menu */}
             <div className={clsx('flex flex-row items-center', scrolled ? 'gap-4' : 'gap-1')}>
               {menuItems.map((item) => {
@@ -101,7 +98,7 @@ export default function Header({ user }: HeaderProps) {
                     key={item.link}
                     href={item.link}
                     className={clsx(
-                      'rounded-sm px-2 py-1 font-bold transition-all duration-200 hover:scale-105',
+                      'rounded-sm px-2 py-px font-bold transition-all duration-200 hover:scale-105',
                       scrolled ? 'text-xs 2xl:text-base' : 'text-xs 2xl:text-base',
                       isActive ? 'bg-primary-lighter text-primary' : 'text-white'
                     )}
@@ -111,7 +108,7 @@ export default function Header({ user }: HeaderProps) {
                 );
               })}
             </div>
-            {/* Contact */}
+            {/* Search + CTA */}
             <div className="flex w-full items-center justify-center gap-4">
               {/* Search */}
               <div className="flex w-full max-w-xl items-center rounded-full bg-white p-1 font-medium ring-1 ring-white/15 backdrop-blur-xl focus-within:bg-primary-lighter">
