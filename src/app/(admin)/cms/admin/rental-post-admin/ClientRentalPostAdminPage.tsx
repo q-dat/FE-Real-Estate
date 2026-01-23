@@ -221,8 +221,12 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
 
       {/* Modal Chỉnh sửa / Thêm mới */}
       <RentalPostAdminModal
+        key={editingPost?._id ?? 'create'}
         open={openModal}
-        onClose={() => setOpenModal(false)}
+        onClose={() => {
+          setOpenModal(false);
+          setEditingPost(null);
+        }}
         editingPost={editingPost}
         categories={categories}
         reload={reload}

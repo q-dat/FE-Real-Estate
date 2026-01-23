@@ -22,9 +22,16 @@ interface Props {
   reload: () => Promise<void>;
   authorId: IRentalAuthor;
 }
+interface RentalPostFormData extends Omit<IRentalPostAdmin, 'author' | 'category' | 'images' | 'adminImages' | 'postedAt' | 'expiredAt'> {
+  author: string;
+  category: string;
+  postedAt: string;
+  expiredAt: string;
+}
+const EXCLUDED_FIELDS = new Set(['images', 'adminImages']);
 
 export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload, authorId }: Props) {
-  const { register, handleSubmit, reset, watch, setValue } = useForm<IRentalPostAdmin>();
+  const { register, handleSubmit, reset, watch, setValue } = useForm<RentalPostFormData>();
   const [images, setImages] = useState<FileList | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [adminImages, setAdminImages] = useState<FileList | null>(null);
@@ -48,12 +55,12 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
   useEffect(() => {
     if (!editingPost) {
-      setValue('author', authorId, {
-        shouldValidate: true,
+      setValue('author', authorId._id, {
         shouldDirty: false,
+        shouldValidate: true,
       });
     }
-  }, [authorId, editingPost, setValue]);
+  }, [authorId._id, editingPost, setValue]);
 
   useEffect(() => {
     const priceNum = Number(watchPrice);
@@ -101,11 +108,11 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
     reset({
       ...editingPost,
+      author: typeof editingPost.author === 'object' ? editingPost.author._id : editingPost.author,
       category: typeof editingPost.category === 'object' ? editingPost.category._id : editingPost.category,
       postedAt: editingPost.postedAt ? new Date(editingPost.postedAt).toISOString().split('T')[0] : '',
       expiredAt: editingPost.expiredAt ? new Date(editingPost.expiredAt).toISOString().split('T')[0] : '',
-    } as unknown as IRentalPostAdmin);
-
+    });
     setPreviewUrls(editingPost.images || []);
     setAdminPreviewUrls(editingPost.adminImages || []);
   }, [editingPost, reset]);
@@ -130,50 +137,64 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   const removeImage = (url: string) => setPreviewUrls((prev) => prev.filter((u) => u !== url));
   const removeAdminImage = (url: string) => setAdminPreviewUrls((prev) => prev.filter((u) => u !== url));
 
-  const handleFormSubmit: SubmitHandler<IRentalPostAdmin> = async (data) => {
+  const handleFormSubmit: SubmitHandler<RentalPostFormData> = async (data) => {
     try {
       setLoading(true);
 
       const formData = new FormData();
 
-      for (const [key, value] of Object.entries(data)) {
-        if (key === 'images' || key === 'adminImages') continue;
-        // Bỏ qua các giá trị null/undefined để tránh lỗi FormData
-        if (value !== undefined && value !== null) {
-          // Ép kiểu tường minh để tránh `any` nếu cần, nhưng ở đây dùng `FormData` nên chấp nhận `String(value)`
-          formData.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+      /* ========= 1. FIELD THƯỜNG (STRING | NUMBER) ========= */
+      Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        if (EXCLUDED_FIELDS.has(key)) return;
+
+        // HARD RULE: form DTO không được có object
+        if (typeof value === 'object') {
+          throw new Error(`INVALID_FORM_FIELD: ${key} must be primitive`);
         }
+
+        formData.append(key, String(value));
+      });
+
+      /* ========= 2. ẢNH CŨ ========= */
+      if (editingPost) {
+        previewUrls.forEach((url) => {
+          if (editingPost.images?.includes(url)) {
+            formData.append('oldImages', url);
+          }
+        });
+
+        adminPreviewUrls.forEach((url) => {
+          if (editingPost.adminImages?.includes(url)) {
+            formData.append('oldAdminImages', url);
+          }
+        });
       }
 
-      // Xử lý ảnh: Thay thế logic cũ bằng cách dùng `previewUrls` và `adminPreviewUrls`
-      // Logic này cần được kiểm tra kỹ với backend API để đảm bảo luồng cập nhật ảnh (xóa ảnh cũ, thêm ảnh mới)
+      /* ========= 3. ẢNH MỚI ========= */
+      if (images instanceof FileList) {
+        Array.from(images).forEach((file) => {
+          formData.append('images', file);
+        });
+      }
 
-      // Ảnh cũ còn lại (đã lọc các ảnh bị xóa trong `removeImage`)
-      previewUrls.forEach((url) => {
-        // Chỉ thêm ảnh cũ nếu không phải là FileList mới được chọn
-        if (!images && (editingPost?.images || []).includes(url)) {
-          formData.append('oldImages', url);
-        }
-      });
-      adminPreviewUrls.forEach((url) => {
-        if (!adminImages && (editingPost?.adminImages || []).includes(url)) {
-          formData.append('oldAdminImages', url);
-        }
-      });
+      if (adminImages instanceof FileList) {
+        Array.from(adminImages).forEach((file) => {
+          formData.append('adminImages', file);
+        });
+      }
 
-      // Ảnh mới
-      if (images) Array.from(images).forEach((f) => formData.append('images', f));
-      if (adminImages) Array.from(adminImages).forEach((f) => formData.append('adminImages', f));
-
-      // Gọi API
-      if (editingPost?._id) await rentalPostAdminService.update(editingPost._id, formData);
-      else await rentalPostAdminService.create(formData);
+      /* ========= 4. CALL API ========= */
+      if (editingPost?._id) {
+        await rentalPostAdminService.update(editingPost._id, formData);
+      } else {
+        await rentalPostAdminService.create(formData);
+      }
 
       await reload();
       onClose();
     } catch (err) {
       console.error('Lỗi gửi form:', err);
-      // Có thể thêm toast/notification ở đây
     } finally {
       setLoading(false);
     }
