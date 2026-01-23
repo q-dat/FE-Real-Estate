@@ -20,12 +20,8 @@ export default function RentalGrid({ posts }: RentalGridProps) {
     return (
       <div className="flex w-full flex-col items-center justify-center px-4 py-16 text-center">
         <div className="max-w-md">
-          <p className="text-base font-semibold text-gray-900">
-            Không có dữ liệu phù hợp
-          </p>
-          <p className="mt-2 text-sm text-gray-500">
-            Hiện tại chưa có bài đăng nào. Vui lòng thử lại với bộ lọc khác hoặc quay lại sau.
-          </p>
+          <p className="text-base font-semibold text-gray-900">Không có dữ liệu phù hợp</p>
+          <p className="mt-2 text-sm text-gray-500">Hiện tại chưa có bài đăng nào. Vui lòng thử lại với bộ lọc khác hoặc quay lại sau.</p>
         </div>
       </div>
     );
@@ -41,7 +37,7 @@ export default function RentalGrid({ posts }: RentalGridProps) {
         </div>
       )} */}
       {/* Grid danh sách bài đăng */}
-      <div className="grid grid-cols-2 gap-4 px-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:px-desktop-padding">
+      <div className="grid grid-cols-2 gap-2 px-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-4 xl:px-desktop-padding">
         {posts.map((post) => {
           const thumbnail = post.images?.[0] || '/no-image.png';
           const totalImages = post.images?.length || 0;
@@ -88,7 +84,7 @@ export default function RentalGrid({ posts }: RentalGridProps) {
                 <p className="mt-1 line-clamp-2 inline-flex items-center text-gray-500">
                   <MdLocationPin size={16} />
                   <span className="text-sm">
-                  {post.district}, {post.province}
+                    {post.district}, {post.province}
                   </span>
                 </p>
               </div>
