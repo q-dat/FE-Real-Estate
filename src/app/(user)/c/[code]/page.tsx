@@ -10,12 +10,10 @@ interface PageProps {
   }>;
 }
 
-const CODE_REGEX = /^[A-Z0-9]{6,10}$/;
-
 export default async function PostByCodePage({ params }: PageProps) {
   const { code } = await params;
 
-  if (!code || !CODE_REGEX.test(code)) {
+  if (!code) {
     notFound();
   }
 

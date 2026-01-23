@@ -57,7 +57,7 @@ export default function Header({ user }: HeaderProps) {
       return;
     }
 
-    router.push(`/post/${value}`);
+    router.push(`/c/${value}`);
     setKeyword('');
   }, [keyword, router]);
 
