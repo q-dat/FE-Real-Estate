@@ -41,7 +41,7 @@ export default function ClientRealEstateProjectPage({ projects }: Props) {
 
                 {/* Status */}
                 {p.status && (
-                  <span className="absolute left-5 top-5 rounded-full border border-white/30 bg-black/40 px-4 py-1 text-xs font-light tracking-wide text-white backdrop-blur">
+                  <span className="bg-overlay absolute left-5 top-5 rounded-full border border-white/30 px-4 py-1 text-xs font-light tracking-wide text-white backdrop-blur">
                     {p.status}
                   </span>
                 )}

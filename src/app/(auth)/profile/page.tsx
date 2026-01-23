@@ -299,7 +299,7 @@ export default function AdvancedProfilePage() {
                         name="displayName"
                         value={formData.displayName}
                         onChange={handleInputChange}
-                        className="input w-full border-white/5 bg-black/40 pl-12 focus:border-primary"
+                        className="input w-full border-white/5 bg-overlay pl-12 focus:border-primary"
                       />
                     </div>
                   </div>
@@ -312,7 +312,7 @@ export default function AdvancedProfilePage() {
                         name="username"
                         value={formData.username}
                         onChange={handleInputChange}
-                        className="input w-full border-white/5 bg-black/40 pl-12 focus:border-primary"
+                        className="input w-full border-white/5 bg-overlay pl-12 focus:border-primary"
                       />
                     </div>
                   </div>
@@ -327,7 +327,7 @@ export default function AdvancedProfilePage() {
                         name="phoneNumber"
                         value={formData.phoneNumber}
                         onChange={handleInputChange}
-                        className="input w-full border-white/5 bg-black/40 pl-12 focus:border-primary"
+                        className="input w-full border-white/5 bg-overlay pl-12 focus:border-primary"
                       />
                     </div>
                   </div>
@@ -340,7 +340,7 @@ export default function AdvancedProfilePage() {
                         name="zaloNumber"
                         value={formData.zaloNumber}
                         onChange={handleInputChange}
-                        className="input w-full border-white/5 bg-black/40 pl-12 focus:border-primary"
+                        className="input w-full border-white/5 bg-overlay pl-12 focus:border-primary"
                       />
                     </div>
                   </div>
@@ -354,7 +354,7 @@ export default function AdvancedProfilePage() {
                         name="viberNumber"
                         value={formData.viberNumber}
                         onChange={handleInputChange}
-                        className="input w-full border-white/5 bg-black/40 pl-12 focus:border-primary"
+                        className="input w-full border-white/5 bg-overlay pl-12 focus:border-primary"
                       />
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export default function AdvancedProfilePage() {
                         name="facebook"
                         value={formData.facebook}
                         onChange={handleInputChange}
-                        className="input w-full border-white/5 bg-black/40 pl-12 focus:border-primary"
+                        className="input w-full border-white/5 bg-overlay pl-12 focus:border-primary"
                       />
                     </div>
                   </div>
@@ -382,7 +382,7 @@ export default function AdvancedProfilePage() {
                         name="messenger"
                         value={formData.messenger}
                         onChange={handleInputChange}
-                        className="input w-full border-white/5 bg-black/40 pl-12 focus:border-primary"
+                        className="input w-full border-white/5 bg-overlay pl-12 focus:border-primary"
                       />
                     </div>
                   </div>
@@ -395,7 +395,7 @@ export default function AdvancedProfilePage() {
                         name="instagram"
                         value={formData.instagram}
                         onChange={handleInputChange}
-                        className="input w-full border-white/5 bg-black/40 pl-12 focus:border-primary"
+                        className="input w-full border-white/5 bg-overlay pl-12 focus:border-primary"
                       />
                     </div>
                   </div>
@@ -409,7 +409,7 @@ export default function AdvancedProfilePage() {
                         name="aboutMe"
                         value={formData.aboutMe}
                         onChange={handleInputChange}
-                        className="textarea h-32 w-full border-white/5 bg-black/40 pl-12 pt-3 focus:border-primary"
+                        className="textarea h-32 w-full border-white/5 bg-overlay pl-12 pt-3 focus:border-primary"
                       />
                     </div>
                   </div>

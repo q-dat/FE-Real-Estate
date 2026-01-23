@@ -1,6 +1,6 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { ChevronDown, RefreshCcw, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronDown, RefreshCcw, SlidersHorizontal } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import LocationModal from './modals/LocationModal';
 import PriceModal from './modals/PriceModal';
@@ -9,7 +9,6 @@ import FilterResetModal from './modals/FilterResetModal';
 import PropertyTypeModal from './modals/PropertyTypeModal';
 import MoreFilterModal from './modals/MoreFilterModal';
 import AdminStatusModal from './modals/AdminStatusModal';
-// Đã xóa: import { getPriceParamsFromLabel, PriceRangeKey } from '@/constants/priceRanges';
 
 interface FilterValues {
   type?: string;
@@ -22,7 +21,7 @@ interface FilterValues {
 
   area?: number;
   areaFrom?: number;
-  areaTo?: number; // Các field hiển thị UI (sẽ bị loại bỏ khỏi URL)
+  areaTo?: number;
 
   displayPrice?: string;
   displayArea?: string;
@@ -40,7 +39,6 @@ interface FilterValues {
   postType?: string;
 }
 
-// Interface của dữ liệu nhận từ PriceModal
 interface PriceOutput {
   label: string;
   priceFrom?: number;
@@ -52,9 +50,9 @@ export default function FilterBar() {
   const pathname = usePathname();
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
-  const [filters, setFilters] = useState<FilterValues>({}); // type riêng, không push lên URL query param vì nó nằm ở pathname
+  const [filters, setFilters] = useState<FilterValues>({});
 
-  const [typeLabel, setTypeLabel] = useState('Căn hộ'); // Tự động cập nhật label type khi pathname thay đổi
+  const [typeLabel, setTypeLabel] = useState('Căn hộ');
 
   useEffect(() => {
     let type = 'Căn hộ';
@@ -75,7 +73,7 @@ export default function FilterBar() {
   const handleSelectType = (val: { title: string; link: string }) => {
     router.push(val.link);
     setActiveModal(null);
-  }; // Hàm xử lý khi chọn Giá
+  }; // handle select Price
   const handleSelectPrice = (data: PriceOutput) => {
     const label = data.label; // GIÁ TRỊ PRICEFROM VÀ PRICETO ĐÃ ĐƯỢC TÍNH TOÁN (UNDEFINED KHI BẰNG 0 HOẶC 1000)
 
@@ -83,7 +81,7 @@ export default function FilterBar() {
     const to = data.priceTo;
 
     setFilters((prev) => ({
-      ...prev, // Hiển thị UI
+      ...prev,
       displayPrice: label === 'Tất cả' ? undefined : label, // Params cho URL: priceFrom sẽ là undefined nếu min = 0
 
       priceFrom: from,
@@ -92,8 +90,8 @@ export default function FilterBar() {
       price: undefined,
     }));
     setActiveModal(null);
-  }; // Hàm xử lý khi chọn Diện tích
-
+  };
+  //  handle select Area
   const handleSelectArea = (data: { label: string; from?: number; to?: number }) => {
     setFilters((prev) => ({
       ...prev,
@@ -104,7 +102,8 @@ export default function FilterBar() {
     }));
 
     setActiveModal(null);
-  }; // Hàm xử lý khi chọn Khu vực
+  };
+  // handle select Location
   const handleSelectLocation = (v: { province: string; district?: string }) => {
     setFilters((prev) => ({
       ...prev,
@@ -114,7 +113,7 @@ export default function FilterBar() {
     }));
     setActiveModal(null);
   };
-
+  // handle More Filter
   const handleMoreFilter = (data: any) => {
     setFilters((prev) => ({
       ...prev,
@@ -123,7 +122,7 @@ export default function FilterBar() {
     // Lưu count vào state riêng nếu cần hiển thị Badge
     setActiveModal(null);
   };
-
+  // handle Admin Filter
   const handleAdminFilter = (data: any) => {
     setFilters((prev) => ({
       ...prev,
@@ -133,13 +132,13 @@ export default function FilterBar() {
     setActiveModal(null);
   };
   useEffect(() => {
-    // 1. Tạo danh sách các key KHÔNG muốn đưa lên URL
+    // Tạo danh sách các key KHÔNG muốn đưa lên URL
     const excludedKeys: (keyof FilterValues)[] = ['displayPrice', 'displayArea', 'location'];
 
-    const params = new URLSearchParams(); // 2. Duyệt qua các key trong filters với Type Assertion an toàn
+    const params = new URLSearchParams(); // Duyệt qua các key trong filters với Type Assertion an toàn
 
     (Object.keys(filters) as Array<keyof FilterValues>).forEach((key) => {
-      const value = filters[key]; // 3. Chỉ set param nếu:
+      const value = filters[key]; // Chỉ set param nếu:
       // - Key không nằm trong danh sách loại trừ
       // - Value có giá trị (khác undefined, null, rỗng)
 
@@ -177,53 +176,15 @@ export default function FilterBar() {
   const isHideType = pathname.includes('/bat-dong-san-ban');
 
   return (
-    <div className="w-full whitespace-nowrap bg-primary-lighter p-2 shadow-md">
-      <div className="flex w-full flex-row items-center justify-start gap-1.5 overflow-auto scrollbar-hide xl:justify-center">
-        {/* Nút Type */}
-        {!isHideType && (
-          <button className="rounded-[10px] border border-gray-50 bg-white px-2 py-0.5 text-sm leading-4" onClick={() => setActiveModal('type')}>
-            <p className="inline-flex w-[100px] items-center justify-start">
-              <span className="text-xs font-normal text-gray-600">Loại nhà đất</span> <ChevronDown size="14px" />
-            </p>
-            <p className={`w-20 truncate text-start text-sm font-bold text-red-600 xl:w-auto`}>{typeLabel}</p>
-          </button>
-        )}
-        {/* Nút Bộ lọc khác */}
-        <button
-          className={`rounded-[10px] border px-2 py-0.5 text-sm font-medium transition-colors ${
-            // Check nếu có filter nâng cao thì highlight
-            filters.bedroomNumber || filters.direction ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-50 bg-white text-gray-600'
-          }`}
-          onClick={() => setActiveModal('more')}
-        >
-          <p className="inline-flex h-10 items-center gap-1">
-            <SlidersHorizontal size="16px" />
-            Bộ lọc khác
-            {/* Hiển thị dot đỏ nếu có filter active */}
-            {(filters.bedroomNumber || filters.direction) && <span className="ml-1 h-2 w-2 rounded-full bg-red-500"></span>}
-          </p>
-        </button>
-
-        {/* Nút Admin Status (Chỉ hiện nếu là trang Admin) */}
-        <button
-          className={`rounded-[10px] border px-2 py-0.5 text-sm font-medium ${
-            filters.status ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-50 bg-white text-gray-600'
-          }`}
-          onClick={() => setActiveModal('admin')}
-        >
-          <p className="inline-flex h-10 items-center gap-1">
-            <ShieldCheck size="16px" />
-            Trạng thái
-          </p>
-        </button>
-
-        {/* Các nút Filter động */}
+    <div className="w-full whitespace-nowrap bg-white shadow-md">
+      <div className="flex w-full flex-wrap items-center justify-start gap-1.5 overflow-auto p-2 scrollbar-hide xl:px-desktop-padding">
+        {/* Các Filter động */}
         {[
           { key: 'location', label: 'Khu vực' },
           { key: 'price', label: 'Khoảng giá' },
           { key: 'area', label: 'Diện tích' },
         ].map(({ key, label }) => {
-          let displayValue = ''; // Lấy giá trị hiển thị từ state UI
+          let displayValue = '';
           if (key === 'price') displayValue = filters.displayPrice ?? 'Tất cả';
           else if (key === 'area') displayValue = filters.displayArea ?? 'Tất cả';
           else if (key === 'location') displayValue = filters.location ?? 'Thành phố Hồ Chí Minh';
@@ -233,32 +194,64 @@ export default function FilterBar() {
           return (
             <button
               key={key}
-              className="rounded-[10px] border border-gray-50 bg-white px-2 py-0.5 text-sm leading-4"
+              className="rounded-md bg-primary px-2 py-0.5 text-sm leading-4 text-white focus:outline-none"
               onClick={() => setActiveModal(key)}
             >
               <p className="inline-flex w-[100px] items-center justify-start">
-                <span className="text-xs font-normal text-gray-600">{label}</span> <ChevronDown size="14px" />
+                <span className="text-xs font-normal">{label}</span> <ChevronDown size="14px" />
               </p>
-              <p className={`w-20 truncate text-start text-sm xl:w-auto ${isAll ? 'font-medium text-black' : 'font-bold text-red-600'}`}>
-                {displayValue}
-              </p>
+              <p className={`w-20 truncate text-start text-sm xl:w-auto ${isAll ? 'font-medium' : 'font-bold'}`}>{displayValue}</p>
             </button>
           );
         })}
-        {/* Nút Reset */}
-        <button className="rounded-[10px] border border-gray-50 bg-white px-2 py-0 text-sm font-medium" onClick={() => setActiveModal('reset')}>
-          <p className="inline-flex h-10 w-[80px] items-center justify-center gap-1">
-            <RefreshCcw size="18px" /> Đặt lại
+        {/* Status*/}
+        {/* <button
+          className={`rounded-md border px-2 text-sm font-medium ${
+            filters.status ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-50 bg-primary text-white'
+          }`}
+          onClick={() => setActiveModal('admin')}
+        >
+          <p className="inline-flex h-10 items-center gap-1">
+            <ShieldCheck size="16px" />
+          </p>
+        </button> */}
+        {/* Type */}
+        {!isHideType && (
+          <button
+            className="rounded-md bg-primary px-2 py-0.5 text-sm leading-4 text-white focus:outline-none"
+            onClick={() => setActiveModal('type')}
+          >
+            <p className="inline-flex w-[100px] items-center justify-start">
+              <span className="text-xs font-normal">Loại nhà đất</span> <ChevronDown size="14px" />
+            </p>
+            <p className={`w-20 truncate text-start text-sm font-bold xl:w-auto`}>{typeLabel}</p>
+          </button>
+        )}
+
+        {/* Bộ lọc khác */}
+        <button
+          className={`relative rounded-md px-2 text-sm font-medium transition-colors focus:outline-none ${
+            // Check nếu có filter nâng cao thì highlight
+            filters.bedroomNumber || filters.direction ? 'text-blue-700' : 'bg-primary text-white'
+          }`}
+          onClick={() => setActiveModal('more')}
+        >
+          <p className="inline-flex h-10 items-center gap-1">
+            <SlidersHorizontal size="16px" />
+            {/* Hiển thị dot đỏ nếu có filter active */}
+            {(filters.bedroomNumber || filters.direction) && (
+              <span className="absolute right-1 top-1 h-2 w-2 animate-ping rounded-full bg-red-700"></span>
+            )}
+          </p>
+        </button>
+        {/* Reset */}
+        <button className="rounded-md bg-primary px-2 text-sm font-medium text-white focus:outline-none" onClick={() => setActiveModal('reset')}>
+          <p className="inline-flex h-10 w-fit items-center justify-center gap-1">
+            <RefreshCcw size="18px" />
           </p>
         </button>
       </div>
-      {activeModal === 'more' && (
-        <MoreFilterModal
-          initialValues={filters} // Truyền filters hiện tại vào để hiển thị lại
-          onSelect={handleMoreFilter}
-          onClose={() => setActiveModal(null)}
-        />
-      )}
+      {activeModal === 'more' && <MoreFilterModal initialValues={filters} onSelect={handleMoreFilter} onClose={() => setActiveModal(null)} />}
       {activeModal === 'admin' && (
         <AdminStatusModal
           initialStatus={filters.status}

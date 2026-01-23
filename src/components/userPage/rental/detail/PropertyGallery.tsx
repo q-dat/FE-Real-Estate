@@ -54,7 +54,7 @@ export function PropertyGallery({ images }: { images: string[] }) {
 
               {/* Show more */}
               {index === 4 && !showAll && images.length > 5 && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                <div className="bg-overlay absolute inset-0 flex items-center justify-center">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

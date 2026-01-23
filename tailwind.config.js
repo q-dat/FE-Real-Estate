@@ -43,6 +43,7 @@ export default {
         primary: '#0556b1',
         'primary-lighter': '#cce0f6',
         secondary: '#007f70',
+        overlay: 'rgba(0, 0, 0, 0.4)',
         info: '#312e91',
         success: '#009485',
         warning: '#ff9900',

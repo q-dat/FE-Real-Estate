@@ -108,7 +108,7 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-2" onClick={handleClickOutside}>
+    <div className="bg-overlay fixed inset-0 z-50 flex items-center justify-center px-2" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in w-full max-w-lg rounded-2xl bg-white shadow-xl transition-all duration-200">
         {/* Header */}
         <div className="flex items-center justify-between border-b p-2">

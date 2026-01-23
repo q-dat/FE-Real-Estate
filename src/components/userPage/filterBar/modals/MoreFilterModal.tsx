@@ -122,7 +122,7 @@ export default function MoreFilterModal({ initialValues, onSelect, onClose }: Mo
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-2" onClick={handleClickOutside}>
+    <div className="bg-overlay fixed inset-0 z-50 flex items-center justify-center px-2" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in flex max-h-[75vh] w-full max-w-xl flex-col rounded-2xl bg-white shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b p-4">

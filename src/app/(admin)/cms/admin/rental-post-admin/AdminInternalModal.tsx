@@ -72,7 +72,7 @@ export default function AdminInternalModal({ open, onClose, post, reload }: Prop
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[999999] flex items-center justify-center bg-overlay backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

@@ -19,7 +19,7 @@ export default function DeleteModal({ open, onClose, onConfirm }: DeleteModalPro
       {open && (
         <motion.div
           key="overlay"
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-overlay backdrop-blur-[2px]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

@@ -96,7 +96,7 @@ export default function LoginPage() {
         transition={{ duration: 0.5, ease: 'circOut' }}
         className="z-10 w-full max-w-[420px] px-2"
       >
-        <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 shadow-2xl ring-1 ring-white/5 backdrop-blur-2xl">
+        <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-overlay shadow-2xl ring-1 ring-white/5 backdrop-blur-2xl">
           <div className="animate-border-flow pointer-events-none absolute -inset-[1px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
 
           <div className="relative p-6 pt-10">

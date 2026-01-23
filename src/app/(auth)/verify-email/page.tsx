@@ -88,7 +88,7 @@ function VerifyContent() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 shadow-2xl backdrop-blur-2xl"
+        className="bg-overlay relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl backdrop-blur-2xl"
       >
         {/* Top Glow */}
         <div className="absolute left-1/2 top-0 h-1 w-1/2 -translate-x-1/2 bg-cyan-500/50 blur-[20px]" />

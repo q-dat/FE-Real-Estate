@@ -26,8 +26,8 @@ export default function FilterResetModal({ onClose, onConfirm }: FilterResetModa
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3" onClick={handleClickOutside}>
-      <div ref={modalRef} className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl transition-all">
+    <div className="bg-overlay fixed inset-0 z-50 flex items-center justify-center" onClick={handleClickOutside}>
+      <div ref={modalRef} className="w-full max-w-md rounded-2xl bg-white p-2 shadow-xl transition-all">
         <h3 className="mb-3 text-center text-base font-semibold text-gray-800">Đặt lại bộ lọc</h3>
 
         <p className="mb-5 text-center text-sm leading-relaxed text-gray-600">
