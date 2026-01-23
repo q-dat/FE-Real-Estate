@@ -53,13 +53,15 @@ async function getPostSitemap(): Promise<MetadataRoute.Sitemap> {
       const slugEncodedIdUrl = `${DOMAIN}/${slug}/${encodedId}`;
       const slugRawIdDashUrl = `${DOMAIN}/${slug}-${rawId}`;
       const slugEncodedIdDashUrl = `${DOMAIN}/${slug}-${encodedId}`;
+      const codeUrl = `${DOMAIN}/c/${post.code}`;
 
       sitemap.push(
         createEntry(canonicalUrl, lastModified, 0.8),
         createEntry(slugOnlyUrl, lastModified, 0.6),
         createEntry(slugEncodedIdUrl, lastModified, 0.5),
         createEntry(slugRawIdDashUrl, lastModified, 0.5),
-        createEntry(slugEncodedIdDashUrl, lastModified, 0.5)
+        createEntry(slugEncodedIdDashUrl, lastModified, 0.5),
+        createEntry(codeUrl, lastModified, 0.4)
       );
     }
   } catch (error) {
