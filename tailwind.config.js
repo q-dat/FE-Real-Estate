@@ -23,8 +23,8 @@ export default {
       //p-desktop-padding
       spacing: {
         'desktop-padding': '3rem',
-        'mobile-padding-top': '70px',
-        'desktop-padding-top': '100px',
+        'mobile-padding-top': '60px',
+        'desktop-padding-top': '110px',
       },
       fontSize: {
         // mobile-font-size

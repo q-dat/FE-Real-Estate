@@ -112,23 +112,23 @@ export default function Header({ user }: HeaderProps) {
               })}
             </div>
             {/* Contact */}
-            <div className="flex w-full items-center gap-4">
+            <div className="flex w-full items-center justify-center gap-4">
               {/* Search */}
-              <div className="flex w-full items-center rounded-full bg-white/10 p-1 ring-1 ring-white/15 backdrop-blur-xl focus-within:bg-white/20">
+              <div className="flex w-full max-w-xl items-center rounded-full bg-white p-1 font-medium ring-1 ring-white/15 backdrop-blur-xl focus-within:bg-primary-lighter">
                 <input
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder="Nhập mã bài đăng (VD: 2802A1E)"
                   className={clsx(
-                    'flex-1 bg-transparent px-5 text-sm text-white placeholder:text-white focus:outline-none',
+                    'flex-1 bg-transparent px-5 text-sm text-primary placeholder:text-primary focus:outline-none',
                     scrolled ? 'h-6' : 'h-10'
                   )}
                 />
                 <button
                   onClick={handleSearch}
                   className={clsx(
-                    'rounded-full bg-white px-8 text-[11px] font-semibold uppercase tracking-widest text-neutral-900 hover:bg-neutral-100',
+                    'rounded-full bg-primary px-8 text-[11px] font-semibold uppercase tracking-widest text-white hover:border hover:border-primary hover:bg-primary-lighter hover:text-black',
                     scrolled ? 'h-6' : 'h-10'
                   )}
                 >
