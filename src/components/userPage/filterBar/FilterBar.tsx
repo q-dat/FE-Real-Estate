@@ -177,7 +177,7 @@ export default function FilterBar() {
   const isHideType = pathname.includes('/bat-dong-san-ban');
 
   return (
-    <div className="w-full bg-primary-lighter p-2 shadow-md">
+    <div className="w-full whitespace-nowrap bg-primary-lighter p-2 shadow-md">
       <div className="flex w-full flex-row items-center justify-start gap-1.5 overflow-auto scrollbar-hide xl:justify-center">
         {/* Nút Type */}
         {!isHideType && (
