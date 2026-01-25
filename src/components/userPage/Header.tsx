@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -31,6 +32,7 @@ export default function Header({ user }: HeaderProps) {
   const controls = useAnimation();
   const [scrolled, setScrolled] = useState(false);
   const [keyword, setKeyword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,7 +50,13 @@ export default function Header({ user }: HeaderProps) {
 
   const handleSearch = useCallback(() => {
     const value = keyword.trim().toUpperCase();
-    if (!value) return;
+
+    if (!value) {
+      setError('Vui lòng nhập mã bài đăng');
+      return;
+    }
+
+    setError(null);
     router.push(`/c/${value}`);
     setKeyword('');
   }, [keyword, router]);
@@ -103,27 +111,35 @@ export default function Header({ user }: HeaderProps) {
             {/* Search + CTA */}
             <div className="flex w-full items-center justify-center gap-4">
               {/* Search */}
-              <div className="flex w-full max-w-xl items-center rounded-full bg-white p-1 font-medium ring-1 ring-white/15 backdrop-blur-xl focus-within:bg-primary-lighter">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSearch();
+                }}
+                className="flex w-full max-w-xl items-center rounded-full bg-white p-1 font-medium ring-1 ring-white/15 backdrop-blur-xl focus-within:bg-primary-lighter"
+              >
                 <input
+                  autoFocus
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  placeholder="Nhập mã bài đăng (VD: 2802A1E)"
+                  placeholder="Nhập mã bài đăng"
                   className={clsx(
                     'flex-1 bg-transparent px-5 text-sm text-primary placeholder:text-primary focus:outline-none',
                     scrolled ? 'h-6' : 'h-10'
                   )}
                 />
+                {error && <p className="m-1 text-xs text-red-500">{error}</p>}
+
                 <button
-                  onClick={handleSearch}
+                  type="submit"
                   className={clsx(
                     'rounded-full bg-primary px-8 text-[11px] font-semibold uppercase tracking-widest text-white hover:border hover:border-primary hover:bg-primary-lighter hover:text-black',
                     scrolled ? 'h-6' : 'h-10'
                   )}
                 >
-                  Tìm kiếm
+                  Enter
                 </button>
-              </div>
+              </form>
 
               {/* CTA */}
               {/* COMPACT */}
