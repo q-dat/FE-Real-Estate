@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -22,8 +21,6 @@ import { useLogout } from '@/hooks/useLogout';
 interface HeaderProps {
   user: MeResponse['data'];
 }
-
-const CODE_REGEX = /^[A-Z0-9]{6,10}$/;
 
 export default function Header({ user }: HeaderProps) {
   const router = useRouter();
@@ -52,11 +49,6 @@ export default function Header({ user }: HeaderProps) {
   const handleSearch = useCallback(() => {
     const value = keyword.trim().toUpperCase();
     if (!value) return;
-
-    if (!CODE_REGEX.test(value)) {
-      return;
-    }
-
     router.push(`/c/${value}`);
     setKeyword('');
   }, [keyword, router]);
