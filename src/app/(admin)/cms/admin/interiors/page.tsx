@@ -2,7 +2,7 @@ export const revalidate = 0;
 
 import { interiorCategoryService } from '@/services/interiorCategoryService';
 import ClientInteriorAdminPage from './ClientInteriorAdminPage';
-import { interiorService } from '@/services/interiorsService';
+import { interiorService } from '@/services/interiorService';
 
 export default async function RentalPostAdminPage() {
   const interiors = await interiorService.getAll();

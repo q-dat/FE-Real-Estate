@@ -1,4 +1,4 @@
-import { interiorService } from '@/services/interiorsService';
+import { interiorService } from '@/services/interiorService';
 import ClientInteriorsPage from './ClientInteriorsPage';
 
 export default async function Page() {
