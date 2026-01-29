@@ -36,13 +36,10 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [adminImages, setAdminImages] = useState<FileList | null>(null);
   const [adminPreviewUrls, setAdminPreviewUrls] = useState<string[]>([]);
-
   const [loading, setLoading] = useState(false);
-
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
-
   const [selectedProvince, setSelectedProvince] = useState<string>('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedWard, setSelectedWard] = useState<string>('');

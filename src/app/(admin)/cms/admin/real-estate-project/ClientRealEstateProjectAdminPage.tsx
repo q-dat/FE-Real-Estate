@@ -6,7 +6,7 @@ import { FaPlus, FaPen, FaTrashAlt, FaBuilding } from 'react-icons/fa';
 import DeleteModal from '../DeleteModal';
 import { IRealEstateProject } from '@/types/type/realEstateProject/realEstateProject';
 import { realEstateProjectService } from '@/services/realEstateProjectService';
-import RealEstateProjectModal from './RealEstateProjectModal';
+import RealEstateProjectModal from './modal/RealEstateProjectModal';
 
 interface Props {
   projects: IRealEstateProject[];
@@ -16,7 +16,6 @@ export default function ClientRealEstateProjectAdminPage({ projects: initial }: 
   const [projects, setProjects] = useState<IRealEstateProject[]>(initial);
   const [editingItem, setEditingItem] = useState<IRealEstateProject | null>(null);
   const [openModal, setOpenModal] = useState(false);
-
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 

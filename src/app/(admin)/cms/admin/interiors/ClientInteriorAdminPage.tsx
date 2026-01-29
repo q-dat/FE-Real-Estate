@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import DeleteModal from '../DeleteModal';
 import { IInterior } from '@/types/type/interiors/interiors';
 import { interiorService } from '@/services/interiorService';
-import InteriorModal from './InteriorModal';
+import InteriorModal from './modal/InteriorModal';
 
 interface Props {
   interiors: IInterior[];
@@ -18,7 +18,6 @@ export default function ClientInteriorAdminPage({ interiors: initialInteriors, c
   const [interiors, setInteriors] = useState<IInterior[]>(initialInteriors);
   const [openModal, setOpenModal] = useState(false);
   const [editingItem, setEditingItem] = useState<IInterior | null>(null);
-
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 

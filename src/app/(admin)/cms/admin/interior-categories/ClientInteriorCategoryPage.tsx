@@ -4,8 +4,7 @@ import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import { interiorCategoryService } from '@/services/interiorCategoryService';
 import { IInteriorCategory } from '@/types/type/interiorsCategory/interiorsCategory';
-
-import InteriorCategoryModal from './InteriorCategoryModal';
+import InteriorCategoryModal from './modal/InteriorCategoryModal';
 import DeleteModal from '../DeleteModal';
 
 interface Props {
@@ -14,10 +13,8 @@ interface Props {
 
 export default function ClientInteriorCategoryPage({ categories: initial }: Props) {
   const [items, setItems] = useState(initial);
-
   const [openModal, setOpenModal] = useState(false);
   const [editingItem, setEditingItem] = useState<IInteriorCategory | null>(null);
-
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 

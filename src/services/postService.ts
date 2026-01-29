@@ -9,31 +9,27 @@ export const postService = {
     return Array.isArray(data) ? data : (data?.posts ?? []);
   },
 
-  async create(payload: Partial<IPost>) {
+  async create(formData: FormData): Promise<IPost> {
     const res = await fetch(getServerApiUrl('api/post'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: formData,
     });
 
     if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Tạo danh mục thất bại: ${res.status} - ${errText}`);
+      throw new Error(`Post create failed: ${res.status}`);
     }
 
     return res.json();
   },
 
-  async update(id: string, payload: Partial<IPost>) {
+  async update(id: string, formData: FormData): Promise<IPost> {
     const res = await fetch(getServerApiUrl(`api/post/${id}`), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: formData,
     });
 
     if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Cập nhật danh mục thất bại: ${res.status} - ${errText}`);
+      throw new Error(`Post update failed: ${res.status}`);
     }
 
     return res.json();

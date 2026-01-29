@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
-import RentalCategoryModal from './RentalCategoryModal';
+import RentalCategoryModal from './modal/RentalCategoryModal';
 import DeleteModal from '../DeleteModal';
 import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';
 import { rentalCategoryService } from '@/services/rentalCategoryService';
@@ -13,10 +13,8 @@ interface Props {
 
 export default function ClientRentalCategoryPage({ categories: initial }: Props) {
   const [items, setItems] = useState(initial);
-
   const [openModal, setOpenModal] = useState(false);
   const [editingItem, setEditingItem] = useState<IRentalCategory | null>(null);
-
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
