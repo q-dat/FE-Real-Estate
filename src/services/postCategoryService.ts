@@ -1,80 +1,15 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IPostCategory } from '@/types/type/post/post-category';
 
-/* ---------------- types ---------------- */
-
-type CacheState = {
-  list: IPostCategory[];
-  byId: Map<string, IPostCategory>;
-};
-
-/* ---------------- cache ---------------- */
-
-const cache: CacheState = {
-  list: [],
-  byId: new Map(),
-};
-
-/* ---------------- service ---------------- */
-
-const postCategoryService = {
-  /* ---------- queries ---------- */
-
+export const postCategoryService = {
   async getAll(): Promise<IPostCategory[]> {
-    const apiUrl = getServerApiUrl('api/post-categories');
-
-    const res = await fetch(apiUrl, {
-      cache: 'force-cache',
-      next: { revalidate: 60 },
-    });
-
-    if (!res.ok) {
-      throw new Error(`PostCategory getAll failed: ${res.status}`);
-    }
-
-    const data = (await res.json()) as {
-      categories?: IPostCategory[];
-    };
-
-    const list = data.categories ?? [];
-
-    cache.list = list;
-    cache.byId.clear();
-    list.forEach((c) => {
-      if (c._id) cache.byId.set(c._id, c);
-    });
-
-    return list;
+    const res = await fetch(getServerApiUrl('api/post-categories'));
+    if (!res.ok) throw new Error('Fetch failed');
+    const data = await res.json();
+    return Array.isArray(data) ? data : (data?.postCategories ?? []);
   },
 
-  async getById(id: string): Promise<IPostCategory | null> {
-    if (!id) return null;
-
-    const cached = cache.byId.get(id);
-    if (cached) return cached;
-
-    const apiUrl = getServerApiUrl(`api/post-category/${id}`);
-
-    const res = await fetch(apiUrl, {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) return null;
-
-    const data = (await res.json()) as {
-      category?: IPostCategory;
-    };
-
-    if (data.category?._id) {
-      cache.byId.set(data.category._id, data.category);
-    }
-
-    return data.category ?? null;
-  },
-
-  /* ---------- mutations ---------- */
-
-  async create(payload: { name: string }): Promise<IPostCategory> {
+  async create(payload: Partial<IPostCategory>) {
     const res = await fetch(getServerApiUrl('api/post-category'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -82,14 +17,14 @@ const postCategoryService = {
     });
 
     if (!res.ok) {
-      throw new Error(`PostCategory create failed: ${res.status}`);
+      const errText = await res.text();
+      throw new Error(`Tạo danh mục thất bại: ${res.status} - ${errText}`);
     }
 
-    await this.handleMutation();
     return res.json();
   },
 
-  async update(id: string, payload: { name: string }): Promise<IPostCategory> {
+  async update(id: string, payload: Partial<IPostCategory>) {
     const res = await fetch(getServerApiUrl(`api/post-category/${id}`), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -97,40 +32,22 @@ const postCategoryService = {
     });
 
     if (!res.ok) {
-      throw new Error(`PostCategory update failed: ${res.status}`);
+      const errText = await res.text();
+      throw new Error(`Cập nhật danh mục thất bại: ${res.status} - ${errText}`);
     }
 
-    await this.handleMutation();
     return res.json();
   },
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string) {
     const res = await fetch(getServerApiUrl(`api/post-category/${id}`), {
       method: 'DELETE',
     });
 
     if (!res.ok) {
-      throw new Error(`PostCategory delete failed: ${res.status}`);
+      const errText = await res.text();
+      throw new Error(`Xoá danh mục thất bại: ${res.status} - ${errText}`);
     }
-
-    await this.handleMutation();
-  },
-
-  /* ---------- cache helpers ---------- */
-
-  async handleMutation() {
-    this.resetLocalCache();
-    try {
-      await fetch('/api/revalidate/post-categories', { method: 'POST' });
-    } catch (e) {
-      console.warn('PostCategory revalidate warning:', e);
-    }
-  },
-
-  resetLocalCache() {
-    cache.list = [];
-    cache.byId.clear();
+    return res.json();
   },
 };
-
-export { postCategoryService };
