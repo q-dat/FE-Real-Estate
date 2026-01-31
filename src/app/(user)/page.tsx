@@ -1,3 +1,5 @@
+export const revalidate = 0
+
 import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
 import ClientHomePage from './ClientHomePage';
 import { homeMetadata } from '@/metadata/home.metadata';
