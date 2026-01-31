@@ -43,7 +43,6 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
   const [selectedProvince, setSelectedProvince] = useState<string>('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedWard, setSelectedWard] = useState<string>('');
-
   const [priceMultiplier, setPriceMultiplier] = useState<number>(1_000); // Mặc định Triệu (1_000), tối ưu UX cho trường hợp giá BDS
 
   // Tự động tính pricePerM2 = (price * multiplier) / area và cập nhật vào input pricePerM2

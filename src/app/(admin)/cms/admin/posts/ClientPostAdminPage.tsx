@@ -48,9 +48,9 @@ export default function ClientPostAdminPage({ posts: initialPosts, categories: i
   return (
     <div className="w-full space-y-4">
       {/* Header */}
-      <div className="sticky top-0 z-10 flex items-center justify-between rounded-md bg-white/80 p-4 shadow backdrop-blur">
+      <div className="sticky top-0 z-10 flex items-center justify-between rounded-lg bg-white/80 px-5 py-4 shadow backdrop-blur">
         <div>
-          <h1 className="text-xl font-bold">Quản lý bài viết</h1>
+          <h1 className="text-xl font-semibold">Quản lý bài viết</h1>
           <p className="text-sm text-gray-500">Tổng số: {posts.length}</p>
         </div>
 
@@ -60,23 +60,49 @@ export default function ClientPostAdminPage({ posts: initialPosts, categories: i
       </div>
 
       {/* List */}
-      <motion.div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         {posts.map((post) => (
           <div
             key={post._id}
-            className="relative cursor-pointer rounded-md border bg-white p-4 shadow transition hover:shadow-lg"
             onClick={() => openEditModal(post)}
+            className="group relative flex gap-4 rounded-lg border bg-white p-4 transition hover:border-primary/40 hover:shadow-md"
           >
-            <h3 className="line-clamp-2 text-base font-semibold">{post.title}</h3>
-            <p className="mt-1 text-xs text-slate-500">Danh mục: {post.catalog?.name ?? '—'}</p>
+            {/* Thumbnail */}
+            <div className="h-20 w-28 shrink-0 overflow-hidden rounded-md bg-gray-100">
+              {post.image ? (
+                <img src={post.image} alt={post.title} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">No image</div>
+              )}
+            </div>
 
-            <p className="mt-1 text-xs">
-              Trạng thái: <span className={post.published ? 'text-green-600' : 'text-gray-400'}>{post.published ? 'Đã xuất bản' : 'Nháp'}</span>
-            </p>
+            {/* Content */}
+            <div className="flex flex-1 flex-col justify-between">
+              <div>
+                <h3 className="line-clamp-2 text-base font-medium">{post.title}</h3>
 
-            <p className="mt-1 text-xs text-gray-400">Cập nhật: {new Date(post.updatedAt).toLocaleDateString()}</p>
+                {post.slug && <p className="mt-0.5 text-xs text-gray-400">/{post.slug}</p>}
 
-            <div className="absolute right-2 top-2 flex gap-2 text-xs">
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                  <span>
+                    Danh mục: <span className="font-medium text-gray-700">{post.catalog?.name ?? '—'}</span>
+                  </span>
+
+                  <span>
+                    Trạng thái:{' '}
+                    <span className={post.published ? 'font-medium text-green-600' : 'text-gray-400'}>{post.published ? 'Đã xuất bản' : 'Nháp'}</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Meta time */}
+              <div className="mt-2 text-xs text-gray-400">
+                Tạo: {new Date(post.createdAt).toLocaleDateString()} · Cập nhật: {new Date(post.updatedAt).toLocaleDateString()}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="absolute right-3 top-3 flex gap-2 text-xs opacity-100 xl:opacity-0 xl:transition xl:group-hover:opacity-100">
               <button
                 className="text-blue-600 hover:underline"
                 onClick={(e) => {
@@ -95,13 +121,14 @@ export default function ClientPostAdminPage({ posts: initialPosts, categories: i
                   setConfirmOpen(true);
                 }}
               >
-                Xóa
+                Xoá
               </button>
             </div>
           </div>
         ))}
-      </motion.div>
+      </div>
 
+      {/* Modals */}
       {openModal && (
         <PostModal
           open={openModal}

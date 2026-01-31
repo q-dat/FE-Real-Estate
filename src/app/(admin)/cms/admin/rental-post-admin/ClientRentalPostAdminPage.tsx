@@ -4,12 +4,12 @@ import { Button } from 'react-daisyui';
 import { FaImages, FaPlus, FaPen, FaTrashAlt } from 'react-icons/fa';
 import Image from 'next/image';
 import { IRentalAuthor, IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-import RentalPostAdminModal from './RentalPostAdminModal';
+import RentalPostAdminModal from './modal/RentalPostAdminModal';
 import { rentalPostAdminService } from '@/services/rentalPostAdminService';
 import { formatCurrency } from '@/utils/formatCurrency';
 import DeleteModal from '../DeleteModal';
 import { GiPadlock } from 'react-icons/gi';
-import AdminInternalModal from './AdminInternalModal';
+import AdminInternalModal from './modal/AdminInternalModal';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 interface Props {
   posts: IRentalPostAdmin[];

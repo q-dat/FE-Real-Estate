@@ -39,9 +39,9 @@ export default function RentalCategoryModal({ open, onClose, reload, editing }: 
 
   useEscClose(open, onClose);
 
-  /* Reset form khi edit dữ liệu */
   useEffect(() => {
     if (!editing) {
+      // reset form
       reset({
         name: '',
         description: '',

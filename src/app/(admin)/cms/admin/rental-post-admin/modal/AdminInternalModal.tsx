@@ -1,5 +1,4 @@
 'use client';
-
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from 'react-daisyui';
 import Image from 'next/image';
