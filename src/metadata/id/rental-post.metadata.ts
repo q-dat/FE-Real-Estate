@@ -1,5 +1,5 @@
 import { slugify } from '@/lib/slugify';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { Metadata } from 'next';
 
 function normalizeKeywords(input: string[]): string[] {

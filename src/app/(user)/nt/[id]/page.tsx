@@ -1,4 +1,4 @@
-import { interiorService } from '@/services/interiorService';
+import { interiorService } from '@/services/interior.service';
 import ClientInteriorDetailPage from './ClientInteriorDetailPage';
 import { notFound } from 'next/navigation';
 

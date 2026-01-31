@@ -1,5 +1,5 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { IInteriorCategory } from '@/types/type/interiorsCategory/interiorsCategory';
+import { IInteriorCategory } from '@/types/interiorsCategory/interiorsCategory.types';
 
 export const interiorCategoryService = {
   async getAll(): Promise<IInteriorCategory[]> {

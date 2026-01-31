@@ -9,7 +9,7 @@ import {
 } from 'react-icons/hi2';
 import { Navbar, Button, Indicator, Dropdown, Avatar } from 'react-daisyui';
 import { motion } from 'framer-motion';
-import { MeResponse } from '@/types/type/auth/auth';
+import { MeResponse } from '@/types/auth/auth.types';
 import { useLogout } from '@/hooks/useLogout';
 
 interface AdminNavbarProps {

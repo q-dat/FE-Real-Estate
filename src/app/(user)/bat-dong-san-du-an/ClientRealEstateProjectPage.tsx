@@ -1,5 +1,5 @@
 import stripHtml from '@/lib/stripHtml';
-import { IRealEstateProject } from '@/types/type/realEstateProject/realEstateProject';
+import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
 import Link from 'next/link';
 
 interface Props {

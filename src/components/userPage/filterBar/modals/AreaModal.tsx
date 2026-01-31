@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import CancelBtn from '../../ui/btn/CancelBtn';
 import SubmitBtn from '../../ui/btn/SubmitBtn';
-import { AREA_RANGES, AreaRange } from '@/constants/areaRanges';
+import { AREA_RANGES, AreaRange } from '@/constants/areaRanges.constants';
 import { RefreshCcw } from 'lucide-react';
 
 interface AreaOutput {

@@ -4,7 +4,7 @@ import ContactForm from '@/components/userPage/ContactForm';
 import Header from '@/components/userPage/Header';
 import FooterFC from '@/components/userPage/FooterFC';
 import { RentalFavoriteProvider } from '@/context/RentalFavoriteContext';
-import { MeResponse } from '@/types/type/auth/auth';
+import { MeResponse } from '@/types/auth/auth.types';
 import { authService } from '@/services/auth.service';
 import { UserAuthProvider } from '@/context/UserAuthContext';
 import { ACCESS_TOKEN_KEY } from '../(auth)';

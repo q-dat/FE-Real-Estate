@@ -1,4 +1,4 @@
-import { rentalPostAdminService } from '@/services/rentalPostAdminService';
+import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
 import ClientRentalPostDetailPage from '../../[slug]/[id]/ClientRentalPostDetailPage';
 import { notFound } from 'next/navigation';
 

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { IRealEstateProject } from '@/types/type/realEstateProject/realEstateProject';
+import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
 
 interface Props {
   project: IRealEstateProject;

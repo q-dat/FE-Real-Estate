@@ -1,5 +1,5 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { IPost } from '@/types/type/post/post';
+import { IPost } from '@/types/post/post.types';
 
 interface ListResponse<T> {
   message?: string;

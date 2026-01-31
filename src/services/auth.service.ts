@@ -1,5 +1,5 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { LoginPayload, RegisterPayload, UpdateProfilePayload, AuthResponse, ProfileResponse, MeResponse } from '@/types/type/auth/auth';
+import { LoginPayload, RegisterPayload, UpdateProfilePayload, AuthResponse, ProfileResponse, MeResponse } from '@/types/auth/auth.types';
 
 const apiUrl = getServerApiUrl('api/auth');
 

@@ -4,8 +4,8 @@ import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import RentalCategoryModal from './modal/RentalCategoryModal';
 import DeleteModal from '../DeleteModal';
-import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';
-import { rentalCategoryService } from '@/services/rentalCategoryService';
+import { IRentalCategory } from '@/types/rentalCategory/rentalCategory.types';
+import { rentalCategoryService } from '@/services/rentalCategory.service';
 
 interface Props {
   categories: IRentalCategory[];

@@ -1,6 +1,6 @@
 export const revalidate = 0
 
-import { realEstateProjectService } from '@/services/realEstateProjectService'
+import { realEstateProjectService } from '@/services/realEstateProject.service'
 import ClientRealEstateProjectAdminPage from './ClientRealEstateProjectAdminPage'
 
 export default async function RealEstateProjectAdminPage() {

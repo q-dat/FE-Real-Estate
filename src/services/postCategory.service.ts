@@ -1,5 +1,5 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { IPostCategory } from '@/types/type/post/post-category';
+import { IPostCategory } from '@/types/post/post-category.types';
 
 export interface PostCategoryPayload {
   name: string;

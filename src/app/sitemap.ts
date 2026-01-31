@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
-import { rentalPostAdminService } from '@/services/rentalPostAdminService';
-import { encodeObjectId } from '@/utils/DetailPage/objectIdCodec';
+import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
+import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
+import { encodeObjectId } from '@/utils/DetailPage/objectIdCodec.utils';
 
 //  Constants
 const DOMAIN = 'https://www.nguonnhagiare.vn';

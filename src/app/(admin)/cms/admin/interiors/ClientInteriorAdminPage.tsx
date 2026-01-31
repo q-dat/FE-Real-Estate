@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { FaPlus, FaPen, FaTrashAlt, FaImages, FaLayerGroup } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import DeleteModal from '../DeleteModal';
-import { IInterior } from '@/types/type/interiors/interiors';
-import { interiorService } from '@/services/interiorService';
+import { IInterior } from '@/types/interiors/interiors.types';
+import { interiorService } from '@/services/interior.service';
 import InteriorModal from './modal/InteriorModal';
 
 interface Props {

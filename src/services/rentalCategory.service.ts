@@ -1,5 +1,5 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { IRentalCategory } from '@/types/type/rentalCategory/rentalCategory';
+import { IRentalCategory } from '@/types/rentalCategory/rentalCategory.types';
 
 export const rentalCategoryService = {
   async getAll(): Promise<IRentalCategory[]> {

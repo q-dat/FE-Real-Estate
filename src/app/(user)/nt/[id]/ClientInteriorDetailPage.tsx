@@ -1,8 +1,8 @@
 'use client';
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 import { PropertyGallery } from '@/components/userPage/rental/detail/PropertyGallery';
-import { IInterior } from '@/types/type/interiors/interiors';
-import { mapInteriorImages } from '@/utils/mapInteriorImages';
+import { IInterior } from '@/types/interiors/interiors.types';
+import { mapInteriorImages } from '@/utils/mapInteriorImages.utils';
 
 interface Props {
   interior: IInterior;

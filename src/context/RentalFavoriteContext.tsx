@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Toastify } from '@/helper/Toastify';
-import { IRentalFavoriteLite, IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { IRentalFavoriteLite, IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { FAVORITES_KEY } from '@/app';
 
 interface RentalFavoriteContextType {

@@ -1,6 +1,6 @@
-import { rentalPostAdminService } from '@/services/rentalPostAdminService';
+import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
 import ClientHomePage from './ClientHomePage';
-import { homeMetadata } from '@/metadata/homeMetadata';
+import { homeMetadata } from '@/metadata/home.metadata';
 
 export const metadata = homeMetadata;
 

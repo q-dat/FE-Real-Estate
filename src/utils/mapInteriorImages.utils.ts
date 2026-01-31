@@ -1,4 +1,4 @@
-import { IInterior } from '@/types/type/interiors/interiors';
+import { IInterior } from '@/types/interiors/interiors.types';
 
 export function mapInteriorImages(interior: IInterior): string[] {
   const result: string[] = [];

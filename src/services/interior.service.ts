@@ -1,6 +1,6 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { getWithFallback } from './shared/getWithFallback';
-import { IInterior } from '@/types/type/interiors/interiors';
+import { IInterior } from '@/types/interiors/interiors.types';
 
 // Cache Types ---
 type CacheState = {

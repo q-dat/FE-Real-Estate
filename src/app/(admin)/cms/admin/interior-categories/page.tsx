@@ -1,6 +1,6 @@
 export const revalidate = 0;
 
-import { interiorCategoryService } from '@/services/interiorCategoryService';
+import { interiorCategoryService } from '@/services/interiorCategory.service';
 import ClientInteriorCategoryPage from './ClientInteriorCategoryPage';
 
 export default async function InteriorCategoryPage() {

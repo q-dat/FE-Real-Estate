@@ -2,7 +2,7 @@
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { motion } from 'framer-motion';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 
 interface FavoriteButtonProps {
   post: IRentalPostAdmin;

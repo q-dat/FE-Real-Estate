@@ -7,8 +7,8 @@ import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import InputForm from '@/components/userPage/ui/form/InputForm';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { useEscClose } from '@/hooks/useEscClose';
-import { IInteriorCategory } from '@/types/type/interiorsCategory/interiorsCategory';
-import { interiorCategoryService } from '@/services/interiorCategoryService';
+import { IInteriorCategory } from '@/types/interiorsCategory/interiorsCategory.types';
+import { interiorCategoryService } from '@/services/interiorCategory.service';
 
 export interface FormValues {
   name: string;

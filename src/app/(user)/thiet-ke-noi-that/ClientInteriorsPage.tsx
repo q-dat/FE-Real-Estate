@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCouch, FaCheckCircle, FaLayerGroup } from 'react-icons/fa';
-import { IInterior } from '@/types/type/interiors/interiors';
+import { IInterior } from '@/types/interiors/interiors.types';
 import Link from 'next/link';
 
 interface Props {

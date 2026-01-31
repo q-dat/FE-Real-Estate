@@ -3,8 +3,8 @@ import React, { useMemo } from 'react';
 import Image from 'next/image';
 import { Button } from 'react-daisyui';
 import { FaPhoneAlt, FaFacebookF, FaInstagram, FaFacebookMessenger, FaViber } from 'react-icons/fa';
-import { IRentalAuthor } from '@/types/type/rentalAdmin/rentalAdmin';
-import { formatPhoneNumber } from '@/utils/formatPhoneNumber';
+import { IRentalAuthor } from '@/types/rentalAdmin/rentalAdmin.types';
+import { formatPhoneNumber } from '@/utils/formatPhoneNumber.utils';
 import { images } from '../../../../../public/images';
 import { HiCheckBadge } from 'react-icons/hi2';
 

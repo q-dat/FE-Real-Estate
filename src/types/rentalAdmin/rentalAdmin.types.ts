@@ -1,4 +1,4 @@
-import { IRentalCategory } from '../rentalCategory/rentalCategory';
+import { IRentalCategory } from '../rentalCategory/rentalCategory.types';
 
 export interface IRentalAuthorProfile {
   avatar?: string;

@@ -18,7 +18,7 @@ import {
 import { SiZalo, SiViber, SiMessenger } from 'react-icons/si';
 import { authService } from '@/services/auth.service';
 import { getAdminToken, requireAdminToken } from '@/services/shared/adminAuth.client';
-import { MeResponse } from '@/types/type/auth/auth';
+import { MeResponse } from '@/types/auth/auth.types';
 import { Button } from 'react-daisyui';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';

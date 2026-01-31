@@ -1,5 +1,5 @@
-import { IRentalAuthor } from '../rentalAdmin/rentalAdmin';
-import { IRentalCategory } from '../rentalCategory/rentalCategory';
+import { IRentalAuthor } from '../rentalAdmin/rentalAdmin.types';
+import { IRentalCategory } from '../rentalCategory/rentalCategory.types';
 
 /**
  * RentalPost - Bài đăng cho thuê / tìm người ở ghép / nhà, mặt bằng

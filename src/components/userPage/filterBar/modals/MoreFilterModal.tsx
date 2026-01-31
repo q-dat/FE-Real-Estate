@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Minus, Plus, X } from 'lucide-react';
 import CancelBtn from '../../ui/btn/CancelBtn';
 import SubmitBtn from '../../ui/btn/SubmitBtn';
-import { DIRECTIONS, FURNITURE_STATUS, LEGAL_STATUS, LOCATION_TYPE } from '@/constants/filterOptions';
+import { DIRECTIONS, FURNITURE_STATUS, LEGAL_STATUS, LOCATION_TYPE } from '@/constants/filterOptions.constants';
 
 interface MoreFilterOutput {
   bedroomNumber?: number;

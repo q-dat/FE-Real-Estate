@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import SubmitBtn from '../../ui/btn/SubmitBtn';
-import { POST_TYPES } from '@/constants/filterOptions';
+import { POST_TYPES } from '@/constants/filterOptions.constants';
 
 interface AdminFilterOutput {
   status?: string;

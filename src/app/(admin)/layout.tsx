@@ -8,7 +8,7 @@ import AdminSidebar from '@/components/adminPage/AdminSidebar';
 import { authService } from '@/services/auth.service';
 import { ADMIN_PAGE_TITLES } from '@/configs/adminPageTitles';
 import { requireAdminToken } from '@/services/shared/adminAuth.client';
-import { MeResponse } from '@/types/type/auth/auth';
+import { MeResponse } from '@/types/auth/auth.types';
 import { AdminAuthProvider } from '@/context/AdminAuthContext';
 
 type Status = 'booting' | 'ready' | 'unauthorized' | 'forbidden';

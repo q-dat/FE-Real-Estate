@@ -4,8 +4,8 @@ import { Button, Badge } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import { FaPlus, FaPen, FaTrashAlt, FaBuilding } from 'react-icons/fa';
 import DeleteModal from '../DeleteModal';
-import { IRealEstateProject } from '@/types/type/realEstateProject/realEstateProject';
-import { realEstateProjectService } from '@/services/realEstateProjectService';
+import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
+import { realEstateProjectService } from '@/services/realEstateProject.service';
 import RealEstateProjectModal from './modal/RealEstateProjectModal';
 
 interface Props {

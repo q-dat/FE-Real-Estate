@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useContext } from 'react';
-import { MeResponse } from '@/types/type/auth/auth';
+import { MeResponse } from '@/types/auth/auth.types';
 
 interface AdminAuthContextValue {
   user: MeResponse['data'];

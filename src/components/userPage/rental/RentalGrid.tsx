@@ -5,8 +5,8 @@ import { IoMdExpand } from 'react-icons/io';
 import { MdLocationPin } from 'react-icons/md';
 import { FaImage } from 'react-icons/fa6';
 import { slugify } from '@/lib/slugify';
-import { formatCurrency } from '@/utils/formatCurrency';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { formatCurrency } from '@/utils/formatCurrency.utils';
+import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 
 interface RentalGridProps {
   posts: IRentalPostAdmin[];

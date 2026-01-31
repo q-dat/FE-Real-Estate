@@ -4,13 +4,13 @@ import { FiMenu, FiX } from 'react-icons/fi';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
-import { menuItems } from '@/constants/menuItems';
+import { menuItems } from '@/constants/menuItems.constants';
 import Image from 'next/image';
 import { images } from '../../../public/images';
 import { AiFillHeart } from 'react-icons/ai';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { IoPerson, IoShieldCheckmarkSharp } from 'react-icons/io5';
-import { MeResponse } from '@/types/type/auth/auth';
+import { MeResponse } from '@/types/auth/auth.types';
 import { HiOutlineArrowRightOnRectangle } from 'react-icons/hi2';
 
 // Biến variants cho chữ (menu items)

@@ -4,7 +4,7 @@ import ErrorBoundary from '@/components/orther/error/ErrorBoundary';
 import ScrollToTopButton from '@/components/orther/scrollToTop/ScrollToTopButton';
 import { Inter, Roboto_Mono } from 'next/font/google';
 import CustomCursor from '@/components/userPage/CustomCursor';
-import { homeMetadata } from '@/metadata/homeMetadata';
+import { homeMetadata } from '@/metadata/home.metadata';
 
 const geistSans = Inter({
   variable: '--font-geist-sans',

@@ -10,8 +10,8 @@ import InputForm from '@/components/userPage/ui/form/InputForm';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { useEscClose } from '@/hooks/useEscClose';
 
-import { IRealEstateProject } from '@/types/type/realEstateProject/realEstateProject';
-import { realEstateProjectService } from '@/services/realEstateProjectService';
+import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
+import { realEstateProjectService } from '@/services/realEstateProject.service';
 import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';

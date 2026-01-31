@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { MdDelete } from 'react-icons/md';
-import { formatCurrency } from '@/utils/formatCurrency';
+import { formatCurrency } from '@/utils/formatCurrency.utils';
 
 export default function RentalFavoritesPage() {
   const { favorites, handleRemove } = useRentalFavorite();

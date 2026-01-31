@@ -1,5 +1,5 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { IRealEstateProject } from '@/types/type/realEstateProject/realEstateProject';
+import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
 
 export const realEstateProjectService = {
   async getAll(): Promise<IRealEstateProject[]> {

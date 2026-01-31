@@ -1,6 +1,6 @@
 export const revalidate = 0;
 
-import { rentalCategoryService } from '@/services/rentalCategoryService';
+import { rentalCategoryService } from '@/services/rentalCategory.service';
 import ClientRentalPostAdminPage from './ClientRentalPostAdminPage';
 
 export default async function RentalPostAdminPage() {

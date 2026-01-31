@@ -1,5 +1,5 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { IRentalPostAdmin } from '@/types/type/rentalAdmin/rentalAdmin';
+import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { getWithFallback } from './shared/getWithFallback';
 import { adminFetch } from './shared/adminFetch.client';
 

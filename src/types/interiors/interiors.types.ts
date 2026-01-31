@@ -1,4 +1,4 @@
-import { IInteriorCategory } from '../interiorsCategory/interiorsCategory';
+import { IInteriorCategory } from '../interiorsCategory/interiorsCategory.types';
 
 export interface IInterior {
   _id: string;

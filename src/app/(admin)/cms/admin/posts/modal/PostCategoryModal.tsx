@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { IPostCategory } from '@/types/type/post/post-category';
-import { postCategoryService } from '@/services/postCategoryService';
+import { IPostCategory } from '@/types/post/post-category.types';
+import { postCategoryService } from '@/services/postCategory.service';
 import DeleteModal from '../../DeleteModal';
 
 interface Props {

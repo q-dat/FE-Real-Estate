@@ -1,7 +1,7 @@
 'use client';
 
-import { otpService } from '@/services/owner/otp/otpService';
-import { OtpItem } from '@/types/type/auth/otp';
+import { otpService } from '@/services/owner/otp/otp.service';
+import { OtpItem } from '@/types/auth/otp.types';
 import { useEffect, useState } from 'react';
 
 export default function OwnerOtpPage() {

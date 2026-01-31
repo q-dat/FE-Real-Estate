@@ -1,4 +1,4 @@
-import { IPostCategory } from './post-category';
+import { IPostCategory } from './post-category.types';
 
 export interface IPost {
   _id: string;

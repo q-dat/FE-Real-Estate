@@ -1,4 +1,4 @@
-import { realEstateProjectService } from '@/services/realEstateProjectService';
+import { realEstateProjectService } from '@/services/realEstateProject.service';
 import ClientRealEstateProjectPage from './ClientRealEstateProjectPage';
 
 export default async function Page() {

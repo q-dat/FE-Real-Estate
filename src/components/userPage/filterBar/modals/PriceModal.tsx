@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { RefreshCcw } from 'lucide-react';
 import CancelBtn from '../../ui/btn/CancelBtn';
 import SubmitBtn from '../../ui/btn/SubmitBtn';
-import { PRICE_RANGES, PriceRange } from '@/constants/priceRanges';
+import { PRICE_RANGES, PriceRange } from '@/constants/priceRanges.constants';
 
 interface PriceOutput {
   label: string;

@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { MeResponse } from '@/types/type/auth/auth';
+import { MeResponse } from '@/types/auth/auth.types';
 import { authService } from '@/services/auth.service';
 
 interface AuthState {

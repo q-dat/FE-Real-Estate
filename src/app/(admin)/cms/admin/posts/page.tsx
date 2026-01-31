@@ -1,8 +1,8 @@
 export const revalidate = 0;
 
-import { postService } from '@/services/postService';
+import { postService } from '@/services/post.service';
 import ClientPostAdminPage from './ClientPostAdminPage';
-import { postCategoryService } from '@/services/postCategoryService';
+import { postCategoryService } from '@/services/postCategory.service';
 
 export default async function PostAdminPage() {
   const posts = await postService.getAll();
