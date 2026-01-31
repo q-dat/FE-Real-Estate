@@ -31,7 +31,15 @@ export const postService = {
     const res = await request<ListResponse<IPost[]>>(getServerApiUrl('api/posts'));
     return res.posts;
   },
-
+  async getPostById(id: string): Promise<IPost | null> {
+    try {
+      const res = await request<SingleResponse<IPost>>(getServerApiUrl(`api/post/${id}`));
+      return res.post;
+    } catch (error) {
+      console.error('Error fetching post by ID:', error);
+      return null;
+    }
+  },
   async create(formData: FormData): Promise<IPost> {
     const res = await request<SingleResponse<IPost>>(getServerApiUrl('api/post'), {
       method: 'POST',
