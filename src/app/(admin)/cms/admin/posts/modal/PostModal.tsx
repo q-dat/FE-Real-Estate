@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { Button } from 'react-daisyui';
 import { useForm } from 'react-hook-form';

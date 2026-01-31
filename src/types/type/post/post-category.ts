@@ -6,3 +6,7 @@ export interface IPostCategory {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface PostCategoryPayload {
+  name: string;
+  description?: string;
+}

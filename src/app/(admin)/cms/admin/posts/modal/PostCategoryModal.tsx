@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { Button } from 'react-daisyui';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -18,18 +19,26 @@ export default function PostCategoryModal({ open, onClose, onUpdated }: Props) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
+
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  /* ----------------------------- load data ----------------------------- */
+
   useEffect(() => {
     if (!open) return;
+
+    resetForm();
+
+    const load = async () => {
+      const data = await postCategoryService.getAll();
+      setCategories(data);
+    };
+
     load();
   }, [open]);
 
-  const load = async () => {
-    const data = await postCategoryService.getAll();
-    setCategories(data);
-  };
+  /* ----------------------------- helpers ----------------------------- */
 
   const resetForm = () => {
     setEditing(null);
@@ -37,38 +46,60 @@ export default function PostCategoryModal({ open, onClose, onUpdated }: Props) {
     setDescription('');
   };
 
+  /* ----------------------------- submit ----------------------------- */
+
   const submit = async () => {
     if (!name.trim()) return;
 
     setLoading(true);
     try {
-      if (editing) {
-        await postCategoryService.update(editing._id, { name, description });
+      if (editing?._id) {
+        const updated = await postCategoryService.update(editing._id, {
+          name,
+          description,
+        });
+        setCategories((prev) => {
+          const next = prev.map((c) => (c._id === updated._id ? updated : c));
+          onUpdated(next);
+          return next;
+        });
       } else {
-        await postCategoryService.create({ name, description });
+        const created = await postCategoryService.create({
+          name,
+          description,
+        });
+
+        setCategories((prev) => {
+          const next = [...prev, created];
+          onUpdated(next);
+          return next;
+        });
       }
 
-      await load();
       resetForm();
-      onUpdated(await postCategoryService.getAll());
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteClick = (id: string) => {
-    setDeletingId(id);
-    setConfirmOpen(true);
-  };
+  /* ----------------------------- delete ----------------------------- */
 
   const confirmDelete = async () => {
     if (!deletingId) return;
+
     await postCategoryService.delete(deletingId);
-    await load();
-    onUpdated(await postCategoryService.getAll());
+
+    setCategories((prev) => {
+      const next = prev.filter((c) => c._id !== deletingId);
+      onUpdated(next);
+      return next;
+    });
+
     setConfirmOpen(false);
     setDeletingId(null);
   };
+
+  /* ----------------------------- render ----------------------------- */
 
   if (!open) return null;
 
@@ -84,7 +115,7 @@ export default function PostCategoryModal({ open, onClose, onUpdated }: Props) {
           <div className="border-b px-5 py-4 text-lg font-semibold">Quản lý danh mục</div>
 
           <div className="grid grid-cols-1 gap-4 px-5 py-4 xl:grid-cols-2">
-            {/* Form */}
+            {/* ---------------------- form ---------------------- */}
             <div className="space-y-3">
               <input
                 value={name}
@@ -104,49 +135,54 @@ export default function PostCategoryModal({ open, onClose, onUpdated }: Props) {
                 <Button color="primary" onClick={submit} loading={loading}>
                   {editing ? 'Cập nhật' : 'Thêm mới'}
                 </Button>
+
                 {editing && <Button onClick={resetForm}>Huỷ</Button>}
               </div>
             </div>
 
-            {/* List */}
+            {/* ---------------------- list ---------------------- */}
             <div className="space-y-2">
-              {categories.map((c) => (
-                <div key={c._id} className="flex items-center justify-between rounded border px-3 py-2">
-                  <div>
-                    <div className="text-sm font-medium">{c.name}</div>
-                    {c.description && <div className="text-xs text-gray-500">{c.description}</div>}
-                  </div>
+              {categories
+                .filter((c): c is IPostCategory => Boolean(c && c._id))
+                .map((c) => (
+                  <div key={c._id} className="flex items-center justify-between rounded border px-3 py-2">
+                    <div>
+                      <div className="text-sm font-medium">{c.name}</div>
+                      {c.description && <div className="text-xs text-gray-500">{c.description}</div>}
+                    </div>
 
-                  <div className="flex gap-2 text-xs">
-                    <button
-                      className="text-blue-600"
-                      onClick={() => {
-                        setEditing(c);
-                        setName(c.name);
-                        setDescription(c.description ?? '');
-                      }}
-                    >
-                      Sửa
-                    </button>
-                    <button
-                      className="text-xs text-red-600 hover:underline"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(c._id);
-                      }}
-                    >
-                      Xóa
-                    </button>
+                    <div className="flex gap-2 text-xs">
+                      <button
+                        className="text-blue-600"
+                        onClick={() => {
+                          setEditing(c);
+                          setName(c.name);
+                          setDescription(c.description ?? '');
+                        }}
+                      >
+                        Sửa
+                      </button>
+
+                      <button
+                        className="text-red-600"
+                        onClick={() => {
+                          setDeletingId(c._id);
+                          setConfirmOpen(true);
+                        }}
+                      >
+                        Xoá
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
 
           <div className="flex justify-end border-t px-5 py-3">
             <Button onClick={onClose}>Đóng</Button>
-            <DeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />
           </div>
+
+          <DeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />
         </motion.div>
       </motion.div>
     </AnimatePresence>
