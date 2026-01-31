@@ -3,19 +3,21 @@ import { useEffect, useState } from 'react';
 import { Button } from 'react-daisyui';
 import { useForm } from 'react-hook-form';
 import { AnimatePresence, motion } from 'framer-motion';
-
 import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
-
 import { IPost } from '@/types/type/post/post';
 import { IPostCategory } from '@/types/type/post/post-category';
 import { postService } from '@/services/postService';
 import PostCategoryModal from './PostCategoryModal';
 import { slugify } from '@/lib/slugify';
+import Zoom from '@/lib/Zoom';
+import Image from 'next/image';
+import { MdClose } from 'react-icons/md';
 
 interface Props {
   open: boolean;
   editingItem: IPost | null;
   categories: IPostCategory[];
+  onCategoriesChange: (categories: IPostCategory[]) => void;
   onClose: () => void;
   reload: () => Promise<void>;
 }
@@ -27,18 +29,13 @@ interface PostFormData {
   published: boolean;
 }
 
-export default function PostModal({ open, editingItem, categories, onClose, reload }: Props) {
+export default function PostModal({ open, editingItem, categories, onCategoriesChange, onClose, reload }: Props) {
   const { register, handleSubmit, reset, watch } = useForm<PostFormData>();
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
-  const [localCategories, setLocalCategories] = useState<IPostCategory[]>(categories);
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-
-  useEffect(() => {
-    setLocalCategories(categories);
-  }, [categories]);
 
   useEffect(() => {
     if (!editingItem) {
@@ -76,13 +73,17 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
     setImageFile(null);
   }, [editingItem, reset]);
 
+  const removeImage = () => {
+    setPreviewImage(null);
+    setImageFile(null);
+  };
+
   const onSubmit = async (data: PostFormData) => {
     setIsLoading(true);
     try {
       const formData = new FormData();
 
       formData.append('title', data.title.trim());
-      formData.append('slug', data.slug.trim());
       formData.append('catalog', data.catalog);
       formData.append('published', String(data.published));
       formData.append('content', content);
@@ -148,7 +149,7 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
                 <div className="flex gap-2">
                   <select {...register('catalog')} className="flex-1 rounded-md border px-3 py-2" required>
                     <option value="">Chọn danh mục</option>
-                    {localCategories.map((c) => (
+                    {categories.map((c) => (
                       <option key={c._id} value={c._id}>
                         {c.name}
                       </option>
@@ -171,6 +172,29 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
               <div>
                 <label className="mb-1 block text-sm font-medium">Ảnh đại diện</label>
                 <input type="file" accept="image/*" onChange={handleImageChange} />
+                {previewImage && previewImage.length > 0 && (
+                  <div className="mt-3 grid grid-cols-3 gap-3 md:grid-cols-4 xl:grid-cols-10">
+                    <div className="group relative aspect-square overflow-hidden rounded-lg border-2 border-gray-100 shadow-md transition hover:border-primary">
+                      <Zoom>
+                        <Image
+                          src={previewImage}
+                          alt={`public-preview`}
+                          fill
+                          style={{ objectFit: 'cover' }}
+                          unoptimized
+                          className="transition-transform duration-300 group-hover:scale-105"
+                        />
+                      </Zoom>
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-90 transition hover:bg-red-700 hover:opacity-100"
+                      >
+                        <MdClose size={16} />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Meta  */}
@@ -202,11 +226,12 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
 
       <PostCategoryModal
         open={openCategoryModal}
+        categories={categories}
         onClose={() => setOpenCategoryModal(false)}
-        onUpdated={(cats) => {
-          setLocalCategories(cats);
+        onChange={(cats) => {
+          onCategoriesChange(cats);
 
-          // nếu đang chưa chọn catalog thì auto select category mới nhất
+          // auto-select category mới khi tạo post
           if (!editingItem && cats.length > 0) {
             const latest = cats[cats.length - 1];
             reset((prev) => ({

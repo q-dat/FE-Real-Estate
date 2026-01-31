@@ -1,6 +1,5 @@
 'use client';
-
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IPostCategory } from '@/types/type/post/post-category';
@@ -9,36 +8,18 @@ import DeleteModal from '../../DeleteModal';
 
 interface Props {
   open: boolean;
+  categories: IPostCategory[];
   onClose: () => void;
-  onUpdated: (categories: IPostCategory[]) => void;
+  onChange: (categories: IPostCategory[]) => void;
 }
 
-export default function PostCategoryModal({ open, onClose, onUpdated }: Props) {
-  const [categories, setCategories] = useState<IPostCategory[]>([]);
+export default function PostCategoryModal({ open, categories, onClose, onChange }: Props) {
   const [editing, setEditing] = useState<IPostCategory | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
-
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  /* ----------------------------- load data ----------------------------- */
-
-  useEffect(() => {
-    if (!open) return;
-
-    resetForm();
-
-    const load = async () => {
-      const data = await postCategoryService.getAll();
-      setCategories(data);
-    };
-
-    load();
-  }, [open]);
-
-  /* ----------------------------- helpers ----------------------------- */
 
   const resetForm = () => {
     setEditing(null);
@@ -46,35 +27,26 @@ export default function PostCategoryModal({ open, onClose, onUpdated }: Props) {
     setDescription('');
   };
 
-  /* ----------------------------- submit ----------------------------- */
-
   const submit = async () => {
     if (!name.trim()) return;
 
     setLoading(true);
     try {
-      if (editing?._id) {
-        const updated = await postCategoryService.update(editing._id, {
+      if (editing) {
+        await postCategoryService.update(editing._id, {
           name,
           description,
-        });
-        setCategories((prev) => {
-          const next = prev.map((c) => (c._id === updated._id ? updated : c));
-          onUpdated(next);
-          return next;
         });
       } else {
-        const created = await postCategoryService.create({
+        await postCategoryService.create({
           name,
           description,
         });
-
-        setCategories((prev) => {
-          const next = [...prev, created];
-          onUpdated(next);
-          return next;
-        });
       }
+
+      // ⬇️ refetch danh sách
+      const fresh = await postCategoryService.getAll();
+      onChange(Array.isArray(fresh) ? fresh : []);
 
       resetForm();
     } finally {
@@ -82,24 +54,17 @@ export default function PostCategoryModal({ open, onClose, onUpdated }: Props) {
     }
   };
 
-  /* ----------------------------- delete ----------------------------- */
-
   const confirmDelete = async () => {
     if (!deletingId) return;
 
     await postCategoryService.delete(deletingId);
 
-    setCategories((prev) => {
-      const next = prev.filter((c) => c._id !== deletingId);
-      onUpdated(next);
-      return next;
-    });
+    const fresh = await postCategoryService.getAll();
+    onChange(Array.isArray(fresh) ? fresh : []);
 
     setConfirmOpen(false);
     setDeletingId(null);
   };
-
-  /* ----------------------------- render ----------------------------- */
 
   if (!open) return null;
 
@@ -115,7 +80,6 @@ export default function PostCategoryModal({ open, onClose, onUpdated }: Props) {
           <div className="border-b px-5 py-4 text-lg font-semibold">Quản lý danh mục</div>
 
           <div className="grid grid-cols-1 gap-4 px-5 py-4 xl:grid-cols-2">
-            {/* ---------------------- form ---------------------- */}
             <div className="space-y-3">
               <input
                 value={name}
@@ -141,41 +105,37 @@ export default function PostCategoryModal({ open, onClose, onUpdated }: Props) {
             </div>
 
             {/* ---------------------- list ---------------------- */}
-            <div className="space-y-2">
-              {categories
-                .filter((c): c is IPostCategory => Boolean(c && c._id))
-                .map((c) => (
-                  <div key={c._id} className="flex items-center justify-between rounded border px-3 py-2">
-                    <div>
-                      <div className="text-sm font-medium">{c.name}</div>
-                      {c.description && <div className="text-xs text-gray-500">{c.description}</div>}
-                    </div>
+            {categories.map((c) => (
+              <div key={c._id} className="flex items-center justify-between rounded border px-3 py-2">
+                <div>
+                  <div className="text-sm font-medium">{c.name}</div>
+                  {c.description && <div className="text-xs text-gray-500">{c.description}</div>}
+                </div>
 
-                    <div className="flex gap-2 text-xs">
-                      <button
-                        className="text-blue-600"
-                        onClick={() => {
-                          setEditing(c);
-                          setName(c.name);
-                          setDescription(c.description ?? '');
-                        }}
-                      >
-                        Sửa
-                      </button>
+                <div className="flex gap-2 text-xs">
+                  <button
+                    className="text-blue-600"
+                    onClick={() => {
+                      setEditing(c);
+                      setName(c.name);
+                      setDescription(c.description ?? '');
+                    }}
+                  >
+                    Sửa
+                  </button>
 
-                      <button
-                        className="text-red-600"
-                        onClick={() => {
-                          setDeletingId(c._id);
-                          setConfirmOpen(true);
-                        }}
-                      >
-                        Xoá
-                      </button>
-                    </div>
-                  </div>
-                ))}
-            </div>
+                  <button
+                    className="text-red-600"
+                    onClick={() => {
+                      setDeletingId(c._id);
+                      setConfirmOpen(true);
+                    }}
+                  >
+                    Xoá
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
 
           <div className="flex justify-end border-t px-5 py-3">
