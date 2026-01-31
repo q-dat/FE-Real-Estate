@@ -4,8 +4,8 @@ import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import { interiorCategoryService } from '@/services/interiorCategory.service';
 import { IInteriorCategory } from '@/types/interiorsCategory/interiorsCategory.types';
-import InteriorCategoryModal from './modal/InteriorCategoryModal';
-import DeleteModal from '../DeleteModal';
+import InteriorCategoryModal from './modal/InteriorCategory.modal';
+import DeleteModal from '../Delete.modal';
 
 interface Props {
   categories: IInteriorCategory[];

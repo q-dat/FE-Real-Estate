@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
-import DeleteModal from '../DeleteModal';
-import PostModal from './modal/PostModal';
+import DeleteModal from '../Delete.modal';
+import PostModal from './modal/Post.modal';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
 import { postService } from '@/services/post.service';

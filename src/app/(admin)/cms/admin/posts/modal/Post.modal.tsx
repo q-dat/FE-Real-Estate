@@ -7,7 +7,7 @@ import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
 import { postService } from '@/services/post.service';
-import PostCategoryModal from './PostCategoryModal';
+import PostCategoryModal from './PostCategory.modal';
 import { slugify } from '@/lib/slugify';
 import Zoom from '@/lib/Zoom';
 import Image from 'next/image';

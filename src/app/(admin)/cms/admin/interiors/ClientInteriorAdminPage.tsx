@@ -4,10 +4,10 @@ import { Button, Badge } from 'react-daisyui';
 import Image from 'next/image';
 import { FaPlus, FaPen, FaTrashAlt, FaImages, FaLayerGroup } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import DeleteModal from '../DeleteModal';
+import DeleteModal from '../Delete.modal';
 import { IInterior } from '@/types/interiors/interiors.types';
 import { interiorService } from '@/services/interior.service';
-import InteriorModal from './modal/InteriorModal';
+import InteriorModal from './modal/Interior.modal';
 
 interface Props {
   interiors: IInterior[];

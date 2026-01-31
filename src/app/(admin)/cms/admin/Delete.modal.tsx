@@ -12,7 +12,7 @@ interface DeleteModalProps {
 }
 
 export default function DeleteModal({ open, onClose, onConfirm }: DeleteModalProps) {
-  useEscClose(open, onClose); // Hook ESC dùng chung cho mọi modal
+  useEscClose(open, onClose); // Hook ESC
 
   return (
     <AnimatePresence>

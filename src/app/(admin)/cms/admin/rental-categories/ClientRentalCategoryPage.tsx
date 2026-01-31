@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
-import RentalCategoryModal from './modal/RentalCategoryModal';
-import DeleteModal from '../DeleteModal';
+import RentalCategoryModal from './modal/RentalCategory.modal';
+import DeleteModal from '../Delete.modal';
 import { IRentalCategory } from '@/types/rentalCategory/rentalCategory.types';
 import { rentalCategoryService } from '@/services/rentalCategory.service';
 
