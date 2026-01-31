@@ -11,6 +11,7 @@ import { IPost } from '@/types/type/post/post';
 import { IPostCategory } from '@/types/type/post/post-category';
 import { postService } from '@/services/postService';
 import PostCategoryModal from './PostCategoryModal';
+import { slugify } from '@/lib/slugify';
 
 interface Props {
   open: boolean;
@@ -25,15 +26,16 @@ interface PostFormData {
   slug: string;
   catalog: string;
   published: boolean;
-  image?: FileList;
 }
 
 export default function PostModal({ open, editingItem, categories, onClose, reload }: Props) {
+  const { register, handleSubmit, reset, watch } = useForm<PostFormData>();
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [localCategories, setLocalCategories] = useState<IPostCategory[]>(categories);
-  const { register, handleSubmit, reset } = useForm<PostFormData>();
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     setLocalCategories(categories);
@@ -41,16 +43,25 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
 
   useEffect(() => {
     if (!editingItem) {
+      // reset form
       reset({
         title: '',
         slug: '',
         catalog: '',
         published: false,
       });
+
+      // reset content
       setContent('');
+
+      // reset image
+      setImageFile(null);
+      setPreviewImage(null);
+
       return;
     }
 
+    // set form values
     reset({
       title: editingItem.title,
       slug: editingItem.slug ?? '',
@@ -58,7 +69,12 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
       published: editingItem.published,
     });
 
+    // set content
     setContent(editingItem.content);
+
+    // set image preview (chỉ preview, không set file)
+    setPreviewImage(editingItem.image || null);
+    setImageFile(null);
   }, [editingItem, reset]);
 
   const onSubmit = async (data: PostFormData) => {
@@ -72,8 +88,8 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
       formData.append('published', String(data.published));
       formData.append('content', content);
 
-      if (data.image?.[0]) {
-        formData.append('image', data.image[0]);
+      if (imageFile) {
+        formData.append('image', imageFile);
       }
 
       if (editingItem?._id) {
@@ -86,6 +102,17 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
       onClose();
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setImageFile(file);
+
+    if (file) {
+      setPreviewImage(URL.createObjectURL(file));
+    } else {
+      setPreviewImage(null);
     }
   };
 
@@ -113,10 +140,7 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
               </div>
 
               {/* Slug */}
-              <div>
-                <label className="mb-1 block text-sm font-medium">Slug</label>
-                <input {...register('slug')} className="w-full rounded-md border px-3 py-2" placeholder="tu-dong-hoac-tu-nhap" />
-              </div>
+              <p className="text-xs text-gray-400">Slug tự động: {slugify(watch('title') || '')}</p>
 
               {/* Category */}
               <div>
@@ -147,7 +171,7 @@ export default function PostModal({ open, editingItem, categories, onClose, relo
               {/* Image */}
               <div>
                 <label className="mb-1 block text-sm font-medium">Ảnh đại diện</label>
-                <input type="file" accept="image/*" {...register('image')} />
+                <input type="file" accept="image/*" onChange={handleImageChange} />
               </div>
 
               {/* Meta  */}
