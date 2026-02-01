@@ -1,3 +1,11 @@
+import React from 'react'
+
+export default function page() {
+  return (
+    <div>page</div>
+  )
+}
+
 // export const revalidate = 18000;
 
 // import { Metadata } from 'next';
