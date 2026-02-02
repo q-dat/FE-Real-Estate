@@ -1,4 +1,5 @@
 'use client';
+import { Toastify } from '@/helper/Toastify';
 import { useState } from 'react';
 import { Badge } from 'react-daisyui';
 
@@ -14,8 +15,10 @@ export default function CopyCodeBadge({ code }: CopyCodeBadgeProps) {
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
+      Toastify('Đã sao chép mã bài đăng vào clipboard', 200);
     } catch (err) {
       console.error('Copy failed', err);
+      Toastify('Không thể sao chép mã bài đăng', 400);
     }
   };
 

@@ -74,8 +74,8 @@ export const PostCard = ({ post }: PostCardProps) => {
           )}
         </div>
 
-        <div className="absolute right-1 top-1 z-20">
-          <FavoriteBtn post={post} />
+        <div className="absolute right-0 top-0 z-20 rounded-sm bg-white/80">
+          <FavoriteBtn size={14} post={post} color="black" />
         </div>
 
         {post.area && (

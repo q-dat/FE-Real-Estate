@@ -12,13 +12,13 @@ import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { PropertyGallery } from '../../../../components/userPage/rental/detail/PropertyGallery';
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
-import DownloadImagesButton from '@/components/userPage/rental/detail/DownloadImagesButton';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import AdminPostInternalSection from '@/components/userPage/rental/detail/AdminPostInternalSection';
 import AuthorProfileCard from '../../../../components/userPage/rental/detail/AuthorProfileCard';
 import CopyCodeBadge from '@/components/userPage/ui/btn/CopyCodeBadge';
-import CopyUrlButton from '@/components/userPage/ui/btn/CopyUrlButton';
 import { slugify } from '@/lib/slugify';
+import DownloadImagesBtn from '@/components/userPage/ui/btn/DownloadImagesBtn';
+import CopyUrlBtn from '@/components/userPage/ui/btn/CopyUrlBtn';
 
 interface Props {
   post: IRentalPostAdmin;
@@ -75,15 +75,15 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
           {/* Copy Code */}
           <CopyCodeBadge code={post.code} />
           {/* DownloadImages */}
-          <DownloadImagesButton images={post.images} filePrefix={post.code} />
+          <DownloadImagesBtn images={post.images} filePrefix={post.code} />
           {/* Copy URL */}
-          <CopyUrlButton url={url} size="sm" />
+          <CopyUrlBtn url={url} size="sm" />
           {/* Share */}
-          <Button size="sm" shape="circle" className="text-blue-600 hover:scale-125">
+          <Button size="sm" shape="circle" className="text-blue-600 xl:hover:scale-125">
             <IoShareSocial size={20} />
           </Button>
           {/* Favorite */}
-          <FavoriteBtn post={post} size={24} color="text-primary" />
+          <FavoriteBtn scaleOnHover={true} border={true} post={post} size={0} color="text-primary" />
         </div>
       </div>
 

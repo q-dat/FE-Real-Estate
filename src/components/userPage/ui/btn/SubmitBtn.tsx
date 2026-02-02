@@ -6,7 +6,7 @@ interface SubmitBtnProps extends ButtonProps {
 }
 export default function SubmitBtn({ value, className, ...props }: SubmitBtnProps) {
   return (
-    <Button size="sm" color="success" {...props} className={`rounded-md text-white ${className}`}>
+    <Button size="sm" color="success" {...props} className={`rounded-md text-white hover:scale-105 ${className}`}>
       {value}
     </Button>
   );

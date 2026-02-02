@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import { Button, ButtonProps } from 'react-daisyui';
 
 interface CancelBtnProps extends ButtonProps {
@@ -8,7 +7,7 @@ interface CancelBtnProps extends ButtonProps {
 
 export default function CancelBtn({ value, className, ...props }: CancelBtnProps) {
   return (
-    <Button size="sm" color="error" {...props} className={`rounded-md text-white ${className}`}>
+    <Button size="sm" color="error" {...props} className={`rounded-md text-white hover:scale-105 hover:border hover:border-black ${className}`}>
       {value}
     </Button>
   );

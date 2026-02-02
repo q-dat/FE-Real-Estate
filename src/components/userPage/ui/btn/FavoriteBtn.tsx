@@ -1,38 +1,52 @@
 'use client';
-import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
+import { AiOutlineHeart } from 'react-icons/ai';
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { motion } from 'framer-motion';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
+import { BsBookmarkHeartFill } from 'react-icons/bs';
 
 interface FavoriteButtonProps {
   post: IRentalPostAdmin;
   className?: string;
   size?: number;
   color?: string;
+  border?: boolean;
+  scaleOnHover?: boolean;
 }
 
-export default function FavoriteBtn({ post, className = '', size = 22, color = 'text-white' }: FavoriteButtonProps) {
+export default function FavoriteBtn({
+  post,
+  className = '',
+  size = 24,
+  color = 'text-white',
+  border = false,
+  scaleOnHover = false,
+}: FavoriteButtonProps) {
   const { favorites, toggleFavorite } = useRentalFavorite();
   const isFavorite = favorites.some((fav) => fav._id === post._id);
 
   return (
-    <div className="w-full rounded-full border border-primary xl:hover:scale-125">
-      <motion.button
-        whileTap={{ scale: 0.9 }}
-        onClick={(e) => {
-          e.stopPropagation(); // Ngăn lan ra Link cha
-          e.preventDefault(); // Ngăn hành vi chuyển trang
-          toggleFavorite(post);
-        }}
-        aria-label="Thêm vào yêu thích"
-        className={`group flex items-center justify-center rounded-full bg-white/30 p-1 transition group-hover:bg-red-100 ${className}`}
+    <div className="tooltip tooltip-top tooltip-primary w-full" data-tip="Thêm vào yêu thích">
+      <div
+        className={`rounded-full ${isFavorite ? 'border-none' : border ? 'border border-primary ' + (scaleOnHover ? 'xl:hover:scale-125' : '') : ''}`}
       >
-        {isFavorite ? (
-          <AiFillHeart size={size} className="text-red-500 drop-shadow-sm" />
-        ) : (
-          <AiOutlineHeart size={size} className={`group-hover:text-red-500 ${color}`} />
-        )}
-      </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={(e) => {
+            e.stopPropagation(); // Ngăn lan ra Link cha
+            e.preventDefault(); // Ngăn hành vi chuyển trang
+            toggleFavorite(post);
+          }}
+          aria-label="Thêm vào yêu thích"
+          className={`group flex items-center justify-center rounded-full bg-white/30 p-1 transition ${isFavorite ? '' : 'group-hover:bg-red-100'} ${className}`}
+        >
+          {isFavorite ? (
+            <BsBookmarkHeartFill size={size === 0 ? 25.8 : size} className="text-orange-500 drop-shadow-sm" />
+          ) : (
+            <AiOutlineHeart size={size === 0 ? 24 : size} className={`group-hover:text-primary ${color}`} />
+          )}
+        </motion.button>
+      </div>
     </div>
   );
 }
