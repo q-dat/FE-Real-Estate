@@ -121,7 +121,18 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
       <Divider className="my-2" />
 
       {/* Price & Area Section */}
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100 p-5 shadow-sm">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100 p-5 shadow-inner">
+        {/* Background grid */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.6]"
+          style={{
+            backgroundImage: `linear-gradient(to right, rgba(148,163,184,0.15) 1px, transparent 1px),
+                             linear-gradient(to bottom, rgba(148,163,184,0.15) 1px, transparent 1px)`,
+            backgroundSize: '20px 20px',
+          }}
+        />
+
+        {/* Content */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           {/* Price - Highlighted */}
           <div className="flex w-full flex-col items-center xl:items-start">
