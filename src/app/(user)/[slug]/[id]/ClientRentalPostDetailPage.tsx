@@ -15,7 +15,7 @@ import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import AdminPostInternalSection from '@/components/userPage/rental/detail/AdminPostInternalSection';
 import AuthorProfileCard from '../../../../components/userPage/rental/detail/AuthorProfileCard';
-import CopyCodeBadge from '@/components/userPage/ui/btn/CopyCodeBadge';
+import CopyCodeBadgeBtn from '@/components/userPage/ui/btn/CopyCodeBadgeBtn';
 import { slugify } from '@/lib/slugify';
 import DownloadImagesBtn from '@/components/userPage/ui/btn/DownloadImagesBtn';
 import CopyUrlBtn from '@/components/userPage/ui/btn/CopyUrlBtn';
@@ -73,7 +73,7 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
         </div>
         <div className="flex flex-row items-center justify-center gap-1 xl:gap-2">
           {/* Copy Code */}
-          <CopyCodeBadge code={post.code} />
+          <CopyCodeBadgeBtn code={post.code} />
           {/* DownloadImages */}
           <DownloadImagesBtn images={post.images} filePrefix={post.code} />
           {/* Copy URL */}

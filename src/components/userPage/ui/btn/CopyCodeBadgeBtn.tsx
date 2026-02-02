@@ -3,11 +3,11 @@ import { Toastify } from '@/helper/Toastify';
 import { useState } from 'react';
 import { Badge } from 'react-daisyui';
 
-interface CopyCodeBadgeProps {
+interface CopyCodeBadgeBtnProps {
   code: string;
 }
 
-export default function CopyCodeBadge({ code }: CopyCodeBadgeProps) {
+export default function CopyCodeBadgeBtn({ code }: CopyCodeBadgeBtnProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
