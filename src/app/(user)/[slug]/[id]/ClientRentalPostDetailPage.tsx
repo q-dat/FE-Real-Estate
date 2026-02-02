@@ -71,7 +71,7 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
             {new Date(post.updatedAt).toLocaleDateString('vi-VN')}
           </span> */}
         </div>
-        <div className="flex flex-row items-center justify-center gap-1 xl:gap-2">
+        <div className="z-50 flex flex-row items-center justify-center gap-1 xl:gap-2">
           {/* Copy Code */}
           <CopyCodeBadgeBtn code={post.code} />
           {/* DownloadImages */}
