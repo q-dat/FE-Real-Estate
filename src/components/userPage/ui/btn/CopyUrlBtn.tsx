@@ -25,7 +25,7 @@ export default function CopyUrlBtn({ url, ...props }: CopyUrlBtnProps) {
   };
 
   return (
-    <div className="tooltip tooltip-top tooltip-primary w-fit" data-tip="Sao chép liên kết">
+    <div className="w-fit xl:tooltip xl:tooltip-top xl:tooltip-primary" data-tip="Sao chép liên kết">
       <Button {...props} shape="circle" className="text-primary xl:hover:scale-125" onClick={handleCopy}>
         <span className="font-semibold">{copied ? <TbCopyCheck size={20} /> : <BiLink size={20} />}</span>
       </Button>

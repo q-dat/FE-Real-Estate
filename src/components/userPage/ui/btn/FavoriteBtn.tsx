@@ -26,7 +26,7 @@ export default function FavoriteBtn({
   const isFavorite = favorites.some((fav) => fav._id === post._id);
 
   return (
-    <div className="tooltip tooltip-top tooltip-primary w-fit" data-tip="Thêm vào yêu thích">
+    <div className="w-fit xl:tooltip xl:tooltip-top xl:tooltip-primary" data-tip="Thêm vào yêu thích">
       <div
         className={`rounded-full ${isFavorite ? 'border-none' : border ? 'border border-primary ' + (scaleOnHover ? 'xl:hover:scale-125' : '') : ''}`}
       >

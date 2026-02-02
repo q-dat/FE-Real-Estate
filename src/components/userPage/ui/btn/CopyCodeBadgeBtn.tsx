@@ -23,7 +23,7 @@ export default function CopyCodeBadgeBtn({ code }: CopyCodeBadgeBtnProps) {
   };
 
   return (
-    <div className="tooltip tooltip-top tooltip-primary w-fit" data-tip="Sao chép mã bài đăng">
+    <div className="w-fit xl:tooltip xl:tooltip-top xl:tooltip-primary" data-tip="Sao chép mã bài đăng">
       <Badge
         className="text-md cursor-pointer whitespace-nowrap border border-primary p-4 font-medium text-primary transition xl:hover:scale-110"
         onClick={handleCopy}

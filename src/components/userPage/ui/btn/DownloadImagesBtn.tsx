@@ -72,7 +72,7 @@ const DownloadImagesBtn: React.FC<DownloadImagesBtnProps> = ({ images, filePrefi
 
   return (
     <>
-      <div className="tooltip tooltip-top tooltip-primary flex w-full flex-col" data-tip={completed ? 'Tải xong' : 'Tải xuống hình ảnh'}>
+      <div className="flex w-fit flex-col xl:tooltip xl:tooltip-top xl:tooltip-primary" data-tip={completed ? 'Tải xong' : 'Tải xuống hình ảnh'}>
         <button
           onClick={() => setIsConfirmOpen(true)}
           className="rounded-full border border-primary p-1 focus:outline-none xl:hover:scale-125"
@@ -85,7 +85,7 @@ const DownloadImagesBtn: React.FC<DownloadImagesBtnProps> = ({ images, filePrefi
       {/* Modal xác nhận */}
       <input type="checkbox" checked={isConfirmOpen} onChange={() => setIsConfirmOpen(false)} className="modal-toggle" />
 
-      <div className="modal modal-bottom sm:modal-middle">
+      <div className="modal modal-middle">
         <div className="modal-box relative">
           {/* ESC hint */}
           <div className="absolute right-2 top-2 flex items-center gap-2 text-xs text-base-content/60">
