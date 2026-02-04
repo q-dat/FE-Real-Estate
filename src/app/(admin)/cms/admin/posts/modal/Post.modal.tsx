@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Button } from 'react-daisyui';
+import { Button, Input } from 'react-daisyui';
 import { useForm } from 'react-hook-form';
 import { AnimatePresence, motion } from 'framer-motion';
 import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
@@ -15,6 +15,8 @@ import { MdClose } from 'react-icons/md';
 import { useEscClose } from '@/hooks/useEscClose';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import SubmitBtn from '@/components/userPage/ui/btn/SubmitBtn';
+import InputForm from '@/components/userPage/ui/form/InputForm';
+import LabelForm from '@/components/userPage/ui/form/LabelForm';
 
 interface Props {
   open: boolean;
@@ -69,6 +71,7 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
       title: editingItem.title,
       slug: editingItem.slug ?? '',
       catalog: editingItem.catalog?._id ?? '',
+      source: editingItem.source,
       published: editingItem.published,
     });
 
@@ -139,7 +142,7 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
           >
             <motion.div
               key="post-modal-content"
-              className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
+              className="flex max-h-[80vh] w-full max-w-6xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
               initial={{ y: 40 }}
               animate={{ y: 0 }}
               exit={{ y: 40 }}
@@ -155,14 +158,14 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
                     <div className="space-y-4 xl:col-span-1">
                       {/* Title */}
                       <div>
-                        <label className="mb-1 block text-sm font-medium">Tiêu đề</label>
-                        <input {...register('title')} className="w-full rounded-md border px-3 py-2" required />
+                        <LabelForm title="Tiêu đề" />
+                        <InputForm {...register('title')} required />
                         <p className="mt-1 text-xs text-gray-400">Slug: {slugify(watch('title') || '')}</p>
                       </div>
 
                       {/* Category */}
                       <div>
-                        <label className="mb-1 block text-sm font-medium">Danh mục</label>
+                        <LabelForm title="Danh mục" />
                         <div className="flex gap-2">
                           <select {...register('catalog')} className="flex-1 rounded-md border px-3 py-2" required>
                             <option value="">Chọn danh mục</option>
@@ -175,7 +178,7 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
                               ))}
                           </select>
 
-                          <Button type="button" size="sm" onClick={() => setOpenCategoryModal(true)}>
+                          <Button type="button" className="bg-primary text-white" size="md" onClick={() => setOpenCategoryModal(true)}>
                             Quản lý
                           </Button>
                         </div>
@@ -186,10 +189,11 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
                         <input type="checkbox" {...register('published')} />
                         Xuất bản
                       </label>
+
                       {/* Source */}
                       <div>
-                        <label className="mb-1 block text-sm font-medium">Nguồn</label>
-                        <input className="w-full rounded-md border px-3 py-2" type="text" {...register('source')} placeholder="Ghi nguồn nếu có!" />
+                        <LabelForm title="Nguồn" />
+                        <InputForm type="text" {...register('source')} placeholder="Ghi nguồn nếu có!" />
                       </div>
                       {/* Image */}
                       <div>
@@ -223,8 +227,8 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
 
                     {/* Right */}
                     <div className="xl:col-span-2">
-                      <label className="mb-1 block text-sm font-medium">Nội dung</label>
-                      <JoditEditorWrapper height={420} value={content} onChange={setContent} />
+                      <LabelForm title="Nội dung" />
+                      <JoditEditorWrapper value={content} onChange={setContent} />
                     </div>
                   </div>
                 </div>

@@ -11,15 +11,22 @@ interface Props {
   onChange: (value: string) => void;
 }
 
-export default function JoditEditorWrapper({ className, height, value, onChange }: Props) {
+export default function JoditEditorWrapper({ className, height = 450, value, onChange }: Props) {
   const editor = useRef(null);
 
   const config = useMemo(
     () => ({
       readonly: false,
-      toolbarAdaptive: false,
-      toolbarSticky: false,
       height,
+      toolbarAdaptive: true,
+      toolbarSticky: true,
+      showCharsCounter: true,
+      showWordsCounter: true,
+      showXPathInStatusbar: true,
+      askBeforePasteHTML: true,
+      askBeforePasteFromWord: true,
+      processPasteHTML: true,
+
       buttons: [
         'source',
         '|',
@@ -28,24 +35,64 @@ export default function JoditEditorWrapper({ className, height, value, onChange 
         'bold',
         'italic',
         'underline',
+        'strikethrough',
+        'eraser',
+        'superscript',
+        'subscript',
         '|',
+        'font',
+        'fontsize',
         'brush',
         'paragraph',
         'align',
+
+        'classSpan',
         '|',
         'ul',
         'ol',
         'outdent',
         'indent',
         '|',
+        'align',
+        'lineHeight',
+        '|',
         'link',
+        'unlink',
+        'anchor',
+        '|',
         'image',
         'video',
+        'file',
+        'table',
         '|',
         'hr',
+
+        'symbols',
+        'emoji',
+        'specialCharacters',
+        '|',
+        'code',
+        'copyformat',
+        'selectall',
+        '|',
+        'cut',
+        'copy',
+        'paste',
+        'pastefromword',
+        '|',
+        'find',
+        'replace',
+        '|',
         'undo',
         'redo',
-        'eraser',
+        '|',
+        'hr',
+        'preview',
+        'print',
+        'fullscreen',
+        '|',
+        'spellcheck',
+        'about',
       ],
       style: {
         font: true,
@@ -65,9 +112,25 @@ export default function JoditEditorWrapper({ className, height, value, onChange 
             Verdana: 'Verdana',
           },
         },
+        fontsize: {
+          list: ['8', '10', '12', '14', '16', '18', '24', '30', '36', '48'],
+        },
+        lineHeight: {
+          list: ['1', '1.2', '1.4', '1.6', '2'],
+        },
+      },
+
+      uploader: {
+        insertImageAsBase64URI: true,
+      },
+
+      filebrowser: {
+        ajax: {
+          url: '',
+        },
       },
     }),
-    []
+    [height]
   );
 
   return <JoditEditor className={className} ref={editor} value={value} config={config} onBlur={(newContent) => onChange(newContent)} />;
