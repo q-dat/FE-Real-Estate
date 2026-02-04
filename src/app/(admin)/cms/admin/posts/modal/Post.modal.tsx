@@ -13,6 +13,8 @@ import Zoom from '@/lib/Zoom';
 import Image from 'next/image';
 import { MdClose } from 'react-icons/md';
 import { useEscClose } from '@/hooks/useEscClose';
+import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
+import SubmitBtn from '@/components/userPage/ui/btn/SubmitBtn';
 
 interface Props {
   open: boolean;
@@ -27,6 +29,7 @@ interface PostFormData {
   title: string;
   slug: string;
   catalog: string;
+  source?: string;
   published: boolean;
 }
 
@@ -47,6 +50,7 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
         title: '',
         slug: '',
         catalog: '',
+        source: '',
         published: false,
       });
 
@@ -88,6 +92,7 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
 
       formData.append('title', data.title.trim());
       formData.append('catalog', data.catalog);
+      formData.append('source', data.source || '');
       formData.append('published', String(data.published));
       formData.append('content', content);
 
@@ -139,7 +144,7 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
               animate={{ y: 0 }}
               exit={{ y: 40 }}
             >
-              <form onSubmit={handleSubmit(onSubmit)} className="flex h-full flex-col">
+              <form onSubmit={handleSubmit(onSubmit)} className="flex h-full flex-col overflow-auto">
                 {/* Header */}
                 <div className="border-b px-6 py-4 text-lg font-semibold">{editingItem ? 'Cập nhật bài viết' : 'Tạo bài viết'}</div>
 
@@ -181,7 +186,11 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
                         <input type="checkbox" {...register('published')} />
                         Xuất bản
                       </label>
-
+                      {/* Source */}
+                      <div>
+                        <label className="mb-1 block text-sm font-medium">Nguồn</label>
+                        <input className="w-full rounded-md border px-3 py-2" type="text" {...register('source')} placeholder="Ghi nguồn nếu có!" />
+                      </div>
                       {/* Image */}
                       <div>
                         <label className="mb-1 block text-sm font-medium">Ảnh đại diện</label>
@@ -222,12 +231,8 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
 
                 {/* Footer */}
                 <div className="flex justify-end gap-2 border-t px-6 py-4">
-                  <Button type="button" onClick={onClose}>
-                    Hủy
-                  </Button>
-                  <Button type="submit" color="primary" loading={isLoading}>
-                    {editingItem ? 'Lưu thay đổi' : 'Tạo mới'}
-                  </Button>
+                  <CancelBtn value="Hủy" onClick={onClose} />
+                  <SubmitBtn value={editingItem ? 'Lưu thay đổi' : 'Tạo mới'} loading={isLoading} />
                 </div>
               </form>
             </motion.div>

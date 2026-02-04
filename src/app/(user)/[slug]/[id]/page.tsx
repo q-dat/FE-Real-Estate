@@ -7,7 +7,6 @@ import ClientRentalPostDetailPage from './ClientRentalPostDetailPage';
 import { generateRentalPostMetadata } from '@/metadata/id/rental-post.metadata';
 import { StructuredData } from '@/metadata/structuredData';
 
-// Đúng kiểu cho Next 15
 type PageProps = {
   params: Promise<{ slug: string; id: string }>;
 };

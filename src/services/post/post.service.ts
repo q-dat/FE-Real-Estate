@@ -1,5 +1,6 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IPost } from '@/types/post/post.types';
+import { getWithFallback } from '../shared/getWithFallback';
 
 interface ListResponse<T> {
   message?: string;
@@ -31,7 +32,7 @@ export const postService = {
     const res = await request<ListResponse<IPost[]>>(getServerApiUrl('api/posts'));
     return res.posts;
   },
-  async getPostById(id: string): Promise<IPost | null> {
+  async getById(id: string): Promise<IPost | null> {
     try {
       const res = await request<SingleResponse<IPost>>(getServerApiUrl(`api/post/${id}`));
       return res.post;
@@ -40,6 +41,10 @@ export const postService = {
       return null;
     }
   },
+  async getFallback(id: string): Promise<IPost | null> {
+    return getWithFallback<IPost>(id, this.getAll.bind(this), this.getById.bind(this));
+  },
+
   async create(formData: FormData): Promise<IPost> {
     const res = await request<SingleResponse<IPost>>(getServerApiUrl('api/post'), {
       method: 'POST',

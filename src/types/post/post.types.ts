@@ -6,6 +6,7 @@ export interface IPost {
   title: string;
   slug?: string;
   content: string;
+  source?: string;
   catalog: IPostCategory;
   published: boolean;
   createdAt: Date;
