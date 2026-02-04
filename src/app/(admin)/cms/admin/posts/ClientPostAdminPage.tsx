@@ -59,12 +59,12 @@ export default function ClientPostAdminPage({ posts: initialPosts, categories: i
       </div>
 
       {/* List */}
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-4">
         {posts.map((post) => (
           <div
             key={post._id}
             onClick={() => openEditModal(post)}
-            className="group relative flex gap-4 rounded-lg border bg-white p-4 transition hover:border-primary/40 hover:shadow-md"
+            className="group relative flex cursor-help gap-2 rounded-lg border bg-white p-4 transition hover:border-primary/40 hover:shadow-md"
           >
             {/* Thumbnail */}
             <div className="h-20 w-28 shrink-0 overflow-hidden rounded-md bg-gray-100">
