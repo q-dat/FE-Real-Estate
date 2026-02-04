@@ -101,10 +101,10 @@ export default function ClientPostAdminPage({ posts: initialPosts, categories: i
             </div>
 
             {/* Actions */}
-            <div className="absolute right-3 top-3 flex gap-2 text-xs opacity-100 xl:opacity-0 xl:transition xl:group-hover:opacity-100">
+            <div className="absolute bottom-3 left-3 flex gap-2 text-xs opacity-100 xl:opacity-0 xl:transition xl:group-hover:opacity-100">
               <Button
                 size="xs"
-                className="bg-white text-blue-600 hover:underline"
+                className="bg-white text-blue-600 hover:bg-white hover:underline"
                 onClick={(e) => {
                   e.stopPropagation();
                   openEditModal(post);
@@ -115,7 +115,7 @@ export default function ClientPostAdminPage({ posts: initialPosts, categories: i
 
               <Button
                 size="xs"
-                className="bg-white text-red-600 hover:underline"
+                className="bg-white text-red-600 hover:bg-white hover:underline"
                 onClick={(e) => {
                   e.stopPropagation();
                   setDeletingId(post._id);

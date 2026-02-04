@@ -11,7 +11,7 @@ interface Props {
   onChange: (value: string) => void;
 }
 
-export default function JoditEditorWrapper({ className, height = 450, value, onChange }: Props) {
+export default function JoditEditorWrapper({ className, height, value, onChange }: Props) {
   const editor = useRef(null);
 
   const config = useMemo(

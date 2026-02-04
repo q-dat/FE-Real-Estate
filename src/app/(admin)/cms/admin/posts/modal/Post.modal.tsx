@@ -1,22 +1,21 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Button, Input } from 'react-daisyui';
 import { useForm } from 'react-hook-form';
 import { AnimatePresence, motion } from 'framer-motion';
+import Image from 'next/image';
 import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
+import PostCategoryModal from './PostCategory.modal';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
 import { postService } from '@/services/post/post.service';
-import PostCategoryModal from './PostCategory.modal';
 import { slugify } from '@/lib/slugify';
 import Zoom from '@/lib/Zoom';
-import Image from 'next/image';
-import { MdClose } from 'react-icons/md';
 import { useEscClose } from '@/hooks/useEscClose';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import SubmitBtn from '@/components/userPage/ui/btn/SubmitBtn';
-import InputForm from '@/components/userPage/ui/form/InputForm';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
+import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
+import { Button, Select } from 'react-daisyui';
 
 interface Props {
   open: boolean;
@@ -47,7 +46,6 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
 
   useEffect(() => {
     if (!editingItem) {
-      // reset form
       reset({
         title: '',
         slug: '',
@@ -55,18 +53,12 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
         source: '',
         published: false,
       });
-
-      // reset content
       setContent('');
-
-      // reset image
       setImageFile(null);
       setPreviewImage(null);
-
       return;
     }
 
-    // set form values
     reset({
       title: editingItem.title,
       slug: editingItem.slug ?? '',
@@ -75,33 +67,27 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
       published: editingItem.published,
     });
 
-    // set content
     setContent(editingItem.content);
-
-    // set image preview (chỉ preview, không set file)
     setPreviewImage(editingItem.image || null);
     setImageFile(null);
   }, [editingItem, reset]);
 
-  const removeImage = () => {
-    setPreviewImage(null);
-    setImageFile(null);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setImageFile(file);
+    setPreviewImage(file ? URL.createObjectURL(file) : null);
   };
 
   const onSubmit = async (data: PostFormData) => {
     setIsLoading(true);
     try {
       const formData = new FormData();
-
       formData.append('title', data.title.trim());
       formData.append('catalog', data.catalog);
       formData.append('source', data.source || '');
       formData.append('published', String(data.published));
       formData.append('content', content);
-
-      if (imageFile) {
-        formData.append('image', imageFile);
-      }
+      if (imageFile) formData.append('image', imageFile);
 
       if (editingItem?._id) {
         await postService.update(editingItem._id, formData);
@@ -116,150 +102,113 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setImageFile(file);
-
-    if (file) {
-      setPreviewImage(URL.createObjectURL(file));
-    } else {
-      setPreviewImage(null);
-    }
-  };
-
-  if (!open) return null;
-
   return (
     <>
       <AnimatePresence>
         {open && (
           <motion.div
-            key="post-modal"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            key="post-modal-backdrop"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              key="post-modal-content"
-              className="flex max-h-[80vh] w-full max-w-6xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
+              key="post-modal"
+              className="flex h-full max-h-[85vh] w-full max-w-7xl flex-col overflow-hidden rounded-2xl bg-primary-lighter shadow-xl xl:max-h-[80vh]"
               initial={{ y: 40 }}
               animate={{ y: 0 }}
               exit={{ y: 40 }}
             >
-              <form onSubmit={handleSubmit(onSubmit)} className="flex h-full flex-col overflow-auto">
-                {/* Header */}
-                <div className="border-b px-6 py-4 text-lg font-semibold">{editingItem ? 'Cập nhật bài viết' : 'Tạo bài viết'}</div>
+              {/* Header */}
+              <div className="p-2">
+                <h1 className="text-lg font-semibold">{editingItem ? 'Cập nhật bài viết' : 'Tạo bài viết'}</h1>
+                <h2 className="mt-1 text-xs text-gray-500">Nhập thông tin cơ bản và nội dung bài viết</h2>
+              </div>
 
-                {/* Body */}
-                <div className="flex-1 overflow-y-auto px-6 py-5">
-                  <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-                    {/* Left */}
-                    <div className="space-y-4 xl:col-span-1">
-                      {/* Title */}
-                      <div>
-                        <LabelForm title="Tiêu đề" />
-                        <InputForm {...register('title')} required />
-                        <p className="mt-1 text-xs text-gray-400">Slug: {slugify(watch('title') || '')}</p>
-                      </div>
-
-                      {/* Category */}
-                      <div>
-                        <LabelForm title="Danh mục" />
-                        <div className="flex gap-2">
-                          <select {...register('catalog')} className="flex-1 rounded-md border px-3 py-2" required>
-                            <option value="">Chọn danh mục</option>
-                            {categories
-                              .filter((c) => c._id)
-                              .map((c) => (
-                                <option key={c._id} value={c._id}>
-                                  {c.name}
-                                </option>
-                              ))}
-                          </select>
-
-                          <Button type="button" className="bg-primary text-white" size="md" onClick={() => setOpenCategoryModal(true)}>
-                            Quản lý
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Published */}
-                      <label className="flex items-center gap-2 text-sm">
-                        <input type="checkbox" {...register('published')} />
-                        Xuất bản
-                      </label>
-
-                      {/* Source */}
-                      <div>
-                        <LabelForm title="Nguồn" />
-                        <InputForm type="text" {...register('source')} placeholder="Ghi nguồn nếu có!" />
-                      </div>
-                      {/* Image */}
-                      <div>
-                        <label className="mb-1 block text-sm font-medium">Ảnh đại diện</label>
-                        <input type="file" accept="image/*" onChange={handleImageChange} />
-
-                        {previewImage && (
-                          <div className="relative mt-3 aspect-video overflow-hidden rounded-lg border">
-                            <Zoom>
-                              <Image src={previewImage} alt="preview" fill unoptimized className="object-cover" />
-                            </Zoom>
-                            <button
-                              type="button"
-                              onClick={removeImage}
-                              className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-xs text-white"
-                            >
-                              X
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Meta */}
-                      {editingItem && (
-                        <div className="text-xs text-gray-400">
-                          <div>Tạo: {new Date(editingItem.createdAt).toLocaleString()}</div>
-                          <div>Cập nhật: {new Date(editingItem.updatedAt).toLocaleString()}</div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right */}
-                    <div className="xl:col-span-2">
-                      <LabelForm title="Nội dung" />
-                      <JoditEditorWrapper value={content} onChange={setContent} />
+              {/* Body */}
+              <form id="post-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 overflow-auto p-2 xl:flex-row">
+                {/* Sidebar */}
+                <div className="shrink-0 space-y-5 rounded-md bg-white p-1 xl:w-1/3 xl:overflow-y-auto xl:scrollbar-hide">
+                  <div className="w-full">
+                    <LabelForm title="Danh mục" />
+                    <div className="flex gap-2">
+                      <Select {...register('catalog')} className="flex-1 rounded-md border focus:outline-none" required>
+                        <option value="">Chọn danh mục</option>
+                        {categories.map((c) => (
+                          <option className="font-bold" key={c._id} value={c._id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </Select>
+                      <Button
+                        type="button"
+                        size="md"
+                        className="rounded-md border bg-green-500 px-3 text-sm uppercase text-white hover:bg-green-700"
+                        onClick={() => setOpenCategoryModal(true)}
+                      >
+                        Quản lý
+                      </Button>
                     </div>
                   </div>
-                </div>
+                  <div className="my-1 break-all text-xs leading-relaxed">
+                    <span className="pr-1 font-bold text-black">Slug:</span>
+                    <span className="rounded-md bg-primary p-1 font-light text-white">
+                      {slugify(watch('title') || '') || 'Slug tự động tạo khi bạn đặt tiêu đề'}
+                    </span>
+                  </div>
+                  <div>
+                    <TextareaForm {...register('title')} required placeholder="Tiêu đề" />
+                    <label className="flex cursor-pointer items-center gap-2 text-sm">
+                      <input type="checkbox" {...register('published')} />
+                      Xuất bản
+                    </label>
+                  </div>
 
-                {/* Footer */}
-                <div className="flex justify-end gap-2 border-t px-6 py-4">
-                  <CancelBtn value="Hủy" onClick={onClose} />
-                  <SubmitBtn value={editingItem ? 'Lưu thay đổi' : 'Tạo mới'} loading={isLoading} />
+                  <TextareaForm {...register('source')} placeholder="Nguồn bài viết" />
+
+                  <div>
+                    <input id="file-upload" type="file" accept="image/*" onChange={handleImageChange} />
+                    {previewImage && (
+                      <div className="relative mt-3 aspect-video overflow-hidden rounded-lg border">
+                        <Zoom>
+                          <Image src={previewImage} alt="preview" fill unoptimized className="object-cover" />
+                        </Zoom>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Content */}
+                <div className="w-full">
+                  <LabelForm className="rounded-t-md border border-primary-lighter bg-white uppercase" title="Nội dung bài viết" />
+                  <JoditEditorWrapper height={500} value={content} onChange={setContent} />
                 </div>
               </form>
+
+              {/* Footer */}
+              <div className="flex flex-row items-center justify-between border-t p-2">
+                {editingItem && (
+                  <div className="text-xs font-medium text-black">
+                    <div>Ngày tạo: {new Date(editingItem.createdAt).toLocaleString()}</div>
+                    <div>Cập nhật: {new Date(editingItem.updatedAt).toLocaleString()}</div>
+                  </div>
+                )}
+                <div className="space-x-2">
+                  <CancelBtn value="Hủy/Esc" onClick={onClose} />
+                  <SubmitBtn type="submit" form="post-form" value={editingItem ? 'Lưu' : 'Tạo mới'} loading={isLoading} />
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Category modal */}
+
       {openCategoryModal && (
         <PostCategoryModal
           open={openCategoryModal}
           categories={categories}
           onClose={() => setOpenCategoryModal(false)}
-          onChange={(cats) => {
-            onCategoriesChange(cats);
-
-            if (!editingItem && cats.length > 0) {
-              const latest = cats[cats.length - 1];
-              reset((prev) => ({
-                ...prev,
-                catalog: latest._id,
-              }));
-            }
-          }}
+          onChange={onCategoriesChange}
         />
       )}
     </>

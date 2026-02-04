@@ -1,11 +1,14 @@
 'use client';
 import { useState } from 'react';
-import { Button } from 'react-daisyui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IPostCategory } from '@/types/post/post-category.types';
 import { postCategoryService } from '@/services/post/postCategory.service';
 import DeleteModal from '../../Delete.modal';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
+import SubmitBtn from '@/components/userPage/ui/btn/SubmitBtn';
+import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
+import InputForm from '@/components/userPage/ui/form/InputForm';
+import { FaDeleteLeft } from 'react-icons/fa6';
 
 interface Props {
   open: boolean;
@@ -34,21 +37,13 @@ export default function PostCategoryModal({ open, categories, onClose, onChange 
     setLoading(true);
     try {
       if (editing) {
-        await postCategoryService.update(editing._id, {
-          name,
-          description,
-        });
+        await postCategoryService.update(editing._id, { name, description });
       } else {
-        await postCategoryService.create({
-          name,
-          description,
-        });
+        await postCategoryService.create({ name, description });
       }
 
-      // ⬇️ refetch danh sách
       const fresh = await postCategoryService.getAll();
       onChange(Array.isArray(fresh) ? fresh : []);
-
       resetForm();
     } finally {
       setLoading(false);
@@ -59,12 +54,12 @@ export default function PostCategoryModal({ open, categories, onClose, onChange 
     if (!deletingId) return;
 
     await postCategoryService.delete(deletingId);
-
     const fresh = await postCategoryService.getAll();
     onChange(Array.isArray(fresh) ? fresh : []);
 
     setConfirmOpen(false);
     setDeletingId(null);
+    if (editing?._id === deletingId) resetForm();
   };
 
   if (!open) return null;
@@ -73,95 +68,83 @@ export default function PostCategoryModal({ open, categories, onClose, onChange 
     <>
       <AnimatePresence>
         <motion.div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-3"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
+            className="flex max-h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-primary-lighter shadow-xl"
             initial={{ y: 40 }}
             animate={{ y: 0 }}
             exit={{ y: 40 }}
           >
             {/* Header */}
-            <div className="border-b px-6 py-4 text-lg font-semibold">Quản lý danh mục</div>
+            <div className="flex items-center justify-between border-b p-2">
+              <div>
+                <h1 className="text-xl font-medium">{editing ? 'Cập nhật danh mục' : 'Thêm danh mục mới'}</h1>
+                <p className="text-xs text-gray-500">Click vào danh mục để chỉnh sửa</p>
+              </div>
+              <CancelBtn value="Đóng/Esc" onClick={onClose} />
+            </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto px-6 py-5">
-              <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                {/* Form */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Tên danh mục</label>
-                    <input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full rounded-md border px-3 py-2"
-                      placeholder="Ví dụ: Tin tức"
-                    />
-                  </div>
+            <div className="grid flex-1 grid-cols-1 gap-2 overflow-hidden p-2 xl:grid-cols-2">
+              {/* Form */}
+              <div className="space-y-4 rounded-xl border bg-white p-2">
+                <InputForm value={name} onChange={(e) => setName(e.target.value)} placeholder="Tên danh mục" />
 
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">Mô tả</label>
-                    <textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      rows={3}
-                      className="w-full resize-none rounded-md border px-3 py-2"
-                    />
-                  </div>
+                <TextareaForm placeholder="Mô tả" value={description} onChange={(e) => setDescription(e.target.value)} />
 
-                  <div className="flex gap-2">
-                    <Button color="primary" onClick={submit} loading={loading}>
-                      {editing ? 'Cập nhật' : 'Thêm mới'}
-                    </Button>
-
-                    {editing && <Button onClick={resetForm}>Huỷ</Button>}
-                  </div>
+                <div className="flex gap-2">
+                  <SubmitBtn loading={loading} onClick={submit} value={editing ? 'Lưu thay đổi' : 'Thêm'} />
+                  {editing && <CancelBtn value="Hủy" onClick={resetForm} />}
                 </div>
+              </div>
 
-                {/* List */}
-                <div className="space-y-2">
-                  {categories.map((c) => (
-                    <div key={c._id} className="flex items-start justify-between rounded-md border px-3 py-2 transition hover:bg-gray-50">
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium">{c.name}</div>
-                        {c.description && <div className="mt-0.5 line-clamp-2 text-xs text-gray-500">{c.description}</div>}
-                      </div>
+              {/* List */}
+              <div className="space-y-2 overflow-y-auto">
+                {categories.map((c) => {
+                  const active = editing?._id === c._id;
 
-                      <div className="ml-3 flex shrink-0 gap-2 text-xs">
+                  return (
+                    <div
+                      key={c._id}
+                      onClick={() => {
+                        setEditing(c);
+                        setName(c.name);
+                        setDescription(c.description ?? '');
+                      }}
+                      className={`group cursor-pointer rounded-lg border px-3 py-2 transition ${
+                        active ? 'border-green-500 bg-green-50 text-black' : 'bg-primary text-white hover:bg-white hover:text-primary'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium">{c.name}</div>
+                          {c.description && <div className="mt-0.5 line-clamp-2 text-xs text-gray-500">{c.description}</div>}
+                        </div>
+
                         <button
-                          className="text-blue-600 hover:underline"
-                          onClick={() => {
-                            setEditing(c);
-                            setName(c.name);
-                            setDescription(c.description ?? '');
-                          }}
-                        >
-                          Sửa
-                        </button>
-
-                        <button
-                          className="text-red-600 hover:underline"
-                          onClick={() => {
+                          className={`shrink-0 text-xs group-hover:text-red-500 ${active ? 'text-red-500' : 'text-white'}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setDeletingId(c._id);
                             setConfirmOpen(true);
                           }}
                         >
-                          Xoá
+                          <FaDeleteLeft size={20} />
                         </button>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
         </motion.div>
       </AnimatePresence>
-      {/* Footer */}
-      <CancelBtn value="Đóng" onClick={onClose} />
+
       <DeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />
     </>
   );
