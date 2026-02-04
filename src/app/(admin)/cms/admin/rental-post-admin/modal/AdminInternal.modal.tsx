@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
-import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
+import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { useEscClose } from '@/hooks/useEscClose';
 import Zoom from '@/lib/Zoom';
 import { useEffect, useState } from 'react';

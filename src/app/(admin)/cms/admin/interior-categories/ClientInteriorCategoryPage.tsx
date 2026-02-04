@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
-import { interiorCategoryService } from '@/services/interiorCategory.service';
+import { interiorCategoryService } from '@/services/interior/interiorCategory.service';
 import { IInteriorCategory } from '@/types/interiorsCategory/interiorsCategory.types';
 import InteriorCategoryModal from './modal/InteriorCategory.modal';
 import DeleteModal from '../Delete.modal';

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Mail, ArrowRight, KeyRound } from 'lucide-react';
-import { authService } from '@/services/auth.service';
+import { authService } from '@/services/auth/auth.service';
 import { CyberBackground } from '@/components/auth/motion/CyberBackground';
 import clsx from 'clsx';
 import Link from 'next/link';

@@ -5,7 +5,7 @@ import DeleteModal from '../Delete.modal';
 import PostModal from './modal/Post.modal';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
-import { postService } from '@/services/post.service';
+import { postService } from '@/services/post/post.service';
 
 interface Props {
   posts: IPost[];

@@ -1,7 +1,7 @@
 export const revalidate = 18000; // 5 giờ 3600x5
 
 import { slugify } from '@/lib/slugify';
-import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
+import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { notFound, redirect } from 'next/navigation';
 import ClientRentalPostDetailPage from './ClientRentalPostDetailPage';
 import { generateRentalPostMetadata } from '@/metadata/id/rental-post.metadata';

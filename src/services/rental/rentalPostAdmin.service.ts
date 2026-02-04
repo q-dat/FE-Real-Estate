@@ -1,7 +1,8 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
-import { getWithFallback } from './shared/getWithFallback';
-import { adminFetch } from './shared/adminFetch.client';
+import { adminFetch } from '../shared/adminFetch.client';
+import { getWithFallback } from '../shared/getWithFallback';
+
 
 // Type Definitions ---
 type CacheState = {

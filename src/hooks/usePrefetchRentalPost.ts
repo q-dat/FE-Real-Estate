@@ -1,6 +1,6 @@
 'use client';
+import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { useCallback, useRef } from 'react';
-import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
 
 export function usePrefetchRentalPost() {
   // tránh prefetch nhiều lần cùng id

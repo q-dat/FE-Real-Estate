@@ -1,5 +1,5 @@
 import ErrorLoading from '@/components/orther/error/ErrorLoading';
-import { postService } from '@/services/post.service';
+import { postService } from '@/services/post/post.service';
 import ClientNewsPage from './ClientNewsPage';
 
 export default async function NewsPage() {

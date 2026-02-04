@@ -11,7 +11,7 @@ import InputForm from '@/components/userPage/ui/form/InputForm';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { useEscClose } from '@/hooks/useEscClose';
 import Zoom from '@/lib/Zoom';
-import { interiorService } from '@/services/interior.service';
+import { interiorService } from '@/services/interior/interior.service';
 import { IInterior } from '@/types/interiors/interiors.types';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';

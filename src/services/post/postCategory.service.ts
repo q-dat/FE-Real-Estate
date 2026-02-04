@@ -20,6 +20,10 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
     throw new Error(text || `HTTP ${res.status}`);
   }
 
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
   return res.json();
 }
 
@@ -27,6 +31,15 @@ export const postCategoryService = {
   async getAll(): Promise<IPostCategory[]> {
     const res = await request<{ postCategories: IPostCategory[] }>(getServerApiUrl('api/post-categories'));
     return res.postCategories;
+  },
+  async getById(id: string): Promise<IPostCategory | null> {
+    try {
+      const res = await request<{ postCategory: IPostCategory }>(getServerApiUrl(`api/post-category/${id}`));
+      return res.postCategory;
+    } catch (error) {
+      console.error('GetById Error:', error);
+      return null;
+    }
   },
   async create(payload: PostCategoryPayload): Promise<IPostCategory> {
     return request<IPostCategory>(getServerApiUrl('api/post-category'), {

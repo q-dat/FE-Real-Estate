@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, ShieldCheck, ArrowRight } from 'lucide-react';
-import { authService } from '@/services/auth.service';
+import { authService } from '@/services/auth/auth.service';
 import { CyberBackground } from '@/components/auth/motion/CyberBackground';
 import clsx from 'clsx';
 import { requireAdminToken } from '@/services/shared/adminAuth.client';

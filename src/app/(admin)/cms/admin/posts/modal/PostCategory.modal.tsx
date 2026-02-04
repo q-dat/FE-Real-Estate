@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IPostCategory } from '@/types/post/post-category.types';
-import { postCategoryService } from '@/services/postCategory.service';
+import { postCategoryService } from '@/services/post/postCategory.service';
 import DeleteModal from '../../Delete.modal';
 
 interface Props {

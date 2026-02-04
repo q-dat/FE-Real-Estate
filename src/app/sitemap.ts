@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
-import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
+import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { encodeObjectId } from '@/utils/DetailPage/objectIdCodec.utils';
 
 //  Constants

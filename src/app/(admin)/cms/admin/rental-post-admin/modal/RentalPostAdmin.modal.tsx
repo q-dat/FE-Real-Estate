@@ -6,7 +6,7 @@ import { MdClose } from 'react-icons/md';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { District, IRentalAuthor, IRentalPostAdmin, Province, Ward } from '@/types/rentalAdmin/rentalAdmin.types';
-import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
+import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import InputForm from '@/components/userPage/ui/form/InputForm';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';

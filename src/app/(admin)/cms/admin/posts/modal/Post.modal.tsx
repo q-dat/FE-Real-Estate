@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
-import { postService } from '@/services/post.service';
+import { postService } from '@/services/post/post.service';
 import PostCategoryModal from './PostCategory.modal';
 import { slugify } from '@/lib/slugify';
 import Zoom from '@/lib/Zoom';

@@ -6,7 +6,7 @@ import { FaPlus, FaPen, FaTrashAlt, FaImages, FaLayerGroup } from 'react-icons/f
 import { motion } from 'framer-motion';
 import DeleteModal from '../Delete.modal';
 import { IInterior } from '@/types/interiors/interiors.types';
-import { interiorService } from '@/services/interior.service';
+import { interiorService } from '@/services/interior/interior.service';
 import InteriorModal from './modal/Interior.modal';
 
 interface Props {

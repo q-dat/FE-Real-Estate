@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, Lock } from 'lucide-react';
-import { authService } from '@/services/auth.service';
+import { authService } from '@/services/auth/auth.service';
 import { CyberBackground } from '@/components/auth/motion/CyberBackground';
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';

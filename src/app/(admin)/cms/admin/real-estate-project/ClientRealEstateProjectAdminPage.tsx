@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { FaPlus, FaPen, FaTrashAlt, FaBuilding } from 'react-icons/fa';
 import DeleteModal from '../Delete.modal';
 import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
-import { realEstateProjectService } from '@/services/realEstateProject.service';
+import { realEstateProjectService } from '@/services/real-estate-project/realEstateProject.service';
 import RealEstateProjectModal from './modal/RealEstateProject.modal';
 
 interface Props {

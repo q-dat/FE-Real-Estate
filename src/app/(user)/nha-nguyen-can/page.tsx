@@ -1,4 +1,4 @@
-import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
+import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { RentalGrid } from '@/components/userPage/rental';
 import FilterBar from '@/components/userPage/filterBar/FilterBar';
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';

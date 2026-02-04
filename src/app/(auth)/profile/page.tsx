@@ -16,7 +16,7 @@ import {
   FiArrowLeft, // [UPDATE] Import icon mũi tên
 } from 'react-icons/fi';
 import { SiZalo, SiViber, SiMessenger } from 'react-icons/si';
-import { authService } from '@/services/auth.service';
+import { authService } from '@/services/auth/auth.service';
 import { getAdminToken, requireAdminToken } from '@/services/shared/adminAuth.client';
 import { MeResponse } from '@/types/auth/auth.types';
 import { Button } from 'react-daisyui';

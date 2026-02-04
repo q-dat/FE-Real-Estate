@@ -11,7 +11,7 @@ import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { useEscClose } from '@/hooks/useEscClose';
 
 import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
-import { realEstateProjectService } from '@/services/realEstateProject.service';
+import { realEstateProjectService } from '@/services/real-estate-project/realEstateProject.service';
 import JoditEditorWrapper from '@/components/adminPage/JoditEditorWrapper';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';

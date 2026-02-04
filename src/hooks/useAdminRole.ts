@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { authService } from '@/services/auth.service';
+import { authService } from '@/services/auth/auth.service';
 import { requireAdminToken } from '@/services/shared/adminAuth.client';
 
 type AdminRole = 'admin' | 'owner';

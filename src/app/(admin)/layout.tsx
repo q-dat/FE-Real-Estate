@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import AdminBootLoading from '@/components/adminPage/AdminBootLoading';
 import AdminNavbar from '@/components/adminPage/AdminNavbar';
 import AdminSidebar from '@/components/adminPage/AdminSidebar';
-import { authService } from '@/services/auth.service';
+import { authService } from '@/services/auth/auth.service';
 import { ADMIN_PAGE_TITLES } from '@/configs/adminPageTitles';
 import { requireAdminToken } from '@/services/shared/adminAuth.client';
 import { MeResponse } from '@/types/auth/auth.types';

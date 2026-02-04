@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import RentalCategoryModal from './modal/RentalCategory.modal';
 import DeleteModal from '../Delete.modal';
 import { IRentalCategory } from '@/types/rentalCategory/rentalCategory.types';
-import { rentalCategoryService } from '@/services/rentalCategory.service';
+import { rentalCategoryService } from '@/services//rental/rentalCategory.service';
 
 interface Props {
   categories: IRentalCategory[];

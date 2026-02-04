@@ -1,7 +1,7 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { MeResponse } from '@/types/auth/auth.types';
-import { authService } from '@/services/auth.service';
+import { authService } from '@/services/auth/auth.service';
 
 interface AuthState {
   user: MeResponse['data'] | null;

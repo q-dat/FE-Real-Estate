@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { realEstateProjectService } from '@/services/realEstateProject.service';
+import { realEstateProjectService } from '@/services/real-estate-project/realEstateProject.service';
 import ClientRealEstateProjectDetailPage from './ClientRealEstateProjectDetailPage';
 
 type PageProps = {

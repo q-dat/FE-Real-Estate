@@ -5,7 +5,7 @@ import { FaImages, FaPlus, FaPen, FaTrashAlt } from 'react-icons/fa';
 import Image from 'next/image';
 import { IRentalAuthor, IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import RentalPostAdminModal from './modal/RentalPostAdmin.modal';
-import { rentalPostAdminService } from '@/services/rentalPostAdmin.service';
+import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { formatCurrency } from '@/utils/formatCurrency.utils';
 import DeleteModal from '../Delete.modal';
 import { GiPadlock } from 'react-icons/gi';
