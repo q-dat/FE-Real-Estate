@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import AdminBootLoading from '@/components/adminPage/AdminBootLoading';
-import AdminLayout from './layout';
+import AdminLayout from '../../app/(admin)/layout';
 
 type Status = 'booting' | 'ready' | 'error';
 

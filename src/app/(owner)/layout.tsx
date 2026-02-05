@@ -10,7 +10,7 @@ import { ADMIN_PAGE_TITLES } from '@/configs/adminPageTitles';
 import { requireAdminToken } from '@/services/shared/adminAuth.client';
 import { MeResponse } from '@/types/auth/auth.types';
 import { AdminAuthProvider } from '@/context/AdminAuthContext';
-import { ADMIN_MENU } from '@/configs/admin-menu.config';
+import { OWNER_MENU } from '@/configs/owner-menu.config';
 
 type Status = 'booting' | 'ready' | 'unauthorized' | 'forbidden';
 
@@ -83,10 +83,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <AdminAuthProvider value={{ user: user! }}>
-      <Drawer open={isSidebarOpen} onClickOverlay={() => setIsSidebarOpen(false)} side={<AdminSidebar menu={ADMIN_MENU} />}>
+      <Drawer open={isSidebarOpen} onClickOverlay={() => setIsSidebarOpen(false)} side={<AdminSidebar menu={OWNER_MENU} />}>
         <div className="flex min-h-screen bg-slate-50">
           <div className="hidden xl:block">
-            <AdminSidebar menu={ADMIN_MENU} />
+            <AdminSidebar menu={OWNER_MENU} />
           </div>
 
           <div className="flex flex-1 flex-col">

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Button } from 'react-daisyui';
-import DeleteModal from '../Delete.modal';
+import DeleteModal from '../../../../components/adminPage/modal/Delete.modal';
 import PostModal from './modal/Post.modal';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';

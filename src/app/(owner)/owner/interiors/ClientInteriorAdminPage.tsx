@@ -4,7 +4,7 @@ import { Button, Badge } from 'react-daisyui';
 import Image from 'next/image';
 import { FaPlus, FaPen, FaTrashAlt, FaImages, FaLayerGroup } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import DeleteModal from '../Delete.modal';
+import DeleteModal from '../../../../components/adminPage/modal/Delete.modal';
 import { IInterior } from '@/types/interiors/interiors.types';
 import { interiorService } from '@/services/interior/interior.service';
 import InteriorModal from './modal/Interior.modal';

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IPostCategory } from '@/types/post/post-category.types';
 import { postCategoryService } from '@/services/post/postCategory.service';
-import DeleteModal from '../../Delete.modal';
+import DeleteModal from '../../../../../components/adminPage/modal/Delete.modal';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
 import SubmitBtn from '@/components/userPage/ui/btn/SubmitBtn';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';

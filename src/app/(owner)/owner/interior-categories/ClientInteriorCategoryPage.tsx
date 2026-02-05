@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { interiorCategoryService } from '@/services/interior/interiorCategory.service';
 import { IInteriorCategory } from '@/types/interiorsCategory/interiorsCategory.types';
 import InteriorCategoryModal from './modal/InteriorCategory.modal';
-import DeleteModal from '../Delete.modal';
+import DeleteModal from '../../../../components/adminPage/modal/Delete.modal';
 
 interface Props {
   categories: IInteriorCategory[];

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import RentalCategoryModal from './modal/RentalCategory.modal';
-import DeleteModal from '../Delete.modal';
+import DeleteModal from '../../../../../components/adminPage/modal/Delete.modal';
 import { IRentalCategory } from '@/types/rentalCategory/rentalCategory.types';
 import { rentalCategoryService } from '@/services//rental/rentalCategory.service';
 

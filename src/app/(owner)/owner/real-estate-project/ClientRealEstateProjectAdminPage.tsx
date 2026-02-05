@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button, Badge } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import { FaPlus, FaPen, FaTrashAlt, FaBuilding } from 'react-icons/fa';
-import DeleteModal from '../Delete.modal';
+import DeleteModal from '../../../../components/adminPage/modal/Delete.modal';
 import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
 import { realEstateProjectService } from '@/services/real-estate-project/realEstateProject.service';
 import RealEstateProjectModal from './modal/RealEstateProject.modal';

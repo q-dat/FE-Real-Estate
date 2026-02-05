@@ -7,7 +7,7 @@ import { IRentalAuthor, IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin
 import RentalPostAdminModal from './modal/RentalPostAdmin.modal';
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { formatCurrency } from '@/utils/formatCurrency.utils';
-import DeleteModal from '../Delete.modal';
+import DeleteModal from '../../../../../components/adminPage/modal/Delete.modal';
 import { GiPadlock } from 'react-icons/gi';
 import AdminInternalModal from './modal/AdminInternal.modal';
 import { useAdminAuth } from '@/context/AdminAuthContext';

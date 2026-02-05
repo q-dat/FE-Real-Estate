@@ -14,7 +14,15 @@ interface SidebarItemProps {
   isExpanded: boolean;
   onSelect: () => void;
 }
-
+interface AdminSidebarProps {
+  menu: IMenuItem[];
+}
+interface SidebarContentProps {
+  pathname: string;
+  isExpanded: boolean;
+  onSelect: () => void;
+  menu: IMenuItem[];
+}
 // Sidebar Item
 const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps) => {
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
@@ -96,10 +104,10 @@ const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps)
 };
 
 // Shared Content
-const SidebarContent = ({ pathname, isExpanded, onSelect }: { pathname: string; isExpanded: boolean; onSelect: () => void }) => (
+const SidebarContent = ({ pathname, isExpanded, onSelect, menu }: SidebarContentProps) => (
   <div className="z-[999999] flex h-full flex-col overflow-hidden">
     {/* Logo Section */}
-    <Link href="/" target="_blank" title='Về Trang Chủ'>
+    <Link href="/" target="_blank" title="Về Trang Chủ">
       <div className="hidden h-24 items-center overflow-hidden px-4 xl:flex">
         <div className={`flex items-center gap-4 ${!isExpanded && 'mx-auto'}`}>
           <div className="relative hidden h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-primary shadow-[0_0_20px_rgba(var(--p),0.3)] xl:flex">
@@ -126,7 +134,7 @@ const SidebarContent = ({ pathname, isExpanded, onSelect }: { pathname: string; 
       {/* Menu */}
       <div className="flex-1 overflow-hidden overflow-y-auto pt-4 xl:pt-0">
         <Menu className="p-0">
-          {ADMIN_MENU.map((item) => (
+          {menu.map((item) => (
             <SidebarItem key={item.path} item={item} pathname={pathname} isExpanded={isExpanded} onSelect={onSelect} />
           ))}
         </Menu>
@@ -152,7 +160,7 @@ const SidebarContent = ({ pathname, isExpanded, onSelect }: { pathname: string; 
 );
 
 // Main Sidebar
-export default function AdminSidebar() {
+export default function AdminSidebar({ menu }: AdminSidebarProps) {
   const pathname = usePathname();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -160,10 +168,10 @@ export default function AdminSidebar() {
     <>
       {/* Mobile Sidebar – luôn expanded */}
       <aside className="sticky top-0 h-screen w-[360px] bg-[#020617] xl:hidden">
-        <SidebarContent pathname={pathname} isExpanded={true} onSelect={() => {}} />
+        <SidebarContent pathname={pathname} isExpanded={true} onSelect={() => {}} menu={menu} />
       </aside>
 
-      {/* Desktop Sidebar – giữ nguyên logic cũ */}
+      {/* Desktop */}
       <motion.aside
         initial="collapsed"
         animate={isExpanded ? 'expanded' : 'collapsed'}
@@ -176,7 +184,7 @@ export default function AdminSidebar() {
         onMouseLeave={() => setIsExpanded(false)}
         className="sticky top-0 hidden h-screen bg-[#020617] xl:block"
       >
-        <SidebarContent pathname={pathname} isExpanded={isExpanded} onSelect={() => setIsExpanded(false)} />
+        <SidebarContent pathname={pathname} isExpanded={isExpanded} onSelect={() => setIsExpanded(false)} menu={menu} />
       </motion.aside>
     </>
   );

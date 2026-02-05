@@ -1,7 +1,7 @@
 export const revalidate = 0;
 
+import ClientRentalCategoryPage from '@/app/(admin)/cms/admin/rental-categories/ClientRentalCategoryPage';
 import { rentalCategoryService } from '@/services/rental/rentalCategory.service';
-import ClientRentalCategoryPage from './ClientRentalCategoryPage';
 
 export default async function CategoryPage() {
   const categories = await rentalCategoryService.getAll();
