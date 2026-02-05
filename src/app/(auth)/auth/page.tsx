@@ -76,7 +76,7 @@ export default function AuthPage() {
 
         switch (role) {
           case 'owner':
-            router.replace('/owner/users');
+            router.replace('/owner/dashboard');
             break;
 
           case 'admin':
