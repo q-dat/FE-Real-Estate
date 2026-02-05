@@ -1,9 +1,9 @@
 'use client';
 import Link from 'next/link';
-import TimeAgo from '@/components/orther/timeAgo/TimeAgo';
 import CatalogSidebar from './CatalogSidebar';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
+import { Space } from '@/components/userPage/ui/space/Space';
 
 interface PostDetailContentProps {
   post: IPost;
@@ -18,23 +18,20 @@ export default function PostDetailContent({ post, catalogWithPosts, onSelectPost
   return (
     <div className="flex flex-col items-start justify-center gap-10 xl:flex-row">
       {/* Content */}
-      <article className="mb-10 xl:w-[40vw]">
+      <article className="mb-10 w-full xl:w-[45vw]">
         <h1 className="py-5 text-3xl font-bold">{post.title}</h1>
-
-        <p className="text-sm font-normal">Danh mục:&nbsp;{post.catalog.name}</p>
-
-        <p className="text-xs text-blue-500">
-          {new Date(post.updatedAt).toLocaleDateString('vi-VN')}
-          &nbsp;(
-          <TimeAgo date={post.updatedAt} />)
-        </p>
-
-        <hr className="my-2" />
-
-        <div className="text-base font-light text-default" dangerouslySetInnerHTML={{ __html: post.content }} />
-
-        <hr className="my-2" />
-
+        <p className="text-sm font-normal">
+          <span>Sự kiện:&nbsp;</span>
+          <span className="text-primary">{post.catalog.name}</span>
+        </p>{' '}
+        <Space />
+        <div className="relative overflow-hidden">
+          <div
+            className="prose-base xl:prose-lg prose max-w-none [&_*]:max-w-full [&_img]:h-auto [&_img]:!max-w-full [&_img]:object-contain"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        </div>
+        <Space />
         {post.source && (
           <div>
             <span>Nguồn:&nbsp;</span>

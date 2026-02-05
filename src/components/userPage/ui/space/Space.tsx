@@ -1,5 +1,3 @@
-import React from "react";
-
 export const Space = () => {
   return (
     <div className="relative py-5">

@@ -25,7 +25,7 @@ export default function RelatedPosts({ relatedPosts }: RelatedPostsProps) {
         {relatedPosts.map((post) => (
           <article
             key={post._id}
-            className="flex cursor-pointer gap-2 rounded bg-white p-1 transition hover:bg-gray-50"
+            className="flex cursor-pointer gap-2 overflow-hidden rounded bg-white p-2 transition hover:bg-primary-lighter"
             onClick={() => navigateToPostDetail(post)}
           >
             {/* Image */}
@@ -34,9 +34,13 @@ export default function RelatedPosts({ relatedPosts }: RelatedPostsProps) {
             </div>
 
             {/* Content */}
-            <div className="flex flex-1 flex-col">
-              <p className="line-clamp-3 text-sm font-semibold text-default">{post.title}</p>
-              <div className="line-clamp-2 text-xs font-light text-default" dangerouslySetInnerHTML={{ __html: post.content }} />
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <p className="line-clamp-2 text-sm font-semibold text-default">{post.title}</p>
+
+              <div
+                className="line-clamp-2 text-xs font-light text-default [&_*]:m-0 [&_*]:leading-snug"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
             </div>
           </article>
         ))}
