@@ -1,5 +1,4 @@
 'use client';
-
 import { otpService } from '@/services/owner/otp/otp.service';
 import { OtpItem } from '@/types/auth/otp.types';
 import { useEffect, useState } from 'react';
@@ -24,10 +23,8 @@ export default function OwnerOtpPage() {
   }
 
   return (
-    <div className="p-4 xl:p-8">
-      <h1 className="mb-6 text-2xl font-bold">OTP Management</h1>
-
-      <div className="overflow-x-auto rounded-lg border border-base-300">
+    <div className="w-screen border-4 border-white xl:w-full">
+      <div className="overflow-x-auto rounded-md border border-primary">
         <table className="table table-zebra">
           <thead>
             <tr className="text-xs uppercase">

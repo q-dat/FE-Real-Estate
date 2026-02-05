@@ -86,17 +86,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <AdminAuthProvider value={{ user }}>
       <Drawer open={isSidebarOpen} onClickOverlay={() => setIsSidebarOpen(false)} side={<AdminSidebar menu={OWNER_MENU} />}>
-        <div className="flex min-h-screen bg-slate-50">
+        <div className="flex bg-white">
           <div className="hidden xl:block">
             <AdminSidebar menu={OWNER_MENU} />
           </div>
-
-          <div className="flex flex-1 flex-col">
+          <div className="flex w-full flex-col">
             <AdminNavbar title={title} user={user} onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-
-            <main className="flex-1 px-2 py-4">
-              <div className="w-full">{children}</div>
-            </main>
+            <main className="w-full">{children}</main>
           </div>
         </div>
       </Drawer>

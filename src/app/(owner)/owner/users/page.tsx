@@ -52,10 +52,8 @@ export default function OwnerUsersPage() {
   }
 
   return (
-    <div className="p-4 xl:p-8">
-      <h1 className="mb-6 text-2xl font-bold">User Management</h1>
-
-      <div className="overflow-x-auto rounded-lg border border-base-300">
+    <div className="w-screen border-4 border-white xl:w-full">
+      <div className="overflow-x-auto rounded-md border border-primary">
         <table className="table table-zebra">
           <thead>
             <tr className="text-xs uppercase">

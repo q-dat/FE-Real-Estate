@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu } from 'react-daisyui';
 import { HiChevronDown } from 'react-icons/hi2';
-import { ADMIN_MENU, IMenuItem, ISubMenuItem } from '@/configs/admin-menu.config';
+import { IMenuItem, ISubMenuItem } from '@/configs/admin-menu.config';
 
 // Types
 interface SidebarItemProps {
