@@ -12,7 +12,7 @@ import { FiArrowLeft } from 'react-icons/fi';
 import { ACCESS_TOKEN_KEY } from '..';
 
 type Status = 'booting' | 'ready' | 'submitting';
-type UserRole = 'user' | 'admin';
+type UserRole = 'user' | 'admin' | 'owner';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -59,15 +59,22 @@ export default function LoginPage() {
       const token = loginRes.data?.token;
       if (!token) throw new Error('Token không tồn tại');
 
-      localStorage.setItem(`${ACCESS_TOKEN_KEY}`, token);
+      localStorage.setItem(ACCESS_TOKEN_KEY, token);
 
       const meRes = await authService.me(token);
       const role = meRes.data.role as UserRole;
 
-      if (role === 'user') {
-        router.replace('/');
-      } else {
-        router.replace('/cms/admin/dashboard');
+      switch (role) {
+        case 'owner':
+          router.replace('/owner/dashboard');
+          break;
+
+        case 'admin':
+          router.replace('/cms/admin/rental-post-admin');
+          break;
+
+        default:
+          router.replace('/');
       }
     } catch (error: unknown) {
       alert(error instanceof Error ? error.message : 'Đăng nhập thất bại');

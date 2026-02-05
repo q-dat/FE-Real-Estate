@@ -13,6 +13,7 @@ import { ACCESS_TOKEN_KEY } from '..';
 
 type AuthTab = 'login' | 'register';
 type Status = 'booting' | 'ready' | 'submitting';
+type UserRole = 'user' | 'admin' | 'owner';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -65,12 +66,26 @@ export default function AuthPage() {
       if (activeTab === 'login') {
         const res = await authService.login({ email, password });
 
-        if (!res.data?.token) {
-          throw new Error('Token không tồn tại');
-        }
+        const token = res.data?.token;
+        if (!token) throw new Error('Token không tồn tại');
 
-        localStorage.setItem(`${ACCESS_TOKEN_KEY}`, res.data.token);
-        router.replace('/');
+        localStorage.setItem(ACCESS_TOKEN_KEY, token);
+
+        const meRes = await authService.me(token);
+        const role = meRes.data.role as UserRole;
+
+        switch (role) {
+          case 'owner':
+            router.replace('/owner/users');
+            break;
+
+          case 'admin':
+            router.replace('/cms/admin/rental-post-admin');
+            break;
+
+          default:
+            router.replace('/');
+        }
       } else {
         await authService.register({ email, password });
         router.push(`/verify-email?email=${encodeURIComponent(email)}`);
