@@ -25,7 +25,7 @@ export default function CatalogSidebar({ catalogWithPosts = [], onSelectPost }: 
               <p className="text-sm text-gray-500">Không có bài viết nào trong danh mục này.</p>
             ) : (
               <div className="flex flex-col gap-3">
-                {item.posts.slice(0, 4).map((p) => (
+                {item.posts.map((p) => (
                   <button
                     key={p._id}
                     onClick={() => onSelectPost(p)}

@@ -8,10 +8,5 @@ export default async function page({ params }: PageProps) {
   const { id } = await params;
   const post = await postService.getFallback(id);
 
-  return (
-    <ClientPostDetailPage
-      post={post}
-      //  relatedPosts={relatedPosts} catalogWithPosts={catalogWithPosts}
-    />
-  );
+  return <ClientPostDetailPage post={post} relatedPosts={[]} catalogWithPosts={[]} />;
 }
