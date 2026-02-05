@@ -1,48 +1,98 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, startTransition } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname, useRouter } from 'next/navigation';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Menu } from 'react-daisyui';
 import { HiChevronDown } from 'react-icons/hi2';
 import { IMenuItem, ISubMenuItem } from '@/configs/admin-menu.config';
+import { PiDotDuotone } from 'react-icons/pi';
+import { BsUniversalAccessCircle } from 'react-icons/bs';
+import { FiArrowLeft } from 'react-icons/fi';
 
-// Types
 interface SidebarItemProps {
   item: IMenuItem;
   pathname: string;
   isExpanded: boolean;
   onSelect: () => void;
+  isMobile: boolean;
 }
 interface AdminSidebarProps {
   menu: IMenuItem[];
+  isExpanded: boolean;
+  onClose: () => void;
 }
 interface SidebarContentProps {
   pathname: string;
   isExpanded: boolean;
   onSelect: () => void;
   menu: IMenuItem[];
+  onClose: () => void;
+  isMobile: boolean;
 }
-// Sidebar Item
+
+// Variants (3D perspective, stagger submenu)
+const sidebarVariants: Variants = {
+  open: {
+    x: 0,
+    rotateY: 0,
+    width: 360,
+    transition: { type: 'spring', stiffness: 200, damping: 25 },
+  },
+  closed: {
+    x: '-100%',
+    rotateY: -5, // 3D tilt close
+    width: 0,
+    transition: { type: 'spring', stiffness: 200, damping: 25 },
+  },
+  hoverOpen: { width: 288, x: 0, rotateY: 0 },
+  hoverClosed: { width: 80, x: 0, rotateY: 0 },
+};
+
+const submenuVariants: Variants = {
+  open: { opacity: 1, height: 'auto', transition: { staggerChildren: 0.1 } }, // Stagger sequential
+  closed: { opacity: 0, height: 0 },
+};
+
+const subItemVariants: Variants = {
+  open: { opacity: 1, x: 0, scale: 1, rotateY: 0 }, // 3D fade-in
+  closed: { opacity: 0, x: -10, scale: 0.95, rotateY: -5 },
+};
+
+// Sidebar Item (chỉ click toggle submenu, auto-open nếu active, no hover, width submenu bằng cha)
 const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps) => {
+  const router = useRouter();
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const hasSubmenu = !!item.submenu?.length;
   const isActive = pathname === item.path || (hasSubmenu && item.submenu?.some((sub) => pathname === sub.path));
 
   const Icon = item.icon;
 
+  // Auto-open nếu pathname match sub (accordian UX)
+  useEffect(() => {
+    if (hasSubmenu && item.submenu?.some((sub) => pathname === sub.path)) {
+      setIsSubmenuOpen(true);
+    }
+  }, [pathname, hasSubmenu, item.submenu]);
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (hasSubmenu) {
+      e.preventDefault();
+      if (isExpanded) setIsSubmenuOpen((v) => !v); // Chỉ toggle trên click (mobile/desktop)
+    } else {
+      e.preventDefault();
+      startTransition(() => {
+        onSelect(); // Close sidebar
+        router.push(item.path); // Smooth nav
+      });
+    }
+  };
+
   return (
-    <div className="relative mb-1 px-3" onMouseEnter={() => isExpanded && setIsSubmenuOpen(true)} onMouseLeave={() => setIsSubmenuOpen(false)}>
+    <div className="relative mb-1 px-3">
       <Link
         href={hasSubmenu ? '#' : item.path}
-        onClick={(e) => {
-          if (hasSubmenu) {
-            e.preventDefault();
-            if (isExpanded) setIsSubmenuOpen((v) => !v);
-          } else {
-            onSelect(); // Thu nhỏ sidebar khi click vào link thường
-          }
-        }}
+        onClick={handleClick}
         className={`group relative flex h-12 items-center rounded-xl transition-all duration-300 ${
           isExpanded ? 'justify-between px-4' : 'justify-center px-0'
         } ${
@@ -83,16 +133,16 @@ const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps)
             className="overflow-hidden"
           >
             <div className="mt-1 flex flex-col gap-1 pl-11 pr-2">
-              {item.submenu?.map((sub: ISubMenuItem) => (
+              {item.submenu?.map((sub: ISubMenuItem, index: number) => (
                 <Link
                   key={sub.path}
                   href={sub.path}
                   onClick={onSelect}
-                  className={`py-2 text-sm transition-all hover:translate-x-1 ${
+                  className={`flex items-center gap-1 py-2 text-sm transition-all hover:translate-x-1 ${
                     pathname === sub.path ? 'font-semibold text-primary' : 'text-slate-500 hover:text-slate-200'
                   }`}
                 >
-                  {sub.title}
+                  <PiDotDuotone className="text-white" /> {sub.title}
                 </Link>
               ))}
             </div>
@@ -104,18 +154,25 @@ const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps)
 };
 
 // Shared Content
-const SidebarContent = ({ pathname, isExpanded, onSelect, menu }: SidebarContentProps) => (
+const SidebarContent = ({ pathname, isExpanded, onSelect, menu, isMobile }: SidebarContentProps) => (
   <div className="z-[999999] flex h-full flex-col overflow-hidden">
     {/* Logo Section */}
     <Link href="/" target="_blank" title="Về Trang Chủ">
-      <div className="hidden h-24 items-center overflow-hidden px-4 xl:flex">
-        <div className={`flex items-center gap-4 ${!isExpanded && 'mx-auto'}`}>
-          <div className="relative hidden h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-primary shadow-[0_0_20px_rgba(var(--p),0.3)] xl:flex">
-            <div className="h-4 w-4 rotate-45 animate-ping rounded-sm bg-white" />
+      <div className="hidden h-24 items-center overflow-hidden px-2 xl:flex">
+        <div className={`flex items-center gap-2 ${!isExpanded && 'mx-auto'}`}>
+          <div className="relative hidden h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-primary shadow-[0_0_20px_rgba(var(--p),0.3)] xl:flex">
+            {/* <div className="h-4 w-4 rotate-45 animate-ping rounded-sm bg-white" /> */}
+            <BsUniversalAccessCircle size={35} className="animate-spin rounded-full bg-primary text-white" />
           </div>
           {isExpanded && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <h1 className="whitespace-nowrap text-lg font-bold tracking-wider text-white">NGUONNHAGIARE</h1>
+              <div className="flex items-center text-[10px] text-white">
+                <FiArrowLeft /> Trang chủ
+              </div>
+              <h1 className="whitespace-nowrap text-lg font-bold tracking-wider">
+                <span className="text-primary">NGUONNHA</span>
+                <span className="text-white">GIARE</span>
+              </h1>
               <div className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
                 <span className="text-[10px] font-bold uppercase text-slate-500">Online</span>
@@ -135,7 +192,7 @@ const SidebarContent = ({ pathname, isExpanded, onSelect, menu }: SidebarContent
       <div className="flex-1 overflow-hidden overflow-y-auto pt-4 xl:pt-0">
         <Menu className="p-0">
           {menu.map((item) => (
-            <SidebarItem key={item.path} item={item} pathname={pathname} isExpanded={isExpanded} onSelect={onSelect} />
+            <SidebarItem key={item.path} item={item} pathname={pathname} isExpanded={isExpanded} onSelect={onSelect} isMobile={isMobile} />
           ))}
         </Menu>
       </div>
@@ -160,31 +217,56 @@ const SidebarContent = ({ pathname, isExpanded, onSelect, menu }: SidebarContent
 );
 
 // Main Sidebar
-export default function AdminSidebar({ menu }: AdminSidebarProps) {
+export default function AdminSidebar({ menu, isExpanded, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isHoverExpanded, setIsHoverExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(pointer: coarse)');
+    setIsMobile(mediaQuery.matches);
+    const handleChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  const effectiveIsExpanded = isExpanded || isHoverExpanded;
+
+  const handleSelect = () => {
+    onClose();
+    setIsHoverExpanded(false);
+  };
 
   return (
     <>
-      {/* Mobile Sidebar – luôn expanded */}
-      <aside className="sticky top-0 h-screen w-[360px] bg-[#020617] xl:hidden">
-        <SidebarContent pathname={pathname} isExpanded={true} onSelect={() => {}} menu={menu} />
-      </aside>
-
-      {/* Desktop */}
+      {/* Mobile Sidebar */}
       <motion.aside
-        initial="collapsed"
-        animate={isExpanded ? 'expanded' : 'collapsed'}
-        variants={{
-          collapsed: { width: 80 },
-          expanded: { width: 288 },
-        }}
-        transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-        onMouseEnter={() => setIsExpanded(true)}
-        onMouseLeave={() => setIsExpanded(false)}
-        className="sticky top-0 hidden h-screen bg-[#020617] xl:block"
+        variants={sidebarVariants}
+        initial="closed"
+        animate={isExpanded ? 'open' : 'closed'}
+        className="sticky top-0 h-screen w-[360px] bg-[#020617] xl:hidden"
+        style={{ perspective: '1000px' }}
       >
-        <SidebarContent pathname={pathname} isExpanded={isExpanded} onSelect={() => setIsExpanded(false)} menu={menu} />
+        <SidebarContent pathname={pathname} isExpanded={isExpanded} onSelect={handleSelect} menu={menu} onClose={onClose} isMobile={isMobile} />
+      </motion.aside>
+
+      {/* Desktop Sidebar */}
+      <motion.aside
+        variants={sidebarVariants}
+        animate={effectiveIsExpanded ? 'hoverOpen' : 'hoverClosed'}
+        onMouseEnter={() => setIsHoverExpanded(true)}
+        onMouseLeave={() => setIsHoverExpanded(false)}
+        className="sticky top-0 hidden h-screen bg-[#020617] xl:block"
+        style={{ perspective: '1000px' }}
+      >
+        <SidebarContent
+          pathname={pathname}
+          isExpanded={effectiveIsExpanded}
+          onSelect={handleSelect}
+          menu={menu}
+          onClose={onClose}
+          isMobile={isMobile}
+        />
       </motion.aside>
     </>
   );

@@ -66,7 +66,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
   }, []);
 
-  //  Redirect side-effect
+  // Redirect side-effect
   useEffect(() => {
     if (status === 'unauthorized') {
       router.replace('/login');
@@ -85,14 +85,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <AdminAuthProvider value={{ user }}>
-      <Drawer open={isSidebarOpen} onClickOverlay={() => setIsSidebarOpen(false)} side={<AdminSidebar menu={OWNER_MENU} />}>
+      <Drawer
+        open={isSidebarOpen}
+        onClickOverlay={() => setIsSidebarOpen(false)}
+        side={
+          <div className="block xl:hidden">
+            <AdminSidebar menu={OWNER_MENU} isExpanded={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+          </div>
+        }
+      >
         <div className="flex bg-white">
           <div className="hidden xl:block">
-            <AdminSidebar menu={OWNER_MENU} />
+            <AdminSidebar menu={OWNER_MENU} isExpanded={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
           </div>
           <div className="flex w-full flex-col">
             <AdminNavbar title={title} user={user} onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-            <main className="w-full">{children}</main>
+            <main className="w-full p-0 xl:p-2">{children}</main>
           </div>
         </div>
       </Drawer>
