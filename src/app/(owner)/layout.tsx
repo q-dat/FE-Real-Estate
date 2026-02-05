@@ -35,7 +35,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const checkHealth = async () => {
       try {
         const healthRes = await fetch('/api/health', { cache: 'no-store' });
-        if (!healthRes.ok) throw new Error('Server not ready');
+        if (!healthRes.ok) throw new Error();
 
         const token = requireAdminToken();
         if (!token) {
@@ -61,28 +61,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
 
     checkHealth();
-
     return () => {
       cancelled = true;
     };
   }, []);
 
+  //  Redirect side-effect
+  useEffect(() => {
+    if (status === 'unauthorized') {
+      router.replace('/login');
+    } else if (status === 'forbidden') {
+      router.replace('/');
+    }
+  }, [status, router]);
+
   if (status === 'booting') {
     return <AdminBootLoading />;
   }
 
-  if (status === 'unauthorized') {
-    router.replace('/login');
-    return null;
-  }
-
-  if (status === 'forbidden') {
-    router.replace('/');
+  if (status !== 'ready' || !user) {
     return null;
   }
 
   return (
-    <AdminAuthProvider value={{ user: user! }}>
+    <AdminAuthProvider value={{ user }}>
       <Drawer open={isSidebarOpen} onClickOverlay={() => setIsSidebarOpen(false)} side={<AdminSidebar menu={OWNER_MENU} />}>
         <div className="flex min-h-screen bg-slate-50">
           <div className="hidden xl:block">
@@ -90,7 +92,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <div className="flex flex-1 flex-col">
-            <AdminNavbar title={title} user={user!} onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+            <AdminNavbar title={title} user={user} onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
             <main className="flex-1 px-2 py-4">
               <div className="w-full">{children}</div>
