@@ -8,11 +8,23 @@ import { CiSearch } from 'react-icons/ci';
 import { IPost } from '@/types/post/post.types';
 import { scrollToTopInstantly } from '@/utils/utils/scrollToTop.utils';
 import { useNavigateToPostDetail } from '@/hooks/useNavigateToPostDetail';
+import imageRepresent from '../../../../public/image-represent';
+import { useImageErrorHandler } from '@/hooks/useImageErrorHandler';
 
 export default function ClientNewsPage({ news }: { news: IPost[] }) {
   const [loading, setLoading] = useState(true);
   // Handle Click Post To Post Detail
   const { navigateToPostDetail } = useNavigateToPostDetail();
+
+  //  handleImageError
+  const fallbackSrc = imageRepresent.Fallback;
+  const { handleImageError, isImageErrored } = useImageErrorHandler();
+
+  const getImageSrc = (id: string, image?: string): string => {
+    if (!image) return fallbackSrc;
+    if (isImageErrored(id)) return fallbackSrc;
+    return image;
+  };
 
   useEffect(() => {
     scrollToTopInstantly();
@@ -92,7 +104,8 @@ export default function ClientNewsPage({ news }: { news: IPost[] }) {
                 onClick={() => navigateToPostDetail(featuredPost)}
               >
                 <Image
-                  src={featuredPost?.image || ''}
+                  src={getImageSrc(featuredPost._id, featuredPost.image)}
+                  onError={() => handleImageError(featuredPost._id)}
                   alt={featuredPost?.title}
                   width={800}
                   height={500}
@@ -111,7 +124,8 @@ export default function ClientNewsPage({ news }: { news: IPost[] }) {
                 {secondaryPosts.map((post) => (
                   <div key={post?._id} className="group flex cursor-pointer gap-3" onClick={() => navigateToPostDetail(post)}>
                     <Image
-                      src={post?.image || ''}
+                      src={getImageSrc(post._id, post.image)}
+                      onError={() => handleImageError(post._id)}
                       alt={post?.title}
                       width={120}
                       height={80}
@@ -138,7 +152,8 @@ export default function ClientNewsPage({ news }: { news: IPost[] }) {
                 >
                   <div className="overflow-hidden">
                     <Image
-                      src={post?.image || ''}
+                      src={getImageSrc(post._id, post.image)}
+                      onError={() => handleImageError(post._id)}
                       alt={post?.title}
                       width={300}
                       height={200}

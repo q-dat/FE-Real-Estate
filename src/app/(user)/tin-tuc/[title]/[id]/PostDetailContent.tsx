@@ -26,8 +26,8 @@ export default function PostDetailContent({ post, catalogWithPosts, onSelectPost
         </p>{' '}
         <Space />
         <div className="relative overflow-hidden">
-          <div
-            className="prose-base xl:prose-lg prose max-w-none [&_*]:max-w-full [&_img]:h-auto [&_img]:!max-w-full [&_img]:object-contain"
+          <article
+            className="prose-base xl:prose-lg prose max-w-none leading-relaxed [&_*]:max-w-full [&_img]:h-auto [&_img]:!max-w-full [&_img]:object-contain"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
         </div>
