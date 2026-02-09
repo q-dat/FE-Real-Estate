@@ -5,6 +5,7 @@ import {
   HiOutlineBuildingOffice2,
   HiOutlineDocumentText,
   HiOutlineQueueList,
+  HiOutlineNewspaper,
 } from 'react-icons/hi2';
 import { IMenuItem } from './admin-menu.config';
 import { MdOutlinePostAdd } from 'react-icons/md';
@@ -48,11 +49,7 @@ export const OWNER_MENU: IMenuItem[] = [
       },
     ],
   },
-  {
-    title: 'Bản tin/Blog',
-    path: '/owner/posts',
-    icon: MdOutlinePostAdd,
-  },
+
   {
     title: 'Danh mục nội thất',
     path: '/owner/interior-categories',
@@ -79,5 +76,15 @@ export const OWNER_MENU: IMenuItem[] = [
     title: 'OTPs',
     path: '/owner/otps',
     icon: HiOutlineBuildingOffice2,
+  },
+  {
+    title: 'Crawler bản tin',
+    path: '/owner/crawler',
+    icon: HiOutlineNewspaper,
+  },
+  {
+    title: 'Bản tin/Blog',
+    path: '/owner/posts',
+    icon: MdOutlinePostAdd,
   },
 ];
