@@ -63,7 +63,7 @@ async function getNewsPostSitemap(): Promise<MetadataRoute.Sitemap> {
 
         const lastModified = post.updatedAt ? new Date(post.updatedAt) : new Date();
 
-        const url = `${DOMAIN}/tin-tuc/${slug}`;
+        const url = `${DOMAIN}/tin-tuc/${slug}/${post._id}`;
 
         return createEntry(url, lastModified, 0.7);
       });
