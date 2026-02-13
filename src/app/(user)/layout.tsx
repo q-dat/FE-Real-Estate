@@ -1,52 +1,41 @@
-'use client';
-import { useEffect, useState } from 'react';
-import ContactForm from '@/components/userPage/ContactForm';
-import Header from '@/components/userPage/Header';
-import FooterFC from '@/components/userPage/FooterFC';
-import { RentalFavoriteProvider } from '@/context/RentalFavoriteContext';
-import { MeResponse } from '@/types/auth/auth.types';
-import { authService } from '@/services/auth/auth.service';
-import { UserAuthProvider } from '@/context/UserAuthContext';
-import { ACCESS_TOKEN_KEY } from '../(auth)';
+import { ReactNode } from 'react';
+import { homeMetadata } from '@/metadata/home.metadata';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<MeResponse['data'] | null>(null);
+export const metadata = homeMetadata;
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchMe = async () => {
-      const token = localStorage.getItem(`${ACCESS_TOKEN_KEY}`);
-      if (!token) return;
-
-      try {
-        const res = await authService.me(token);
-        if (!cancelled) {
-          setUser(res.data);
-        }
-      } catch {
-        if (!cancelled) setUser(null);
-      }
-    };
-
-    fetchMe();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+export default function RootLayout({ children }: { children: ReactNode }) {
+  const structuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Nguồn Nhà Giá Rẻ',
+      url: 'https://www.nguonnhagiare.vn',
+      logo: 'https://www.nguonnhagiare.vn/favicon.png',
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Nguồn Nhà Giá Rẻ',
+      url: 'https://www.nguonnhagiare.vn',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://www.nguonnhagiare.vn/search?q={search_term_string}',
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ];
 
   return (
-    <RentalFavoriteProvider>
-      <UserAuthProvider>
-        <div className="flex min-h-screen flex-col bg-primary-white">
-          <Header user={user!} />
-          <main className="flex-1 bg-primary-white selection:bg-primary selection:text-white">{children}</main>
-          {/* <NavBottom /> */}
-          <ContactForm />
-          <FooterFC />
-        </div>
-      </UserAuthProvider>
-    </RentalFavoriteProvider>
+    <html lang="vi">
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
+        />
+        {children}
+      </body>
+    </html>
   );
 }

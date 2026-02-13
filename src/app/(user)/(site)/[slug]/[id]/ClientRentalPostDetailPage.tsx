@@ -9,16 +9,16 @@ import { GiHouse, GiPencilRuler, GiStarsStack } from 'react-icons/gi';
 import { BsBuildingFillUp } from 'react-icons/bs';
 import { SiGooglemaps } from 'react-icons/si';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
-import { PropertyGallery } from '../../../../components/userPage/rental/detail/PropertyGallery';
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import AdminPostInternalSection from '@/components/userPage/rental/detail/AdminPostInternalSection';
-import AuthorProfileCard from '../../../../components/userPage/rental/detail/AuthorProfileCard';
 import CopyCodeBadgeBtn from '@/components/userPage/ui/btn/CopyCodeBadgeBtn';
 import { slugify } from '@/lib/slugify';
 import DownloadImagesBtn from '@/components/userPage/ui/btn/DownloadImagesBtn';
 import CopyUrlBtn from '@/components/userPage/ui/btn/CopyUrlBtn';
+import { PropertyGallery } from '@/components/userPage/rental/detail/PropertyGallery';
+import AuthorProfileCard from '@/components/userPage/rental/detail/AuthorProfileCard';
 
 interface Props {
   post: IRentalPostAdmin;

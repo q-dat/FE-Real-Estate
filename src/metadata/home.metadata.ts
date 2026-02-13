@@ -1,63 +1,77 @@
 import { Metadata } from 'next';
 
-const titleBase = 'Nguồn Nhà Giá Rẻ - Bất động sản TP.HCM - Mua bán, cho thuê, dữ liệu minh bạch • Tháng 01/2026';
+const BRAND = 'Nguồn Nhà Giá Rẻ';
+const DOMAIN = 'https://www.nguonnhagiare.vn';
+
+const titleBase = `${BRAND} | Bất Động Sản TP.HCM Chính Chủ, Giá Tốt 2026`;
+
 const descriptionBase =
-  'Nguonnhagiare.vn - Nền tảng dữ liệu bất động sản hiện đại, minh bạch và cập nhật liên tục. Hỗ trợ tìm kiếm nhanh, so sánh hiệu quả và ra quyết định chính xác về mua bán - cho thuê nhà đất tại TP.HCM.';
+  `${BRAND} là nền tảng dữ liệu bất động sản minh bạch tại TP.HCM. ` +
+  `Tìm kiếm mua bán, cho thuê nhà đất chính chủ, so sánh giá, ` +
+  `xem dữ liệu thị trường cập nhật liên tục và ra quyết định chính xác.`;
 
 export const homeMetadata: Metadata = {
+  metadataBase: new URL(DOMAIN),
+
+  title: {
+    default: titleBase,
+    template: `%s | ${BRAND}`,
+  },
+
+  description: descriptionBase,
+
+  keywords: [
+    BRAND,
+    'Nguon Nha Gia Re',
+    'nguon nha gia re',
+    'bất động sản TP.HCM',
+    'nhà đất giá rẻ',
+    'mua bán nhà chính chủ',
+    'cho thuê nhà TP.HCM',
+    'căn hộ chung cư giá tốt',
+    'đất nền TP.HCM',
+    'bản đồ bất động sản',
+    'dữ liệu bất động sản minh bạch',
+    'so sánh giá nhà đất',
+    'định giá bất động sản',
+  ],
+
+  alternates: {
+    canonical: '/',
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+      'max-snippet': -1,
+    },
+  },
+
   icons: {
     icon: '/favicon.png',
   },
-  title: titleBase,
-  description: descriptionBase,
-  keywords: [
-    'bất động sản',
-    'nhà đất',
-    'mua bán nhà đất',
-    'cho thuê nhà',
-    'cho thuê căn hộ',
-    'căn hộ chung cư',
-    'nhà phố',
-    'đất nền',
-    'bất động sản TP.HCM',
-    'bất động sản giá rẻ',
-    'bán nhà chính chủ',
-    'thuê nhà nguyên căn',
-    'chung cư giá tốt',
-    'thị trường bất động sản 2025',
-    'dữ liệu bất động sản',
-    'nền tảng bất động sản',
-    'tìm nhà nhanh',
-    'so sánh bất động sản',
-    'Nguonnhagiare.vn',
-    'nguon nhagiare',
-    'nguon nha gia re',
-    'bất động sản chính chủ',
-    'bản đồ bất động sản',
-    'nhà đất minh bạch',
-    'tin đăng nhà đất',
-    'thông tin quy hoạch',
-    'dịch vụ bất động sản',
-    'định giá bất động sản',
-    'giao dịch bất động sản an toàn',
-  ],
-  robots: 'index, follow',
-  metadataBase: new URL('https://www.nguonnhagiare.vn'),
+
   openGraph: {
+    type: 'website',
+    url: DOMAIN,
+    siteName: BRAND,
     title: titleBase,
     description: descriptionBase,
-    url: 'https://www.nguonnhagiare.vn',
-    siteName: 'Nguonnhagiare.vn',
     images: [
       {
         url: '/favicon.png',
         width: 1200,
         height: 630,
-        alt: 'Nguonnhagiare.vn - Nền tảng dữ liệu bất động sản hiện đại',
+        alt: `${BRAND} - Nền tảng dữ liệu bất động sản`,
       },
     ],
-    type: 'website',
   },
+
   twitter: {
     card: 'summary_large_image',
     title: titleBase,

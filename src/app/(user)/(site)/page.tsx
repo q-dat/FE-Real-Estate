@@ -1,4 +1,4 @@
-export const revalidate = 0
+export const revalidate = 300;
 
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import ClientHomePage from './ClientHomePage';
@@ -14,5 +14,9 @@ export default async function Home() {
     rentalPostAdminService.getAll({ categoryCode: 3 }), // Cho thuê mặt bằng
   ]);
 
-  return <ClientHomePage salePosts={salePosts} apartmentPosts={apartmentPosts} housePosts={housePosts} businessSpacePosts={businessSpacePosts} />;
+  return (
+    <>
+      <ClientHomePage salePosts={salePosts} apartmentPosts={apartmentPosts} housePosts={housePosts} businessSpacePosts={businessSpacePosts} />
+    </>
+  );
 }

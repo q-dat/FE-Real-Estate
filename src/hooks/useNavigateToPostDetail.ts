@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { slugify } from '@/lib/slugify';
 import { IPost } from '@/types/post/post.types';
-import { NEWS_BASE_PATH } from '@/app/(user)/tin-tuc';
+import { NEWS_BASE_PATH } from '@/app/(user)/(site)/tin-tuc';
 
 interface NavigateOptions {
   scroll?: boolean;
