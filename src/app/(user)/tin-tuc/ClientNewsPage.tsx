@@ -6,7 +6,6 @@ import Image from 'next/image';
 import LoadingSpinner from '@/components/orther/loading/LoadingSpinner';
 import { CiSearch } from 'react-icons/ci';
 import { IPost } from '@/types/post/post.types';
-import { scrollToTopInstantly } from '@/utils/utils/scrollToTop.utils';
 import { useNavigateToPostDetail } from '@/hooks/useNavigateToPostDetail';
 import imageRepresent from '../../../../public/image-represent';
 import { useImageErrorHandler } from '@/hooks/useImageErrorHandler';
@@ -27,7 +26,6 @@ export default function ClientNewsPage({ news }: { news: IPost[] }) {
   };
 
   useEffect(() => {
-    scrollToTopInstantly();
     setLoading(false);
   }, [news]);
 
