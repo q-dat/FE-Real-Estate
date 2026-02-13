@@ -1,17 +1,16 @@
 import { MetadataRoute } from 'next';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
+import { IPost } from '@/types/post/post.types';
+import { postService } from '@/services/post/post.service';
 import { encodeObjectId } from '@/utils/DetailPage/objectIdCodec.utils';
 
-//  Constants
 const DOMAIN = 'https://www.nguonnhagiare.vn';
 
 const DAILY: MetadataRoute.Sitemap[number]['changeFrequency'] = 'daily';
 
-//  Utils
 const slugify = (text: string): string =>
   text
-    .toString()
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '')
     .toLowerCase()
@@ -25,56 +24,60 @@ const createEntry = (url: string, lastModified: Date, priority = 0.7): MetadataR
   priority,
 });
 
-//  Dynamic Posts Sitemap
-async function getPostSitemap(): Promise<MetadataRoute.Sitemap> {
-  const sitemap: MetadataRoute.Sitemap = [];
-
+/* Rental Posts */
+async function getRentalPostSitemap(): Promise<MetadataRoute.Sitemap> {
   try {
-    const posts: IRentalPostAdmin[] = await rentalPostAdminService.getAll();
+    const rentalPosts: IRentalPostAdmin[] = await rentalPostAdminService.getAll();
 
-    if (!posts.length) return sitemap;
+    if (!rentalPosts?.length) return [];
 
-    for (const post of posts) {
-      if (!post._id || !post.title) continue;
-      if (post.status && post.status !== 'active') continue;
+    return rentalPosts
+      .filter((post) => post._id && post.title && (!post.status || post.status === 'active'))
+      .map((post) => {
+        const slug = slugify(post.title);
+        const encodedId = encodeObjectId(post._id);
 
-      const slug = slugify(post.title);
-      if (!slug) continue;
+        const lastModified = post.updatedAt ? new Date(post.updatedAt) : new Date();
 
-      const rawId = post._id;
-      const encodedId = encodeObjectId(rawId);
-      const lastModified = post.updatedAt ? new Date(post.updatedAt) : new Date();
+        const url = `${DOMAIN}/${slug}/${encodedId}`;
 
-      // Canonical: /slug/id
-      const canonicalUrl = `${DOMAIN}/${slug}/${rawId}`;
-
-      // Variants SEO
-      const slugOnlyUrl = `${DOMAIN}/${slug}`;
-      const slugEncodedIdUrl = `${DOMAIN}/${slug}/${encodedId}`;
-      const slugRawIdDashUrl = `${DOMAIN}/${slug}-${rawId}`;
-      const slugEncodedIdDashUrl = `${DOMAIN}/${slug}-${encodedId}`;
-      const codeUrl = `${DOMAIN}/c/${post.code}`;
-
-      sitemap.push(
-        createEntry(canonicalUrl, lastModified, 0.8),
-        createEntry(slugOnlyUrl, lastModified, 0.6),
-        createEntry(slugEncodedIdUrl, lastModified, 0.5),
-        createEntry(slugRawIdDashUrl, lastModified, 0.5),
-        createEntry(slugEncodedIdDashUrl, lastModified, 0.5),
-        createEntry(codeUrl, lastModified, 0.4)
-      );
-    }
+        return createEntry(url, lastModified, 0.8);
+      });
   } catch (error) {
-    console.error('[SITEMAP] getPostSitemap failed:', error);
+    console.error('[SITEMAP] Rental posts failed:', error);
+    return [];
   }
-
-  return sitemap;
 }
 
-//  Static + Dynamic
+/* News Posts */
+async function getNewsPostSitemap(): Promise<MetadataRoute.Sitemap> {
+  try {
+    const posts: IPost[] = await postService.getAll();
+
+    if (!posts?.length) return [];
+
+    return posts
+      .filter((post) => post._id && post.title)
+      .map((post) => {
+        const slug = slugify(post.title);
+
+        const lastModified = post.updatedAt ? new Date(post.updatedAt) : new Date();
+
+        const url = `${DOMAIN}/tin-tuc/${slug}`;
+
+        return createEntry(url, lastModified, 0.7);
+      });
+  } catch (error) {
+    console.error('[SITEMAP] News posts failed:', error);
+    return [];
+  }
+}
+
+/* Root Sitemap */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     createEntry(`${DOMAIN}`, new Date(), 1),
+    createEntry(`${DOMAIN}/tin-tuc`, new Date(), 0.9),
 
     createEntry(`${DOMAIN}/can-ho`, new Date()),
     createEntry(`${DOMAIN}/mat-bang`, new Date()),
@@ -88,10 +91,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     createEntry(`${DOMAIN}/lien-he-ky-gui`, new Date(), 0.6),
   ];
 
-  const postPages = await getPostSitemap();
-  console.log('____Static Pages Count:', staticPages.length); // Debug
-  console.log('____Dynamic Pages Count:', postPages.length); // Debug
-  console.log('____Total Pages:', [...staticPages, ...postPages].length); // Debug
+  const [rentalPages, newsPages] = await Promise.all([getRentalPostSitemap(), getNewsPostSitemap()]);
+  // console.log('____Static Pages Count:', staticPages.length);
+  // console.log('____Dynamic Pages Count:', rentalPages.length + newsPages.length);
+  // console.log('____Total Pages:', [...staticPages, ...rentalPages, ...newsPages].length);
 
-  return [...staticPages, ...postPages].slice(0, 5000);
+  return [...staticPages, ...rentalPages, ...newsPages];
 }
