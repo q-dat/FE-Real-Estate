@@ -183,22 +183,41 @@ export default function AdvancedProfilePage() {
                 <FiMail size={12} /> {userMeta.email || 'email'}
               </span>
             </div>
+            {/*  */}
+           <div className='mt-4'>
+             <Button
+              size="xs"
+              onClick={onSave}
+              disabled={isSaving}
+              className="rounded-lg text-sm font-bold text-green-600 shadow-sm shadow-primary/20 transition-transform hover:scale-[1.05]"
+            >
+              {isSaving ? (
+                <span className="loading loading-spinner"></span>
+              ) : (
+                <>
+                  <FiSave /> Lưu hồ sơ
+                </>
+              )}
+            </Button>
+           </div>
           </div>
 
           {/* Tab Navigation */}
-          <div className="mt-8 flex rounded-2xl border border-white/5 bg-slate-900/80 p-1.5 backdrop-blur-md xl:mb-4">
-            <button
+          <div className="mt-8 flex gap-1 rounded-2xl border border-white/5 bg-slate-900/80 p-1.5 backdrop-blur-md xl:mb-4">
+            <Button
+              size="md"
               onClick={() => setActiveTab('feed')}
               className={`btn btn-sm h-10 rounded-xl border-none px-6 transition-all ${activeTab === 'feed' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'btn-ghost text-slate-400'}`}
             >
               <FiGrid className="mr-2" /> Hoạt động
-            </button>
-            <button
+            </Button>
+            <Button
+              size="md"
               onClick={() => setActiveTab('edit')}
               className={`btn btn-sm h-10 rounded-xl border-none px-6 transition-all ${activeTab === 'edit' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'btn-ghost text-slate-400'}`}
             >
               <FiSettings className="mr-2" /> Thiết lập
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -272,20 +291,7 @@ export default function AdvancedProfilePage() {
                     <h3 className="text-3xl font-black text-white">Hồ sơ</h3>
                     <p className="mt-1 text-sm text-slate-500">Tùy chỉnh thông tin nhận diện cá nhân và các liên kết mạng xã hội.</p>
                   </div>
-                  <Button
-                    size="md"
-                    onClick={onSave}
-                    disabled={isSaving}
-                    className="rounded-lg text-lg font-bold text-green-600 shadow-md shadow-primary/20 transition-transform hover:scale-[1.05]"
-                  >
-                    {isSaving ? (
-                      <span className="loading loading-spinner"></span>
-                    ) : (
-                      <>
-                        <FiSave /> Lưu hồ sơ
-                      </>
-                    )}
-                  </Button>
+                  <></>
                 </div>
 
                 <div className="grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
