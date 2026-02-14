@@ -10,7 +10,6 @@ import PostDetailContent from './PostDetailContent';
 import PostNotFound from './PostNotFound';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
-import { scrollToTopInstantly } from '@/utils/utils/scrollToTop.utils';
 import { useNavigateToPostDetail } from '@/hooks/useNavigateToPostDetail';
 import TimeAgo from '@/components/orther/timeAgo/TimeAgo';
 
@@ -29,7 +28,6 @@ export default function ClientPostDetailPage({ post, relatedPosts = [], catalogW
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    scrollToTopInstantly();
     setMounted(true);
   }, [id]);
 
