@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import LoadingSpinner from '@/components/orther/loading/LoadingSpinner';
-import CatalogSidebar from './CatalogSidebar';
-import RelatedPosts from './RelatedPosts';
-import PostDetailContent from './PostDetailContent';
-import PostNotFound from './PostNotFound';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
 import { useNavigateToPostDetail } from '@/hooks/useNavigateToPostDetail';
 import TimeAgo from '@/components/orther/timeAgo/TimeAgo';
+import CatalogSidebar from './[id]/CatalogSidebar';
+import PostDetailContent from './[id]/PostDetailContent';
+import PostNotFound from './[id]/PostNotFound';
+import RelatedPosts from './[id]/RelatedPosts';
 
 interface ClientPostDetailPageProps {
   post: IPost | null;

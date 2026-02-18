@@ -57,13 +57,14 @@ async function getNewsPostSitemap(): Promise<MetadataRoute.Sitemap> {
     if (!posts?.length) return [];
 
     return posts
-      .filter((post) => post._id && post.title)
+      .filter((post) => post._id && post.slug)
       .map((post) => {
-        const slug = slugify(post.title);
+        const slug = post.slug;
 
         const lastModified = post.updatedAt ? new Date(post.updatedAt) : new Date();
 
-        const url = `${DOMAIN}/tin-tuc/${slug}/${post._id}`;
+        // const url = `${DOMAIN}/tin-tuc/${slug}/${post._id}`;
+        const url = `${DOMAIN}/tin-tuc/${slug}`;
 
         return createEntry(url, lastModified, 0.7);
       });

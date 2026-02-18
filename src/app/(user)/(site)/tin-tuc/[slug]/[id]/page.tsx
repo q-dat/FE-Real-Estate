@@ -1,5 +1,5 @@
 import { postService } from '@/services/post/post.service';
-import ClientPostDetailPage from './ClientPostDetailPage';
+import ClientPostDetailPage from '../ClientPostDetailPage';
 
 type PageProps = {
   params: Promise<{ title: string; id: string }>;

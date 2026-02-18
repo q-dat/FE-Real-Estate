@@ -26,16 +26,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <html lang="vi">
-      <body>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData),
-          }}
-        />
-        {children}
-      </body>
-    </html>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      {children}
+    </>
   );
 }

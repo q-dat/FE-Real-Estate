@@ -96,6 +96,22 @@ export const postService = {
       return null;
     }
   },
+  async getBySlug(slug: string): Promise<IPost | null> {
+    try {
+      const res = await request<SingleResponse<IPost>>(getServerApiUrl(`api/post/slug/${slug}`));
+      const post = res.post;
+
+      if (post?._id) {
+        cache.byId.set(post._id, post);
+      }
+
+      return post;
+    } catch (error) {
+      console.error('Error fetching post by Slug:', error);
+      return null;
+    }
+  },
+
   async getFallback(id: string): Promise<IPost | null> {
     return getWithFallback<IPost>(id, this.getAll.bind(this), this.getById.bind(this));
   },
