@@ -107,7 +107,7 @@ export default function ClientNewsPage({ news }: { news: IPost[] }) {
                   alt={featuredPost?.title}
                   width={800}
                   height={500}
-                  className="h-[300px] w-full object-cover transition-transform duration-500 group-hover:scale-105 lg:h-[400px]"
+                  className="h-[300px] w-full object-cover transition-transform duration-500 group-hover:scale-105 lg:h-[350px]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                 <div className="absolute bottom-4 left-4 text-white">
