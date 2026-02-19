@@ -19,6 +19,7 @@ import DownloadImagesBtn from '@/components/userPage/ui/btn/DownloadImagesBtn';
 import CopyUrlBtn from '@/components/userPage/ui/btn/CopyUrlBtn';
 import { PropertyGallery } from '@/components/userPage/rental/detail/PropertyGallery';
 import AuthorProfileCard from '@/components/userPage/rental/detail/AuthorProfileCard';
+import SocialShareBtn from '@/components/userPage/ui/btn/SocialShareBtn';
 
 interface Props {
   post: IRentalPostAdmin;
@@ -79,9 +80,7 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
           {/* Copy URL */}
           <CopyUrlBtn url={url} size="sm" />
           {/* Share */}
-          <Button size="sm" shape="circle" className="text-blue-600 xl:hover:scale-125">
-            <IoShareSocial size={20} />
-          </Button>
+          <SocialShareBtn slug={`${slug}/${post._id}`} title={post.title} />
           {/* Favorite */}
           <FavoriteBtn scaleOnHover={true} border={true} post={post} size={0} color="text-primary" />
         </div>
