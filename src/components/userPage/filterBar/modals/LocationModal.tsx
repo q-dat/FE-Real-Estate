@@ -113,7 +113,7 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
   };
 
   return (
-    <div className="bg-overlay fixed inset-0 z-50 flex items-center justify-center px-2" onClick={handleClickOutside}>
+    <div className="fixed inset-0 z-[9999991] flex items-center justify-center bg-overlay px-2" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in w-full rounded-2xl bg-white shadow-xl transition-all duration-200 xl:w-1/2">
         {/* Header */}
         <div className="flex items-center justify-between border-b p-2">

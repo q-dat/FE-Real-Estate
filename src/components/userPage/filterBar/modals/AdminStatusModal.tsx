@@ -42,7 +42,7 @@ export default function AdminStatusModal({ initialStatus, initialPostType, onSel
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4" onClick={handleClickOutside}>
+    <div className="fixed inset-0  z-[9999991] flex items-center justify-center bg-black/30 px-4" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between bg-slate-800 px-4 py-3">
