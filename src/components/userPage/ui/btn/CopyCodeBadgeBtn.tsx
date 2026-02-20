@@ -1,7 +1,8 @@
 'use client';
-import { Toastify } from '@/helper/Toastify';
 import { useState } from 'react';
 import { Badge } from 'react-daisyui';
+import { Toastify } from '@/helper/Toastify';
+import { copyToClipboard } from '@/lib/clipboard';
 
 interface CopyCodeBadgeBtnProps {
   code: string;
@@ -11,13 +12,13 @@ export default function CopyCodeBadgeBtn({ code }: CopyCodeBadgeBtnProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(code);
+    const success = await copyToClipboard(code);
+
+    if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
       Toastify('Đã sao chép mã bài đăng vào clipboard', 200);
-    } catch (err) {
-      console.error('Copy failed', err);
+    } else {
       Toastify('Không thể sao chép mã bài đăng', 400);
     }
   };

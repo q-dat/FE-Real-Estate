@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from 'react-daisyui';
@@ -9,6 +8,8 @@ import { SiZalo } from 'react-icons/si';
 import { buildShareLink, buildFullUrl, SharePlatform } from '@/lib/social-share';
 import Link from 'next/link';
 import { IoCloseCircle } from 'react-icons/io5';
+import { copyToClipboard } from '@/lib/clipboard';
+import { Toastify } from '@/helper/Toastify';
 
 interface Props {
   fullPath: string;
@@ -25,7 +26,7 @@ interface PlatformConfig {
 
 const PLATFORMS: PlatformConfig[] = [
   { key: 'facebook', label: 'Facebook', icon: <FaFacebookF />, color: 'bg-[#1877F2]' },
-  { key: 'zalo', label: 'Zalo', icon: <SiZalo className="rounded-full border border-white p-px bg-white text-[#0068FF]"  />, color: 'bg-[#0068FF]' },
+  { key: 'zalo', label: 'Zalo', icon: <SiZalo className="rounded-full border border-white bg-white p-px text-[#0068FF]" />, color: 'bg-[#0068FF]' },
   { key: 'twitter', label: 'Twitter', icon: <FaTwitter />, color: 'bg-black' },
   { key: 'linkedin', label: 'LinkedIn', icon: <FaLinkedinIn />, color: 'bg-[#0A66C2]' },
   { key: 'reddit', label: 'Reddit', icon: <FaRedditAlien />, color: 'bg-[#FF4500]' },
@@ -37,7 +38,6 @@ const PLATFORMS: PlatformConfig[] = [
 
 export default function SocialShareBtn({ fullPath, title, size = 'sm' }: Props) {
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
   const absoluteUrl = buildFullUrl(fullPath);
@@ -80,10 +80,16 @@ export default function SocialShareBtn({ fullPath, title, size = 'sm' }: Props) 
   };
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(absoluteUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const success = await copyToClipboard(absoluteUrl);
+
+    if (success) {
+      Toastify('Đã sao chép liên kết bài viết', 200);
+      close();
+    } else {
+      Toastify('Không thể sao chép liên kết', 400);
+    }
   };
+
   const isNativeShareSupported = (): boolean => {
     if (typeof window === 'undefined') return false;
 
@@ -114,7 +120,7 @@ export default function SocialShareBtn({ fullPath, title, size = 'sm' }: Props) 
               className="w-full max-w-md rounded-lg bg-white p-3 shadow-2xl"
             >
               <div className="mb-5 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-800">Chia sẻ bài viết</h3>
+                <h3 className="text-sm font-bold text-slate-800">Chia sẻ</h3>
                 <button onClick={close} className="text-sm font-medium text-slate-400 hover:text-slate-700">
                   <IoCloseCircle size="25" />
                 </button>
@@ -138,10 +144,10 @@ export default function SocialShareBtn({ fullPath, title, size = 'sm' }: Props) 
                 {/* Copy Link */}
                 <button
                   onClick={handleCopy}
-                  className="flex flex-col items-center justify-center gap-2 rounded-md bg-slate-200 p-2 text-slate-800 shadow-md transition hover:bg-slate-300"
+                  className="flex flex-col items-center justify-center gap-1 rounded-md bg-slate-200 p-2 text-slate-800 shadow-md transition hover:bg-slate-300"
                 >
                   <FaLink />
-                  <span className="text-[8px] font-light">{copied ? 'Đã sao chép' : 'Copy link'}</span>
+                  <span className="text-[8px] font-light">Copy link</span>
                 </button>
               </div>
 
