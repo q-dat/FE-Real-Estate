@@ -24,27 +24,35 @@ const PREFIX_MAP: Record<SharePlatform, string> = {
   email: process.env.NEXT_PUBLIC_EMAIL_SHARE_URL ?? '',
 };
 
-export const buildFullUrl = (path: string): string => {
-  const base = getSiteUrl();
+const appendUtm = (url: string, platform: SharePlatform): string => {
+  const hasQuery = url.includes('?');
+  const utm = `utm_source=${platform}&utm_medium=social&utm_campaign=share`;
+  return `${url}${hasQuery ? '&' : '?'}${utm}`;
+};
 
-  const normalizedPath = path.startsWith('/')
-    ? path
-    : `/${path}`;
+export const buildFullUrl = (pathOrUrl: string): string => {
+  if (pathOrUrl.startsWith('http')) return pathOrUrl;
+
+  const base = getSiteUrl();
+  const normalizedPath = pathOrUrl.startsWith('/')
+    ? pathOrUrl
+    : `/${pathOrUrl}`;
 
   return `${base}${normalizedPath}`;
 };
 
 export const buildShareLink = (
   platform: SharePlatform,
-  path: string,
+  pathOrUrl: string,
   title?: string
 ): string => {
-  const fullUrl = buildFullUrl(path);
+  const fullUrl = buildFullUrl(pathOrUrl);
+  const trackedUrl = appendUtm(fullUrl, platform);
   const prefix = PREFIX_MAP[platform];
 
-  if (!prefix) return fullUrl;
+  if (!prefix) return trackedUrl;
 
-  const encodedUrl = encodeURIComponent(fullUrl);
+  const encodedUrl = encodeURIComponent(trackedUrl);
   const encodedTitle = encodeURIComponent(title ?? '');
 
   switch (platform) {
@@ -53,7 +61,7 @@ export const buildShareLink = (
 
     case 'whatsapp':
       return `${prefix}${encodeURIComponent(
-        `${title ?? ''} ${fullUrl}`
+        `${title ?? ''} ${trackedUrl}`
       )}`;
 
     case 'twitter':
