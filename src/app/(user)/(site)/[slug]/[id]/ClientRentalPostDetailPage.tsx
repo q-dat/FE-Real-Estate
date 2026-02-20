@@ -80,7 +80,7 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
           {/* Copy URL */}
           <CopyUrlBtn url={url} size="sm" />
           {/* Share */}
-          <SocialShareBtn slug={`${slug}/${post._id}`} title={post.title} />
+          <SocialShareBtn fullPath={`/${slug}/${post._id}`} title={post.title} />
           {/* Favorite */}
           <FavoriteBtn scaleOnHover={true} border={true} post={post} size={0} color="text-primary" />
         </div>

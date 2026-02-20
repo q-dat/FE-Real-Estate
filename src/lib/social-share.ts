@@ -1,6 +1,16 @@
-export type SharePlatform = 'facebook' | 'zalo' | 'twitter' | 'linkedin' | 'reddit' | 'whatsapp' | 'telegram' | 'pinterest' | 'email';
+export type SharePlatform =
+  | 'facebook'
+  | 'zalo'
+  | 'twitter'
+  | 'linkedin'
+  | 'reddit'
+  | 'whatsapp'
+  | 'telegram'
+  | 'pinterest'
+  | 'email';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? '';
+const getSiteUrl = (): string =>
+  (process.env.NEXT_PUBLIC_SITE_URL ?? '').replace(/\/+$/, '');
 
 const PREFIX_MAP: Record<SharePlatform, string> = {
   facebook: process.env.NEXT_PUBLIC_FACEBOOK_SHARE_URL ?? '',
@@ -15,32 +25,41 @@ const PREFIX_MAP: Record<SharePlatform, string> = {
 };
 
 export const buildFullUrl = (path: string): string => {
-  return `${SITE_URL}${path}`;
+  const base = getSiteUrl();
+
+  const normalizedPath = path.startsWith('/')
+    ? path
+    : `/${path}`;
+
+  return `${base}${normalizedPath}`;
 };
 
-export const buildShareLink = (platform: SharePlatform, path: string, title?: string): string => {
+export const buildShareLink = (
+  platform: SharePlatform,
+  path: string,
+  title?: string
+): string => {
   const fullUrl = buildFullUrl(path);
-  const encodedUrl = encodeURIComponent(fullUrl);
   const prefix = PREFIX_MAP[platform];
 
   if (!prefix) return fullUrl;
 
-  // Email đặc biệt: body + title
-  if (platform === 'email') {
-    const encodedTitle = encodeURIComponent(title ?? '');
-    return `${prefix}${encodedTitle}%20${encodedUrl}`;
-  }
+  const encodedUrl = encodeURIComponent(fullUrl);
+  const encodedTitle = encodeURIComponent(title ?? '');
 
-  // WhatsApp dùng text thay vì url param
-  if (platform === 'whatsapp') {
-    return `${prefix}${encodeURIComponent(`${title ?? ''} ${fullUrl}`)}`;
-  }
+  switch (platform) {
+    case 'email':
+      return `${prefix}${encodedTitle}%20${encodedUrl}`;
 
-  // Twitter thêm text
-  if (platform === 'twitter') {
-    const encodedTitle = encodeURIComponent(title ?? '');
-    return `${prefix}${encodedUrl}&text=${encodedTitle}`;
-  }
+    case 'whatsapp':
+      return `${prefix}${encodeURIComponent(
+        `${title ?? ''} ${fullUrl}`
+      )}`;
 
-  return `${prefix}${encodedUrl}`;
+    case 'twitter':
+      return `${prefix}${encodedUrl}&text=${encodedTitle}`;
+
+    default:
+      return `${prefix}${encodedUrl}`;
+  }
 };
