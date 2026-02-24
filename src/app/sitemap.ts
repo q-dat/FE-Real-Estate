@@ -4,18 +4,11 @@ import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.servic
 import { IPost } from '@/types/post/post.types';
 import { postService } from '@/services/post/post.service';
 import { encodeObjectId } from '@/utils/DetailPage/objectIdCodec.utils';
+import { slugify } from '@/lib/slugify';
 
 const DOMAIN = 'https://www.nguonnhagiare.vn';
 
 const DAILY: MetadataRoute.Sitemap[number]['changeFrequency'] = 'daily';
-
-const slugify = (text: string): string =>
-  text
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 
 const createEntry = (url: string, lastModified: Date, priority = 0.7): MetadataRoute.Sitemap[number] => ({
   url,

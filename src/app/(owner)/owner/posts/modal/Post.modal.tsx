@@ -8,7 +8,6 @@ import PostCategoryModal from './PostCategory.modal';
 import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
 import { postService } from '@/services/post/post.service';
-import { slugify } from '@/lib/slugify';
 import Zoom from '@/lib/Zoom';
 import { useEscClose } from '@/hooks/useEscClose';
 import CancelBtn from '@/components/userPage/ui/btn/CancelBtn';
@@ -16,6 +15,7 @@ import SubmitBtn from '@/components/userPage/ui/btn/SubmitBtn';
 import LabelForm from '@/components/userPage/ui/form/LabelForm';
 import TextareaForm from '@/components/userPage/ui/form/TextareaForm';
 import { Button, Select } from 'react-daisyui';
+import { slugify } from '@/lib/slugify';
 
 interface Props {
   open: boolean;
