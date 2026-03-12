@@ -2,7 +2,7 @@
 import { Button } from 'react-daisyui';
 import { motion } from 'framer-motion';
 
-const FormInputStyle =
+const FormInputClass =
   'w-full rounded-none border-b border-neutral-200 bg-transparent py-4 text-sm ' +
   'outline-none transition-all duration-300 ' +
   'focus:border-neutral-900 focus:ring-0 ' +
@@ -41,17 +41,17 @@ export default function HomeSearchConsultationPage() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                   <FormLabel title="Họ và tên" required />
-                  <input type="text" placeholder="Nguyễn Văn A" className={FormInputStyle} />
+                  <input type="text" placeholder="Nguyễn Văn A" className={FormInputClass} />
                 </div>
                 <div>
                   <FormLabel title="Số điện thoại" required />
-                  <input type="tel" placeholder="0909 xxx xxx" className={FormInputStyle} />
+                  <input type="tel" placeholder="0909 xxx xxx" className={FormInputClass} />
                 </div>
               </div>
 
               <div>
                 <FormLabel title="Khu vực quan tâm" />
-                <select className={FormInputStyle}>
+                <select className={FormInputClass}>
                   <option value="">Chọn Quận/Huyện</option>
                   <option value="q1">Quận 1, TP. HCM</option>
                   <option value="q2">Quận 2, TP. HCM</option>
@@ -61,7 +61,7 @@ export default function HomeSearchConsultationPage() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                   <FormLabel title="Ngân sách dự kiến" />
-                  <select className={FormInputStyle}>
+                  <select className={FormInputClass}>
                     <option value="">Chọn khoảng giá</option>
                     <option value="1-3">1 - 3 Tỷ</option>
                     <option value="3-5">3 - 5 Tỷ</option>
@@ -70,7 +70,7 @@ export default function HomeSearchConsultationPage() {
                 </div>
                 <div>
                   <FormLabel title="Loại hình" />
-                  <select className={FormInputStyle}>
+                  <select className={FormInputClass}>
                     <option value="apartment">Căn hộ</option>
                     <option value="house">Nhà phố</option>
                     <option value="villa">Biệt thự</option>
@@ -80,7 +80,7 @@ export default function HomeSearchConsultationPage() {
 
               <div>
                 <FormLabel title="Yêu cầu chi tiết" />
-                <textarea rows={3} placeholder="Ví dụ: Căn hộ tầng cao, hướng Đông Nam..." className={FormInputStyle} />
+                <textarea rows={3} placeholder="Ví dụ: Căn hộ tầng cao, hướng Đông Nam..." className={FormInputClass} />
               </div>
 
               <Button className="w-full rounded-none border-none bg-neutral-900 font-bold uppercase tracking-widest text-white hover:bg-neutral-800">
