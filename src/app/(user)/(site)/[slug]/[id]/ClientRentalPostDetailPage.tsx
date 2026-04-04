@@ -152,10 +152,10 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
             <div className="flex flex-col">
               <p className="whitespace-nowrap text-xs">
                 <span className="font-semibold uppercase tracking-wider text-slate-400">Diện tích:</span>
-                {/* Ngang trước - Dài sau */}
-                {post.width && post.length && (
+                {/* Chiều ngang - Chiều sâu */}
+                {post.frontageWidth && post.lotDepth && (
                   <span className="px-1 font-bold text-black">
-                    ({post.width} x {post.length})
+                    ({post.frontageWidth} x {post.lotDepth})
                   </span>
                 )}
               </p>
@@ -187,8 +187,12 @@ const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
     { icon: <FaBed size={20} className="text-primary" />, label: 'Phòng ngủ', value: post?.bedroomNumber },
     { icon: <FaShower size={20} className="text-primary" />, label: 'WC/Toilet', value: post?.toiletNumber },
     { icon: <GiHouse size={20} className="text-primary" />, label: 'Loại BĐS', value: post?.propertyType },
-    { icon: <FaRulerHorizontal size={20} className="text-primary" />, label: 'Chiều ngang', value: post?.width ? `${post.width}m` : null },
-    { icon: <FaRulerVertical size={20} className="text-primary" />, label: 'Chiều dài', value: post?.length ? `${post.length}m` : null },
+    {
+      icon: <FaRulerHorizontal size={20} className="text-primary" />,
+      label: 'Chiều ngang',
+      value: post?.frontageWidth ? `${post.frontageWidth}m` : null,
+    },
+    { icon: <FaRulerVertical size={20} className="text-primary" />, label: 'Chiều sâu', value: post?.lotDepth ? `${post.lotDepth}m` : null },
     { icon: <FaTools size={20} className="text-primary" />, label: 'Nội thất', value: post?.furnitureStatus },
     { icon: <GiPencilRuler size={20} className="text-primary" />, label: 'Pháp lý', value: post?.legalStatus },
   ];

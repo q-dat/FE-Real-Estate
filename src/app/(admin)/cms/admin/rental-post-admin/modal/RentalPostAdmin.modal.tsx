@@ -348,12 +348,18 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       bordered
                       required
                     />
-                    <InputForm classNameLabel={classNameLabel} {...register('length')} label="Chiều dài (m)" placeholder="Nhập chiều dài" bordered />
                     <InputForm
                       classNameLabel={classNameLabel}
-                      {...register('width')}
+                      {...register('frontageWidth')}
                       label="Chiều ngang (m)"
                       placeholder="Nhập chiều ngang"
+                      bordered
+                    />
+                    <InputForm
+                      classNameLabel={classNameLabel}
+                      {...register('lotDepth')}
+                      label="Chiều sâu (m)"
+                      placeholder="Nhập chiều sâu"
                       bordered
                     />
                     <InputForm classNameLabel={classNameLabel} {...register('backSize')} label="Mặt hậu (m)" placeholder="Nhập mặt hậu" bordered />

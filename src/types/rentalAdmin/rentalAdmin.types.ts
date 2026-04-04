@@ -33,8 +33,8 @@ export interface IRentalPostAdmin {
   priceUnit: string; // VD: "Tỷ", "Triệu/m²", "/tháng", "/m²"...
   pricePerM2?: number; // giá theo m2 (VNĐ/m2)
   area: number; // diện tích (m2)
-  length?: string; // chiều dài
-  width?: string; // chiều ngang
+  frontageWidth?: string; // chiều ngang (mặt tiền)
+  lotDepth?: string; // chiều sâu (chiều dài từ trước ra sau)
   backSize?: string; // mặt hậu
   floorNumber?: number; // số tầng
   bedroomNumber?: number; // số phòng ngủ
