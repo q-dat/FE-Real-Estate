@@ -11,6 +11,7 @@ import DeleteModal from '../../../../../components/adminPage/modal/Delete.modal'
 import { GiPadlock } from 'react-icons/gi';
 import AdminInternalModal from './modal/AdminInternal.modal';
 import { useAdminAuth } from '@/context/AdminAuthContext';
+import ImportRentalPostModal from './modal/ImportRentalPost.modal';
 interface Props {
   posts: IRentalPostAdmin[];
   categories: { _id: string; name: string }[];
@@ -23,6 +24,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
     _id: user.id,
   };
   const [posts, setPosts] = useState<IRentalPostAdmin[]>(initialPosts);
+  const [importOpen, setImportOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [editingPost, setEditingPost] = useState<IRentalPostAdmin | null>(null);
   // Modal Xoá
@@ -73,6 +75,9 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
       {/* Header */}
       <div className="flex items-center justify-between border-b-2 border-primary/20 pb-4">
         <h1 className="flex items-center gap-3 text-xl font-bold text-gray-800 xl:text-2xl">Quản lý Bài đăng Cho thuê</h1>
+        <Button size="sm" className="rounded-lg font-semibold" onClick={() => setImportOpen(true)}>
+          Import JSON
+        </Button>
         <Button
           size="sm"
           color="primary"
@@ -85,7 +90,6 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
           <FaPlus size={14} /> Thêm Bài đăng
         </Button>
       </div>
-
       {/* Danh sách */}
       {/* Cải thiện Grid Layout: Tăng mật độ thông tin trên màn hình lớn */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
@@ -195,13 +199,12 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                     >
                       <GiPadlock size={12} />
                     </Button>
-
-                    {/* Nút Xóa riêng biệt */}
+                    {/* Delete Btn */}
                     <Button
                       size="sm"
                       color="error"
                       onClick={(e) => {
-                        e.stopPropagation(); // Ngăn chặn mở modal chỉnh sửa
+                        e.stopPropagation();
                         handleDelete(post._id);
                       }}
                       className="btn-square text-white transition-colors duration-200 xl:hover:bg-red-600"
@@ -215,10 +218,9 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
           );
         })}
       </div>
-
-      {/* Modal Nội bộ Admin */}
+      {/*  */}
+      <ImportRentalPostModal open={importOpen} onClose={() => setImportOpen(false)} reload={reload} /> {/* Modal Nội bộ Admin */}
       <AdminInternalModal open={internalOpen} onClose={() => setInternalOpen(false)} post={internalPost} reload={reload} />
-
       {/* Modal Chỉnh sửa / Thêm mới */}
       <RentalPostAdminModal
         key={editingPost?._id ?? 'create'}
@@ -232,7 +234,6 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
         reload={reload}
         authorId={authorRef}
       />
-
       {/* Modal Xóa */}
       <DeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />
     </div>

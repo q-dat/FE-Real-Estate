@@ -3,7 +3,6 @@ import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { adminFetch } from '../shared/adminFetch.client';
 import { getWithFallback } from '../shared/getWithFallback';
 
-
 // Type Definitions ---
 type CacheState = {
   list: IRentalPostAdmin[];
@@ -209,6 +208,34 @@ const rentalPostAdminService = {
   resetLocalCache() {
     cache.list = [];
     cache.byId.clear();
+  },
+  async importRentalPost(items: unknown[]) {
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new Error('Import data must be non-empty array');
+    }
+
+    const res = await fetch(getServerApiUrl('api/rental-admin-posts/import'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(items),
+    });
+    console.log('Import Response:', res);
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Import Error: ${res.status} - ${text}`);
+    }
+
+    await this.handlePostMutation();
+
+    return res.json() as Promise<{
+      success: number;
+      updated: number;
+      failed: number;
+      errors: string[];
+    }>;
   },
 };
 
