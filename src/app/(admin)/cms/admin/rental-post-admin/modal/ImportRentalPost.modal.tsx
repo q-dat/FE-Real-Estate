@@ -2,14 +2,16 @@
 import { useState } from 'react';
 import { Button, Modal } from 'react-daisyui';
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
+import { IRentalAuthor } from '@/types/rentalAdmin/rentalAdmin.types';
 
 interface Props {
   open: boolean;
   onClose: () => void;
   reload: () => Promise<void>;
+  authorId: IRentalAuthor;
 }
 
-export default function ImportRentalPostModal({ open, onClose, reload }: Props) {
+export default function ImportRentalPostModal({ open, onClose, reload, authorId }: Props) {
   const [jsonText, setJsonText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,15 +21,48 @@ export default function ImportRentalPostModal({ open, onClose, reload }: Props) 
       setLoading(true);
       setError(null);
 
-      const parsed = JSON.parse(jsonText);
+      /* PARSE */
+      let parsed: unknown;
+
+      try {
+        parsed = JSON.parse(jsonText);
+      } catch {
+        throw new Error('JSON không hợp lệ');
+      }
 
       if (!Array.isArray(parsed)) {
         throw new Error('JSON phải là array');
       }
 
-      const res = await rentalPostAdminService.importRentalPost(parsed);
+      /* NORMALIZE */
+      const normalized = parsed.map((item, index) => {
+        if (typeof item !== 'object' || item === null) {
+          throw new Error(`Item ${index} không hợp lệ`);
+        }
 
-      console.log(res);
+        const obj = item as Record<string, unknown>;
+
+        return {
+          ...obj,
+
+          // FIX QUAN TRỌNG
+          author: authorId._id,
+
+          // FORCE primitive (tránh crash UI)
+          title: String(obj.title || ''),
+          province: String(obj.province || ''),
+          district: String(obj.district || ''),
+          ward: String(obj.ward || ''),
+
+          price: Number(obj.price || 0),
+          area: Number(obj.area || 0),
+        };
+      });
+
+      /* CALL API */
+      const res = await rentalPostAdminService.importRentalPost(normalized);
+
+      console.log('IMPORT SUCCESS:', res);
 
       await reload();
       onClose();
@@ -47,9 +82,7 @@ export default function ImportRentalPostModal({ open, onClose, reload }: Props) 
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <Modal.Header className="text-lg font-bold">
-        Import JSON Bài đăng
-      </Modal.Header>
+      <Modal.Header className="text-lg font-bold">Import JSON Bài đăng</Modal.Header>
 
       <Modal.Body className="space-y-4">
         <textarea

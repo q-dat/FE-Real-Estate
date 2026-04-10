@@ -219,7 +219,8 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
         })}
       </div>
       {/*  */}
-      <ImportRentalPostModal open={importOpen} onClose={() => setImportOpen(false)} reload={reload} /> {/* Modal Nội bộ Admin */}
+      <ImportRentalPostModal open={importOpen} onClose={() => setImportOpen(false)} reload={reload} authorId={authorRef} />
+      {/*  */}
       <AdminInternalModal open={internalOpen} onClose={() => setInternalOpen(false)} post={internalPost} reload={reload} />
       {/* Modal Chỉnh sửa / Thêm mới */}
       <RentalPostAdminModal
