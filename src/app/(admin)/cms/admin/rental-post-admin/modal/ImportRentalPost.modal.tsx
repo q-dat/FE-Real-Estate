@@ -46,8 +46,6 @@ const EXAMPLE_JSON = [
     status: 'active',
     adminNote: 'Khách hàng VIP, cần duyệt ưu tiên',
     adminImages: [],
-    postedAt: '2026-04-11T00:00:00.000Z',
-    expiredAt: '2026-05-11T00:00:00.000Z',
   },
 ];
 
