@@ -316,7 +316,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
       {/* --- BODY --- */}
       <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
         {/* Lõi Nhập Liệu JSON */}
-        <div className="flex h-[35vh] shrink-0 flex-col border-b border-base-content/5 bg-base-100/40 p-4 lg:h-auto lg:h-full lg:w-4/12 lg:shrink lg:overflow-y-auto lg:border-b-0 lg:border-r lg:p-6 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
+        <div className="flex h-[35vh] shrink-0 flex-col border-b border-base-content/5 bg-base-100/40 p-4 lg:h-full lg:w-4/12 lg:shrink lg:overflow-y-auto lg:border-b-0 lg:border-r lg:p-6 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wide text-base-content/70 sm:text-sm">Trình Biên Tập JSON</h3>
           </div>
