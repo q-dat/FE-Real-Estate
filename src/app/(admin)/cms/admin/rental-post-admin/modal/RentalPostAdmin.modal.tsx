@@ -139,7 +139,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
 
       const formData = new FormData();
 
-      /* ========= 1. FIELD THƯỜNG (STRING | NUMBER) ========= */
+      /* FIELD THƯỜNG (STRING | NUMBER) */
       Object.entries(data).forEach(([key, value]) => {
         if (value === undefined || value === null) return;
         if (EXCLUDED_FIELDS.has(key)) return;
@@ -152,22 +152,22 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
         formData.append(key, String(value));
       });
 
-      /* ========= 2. ẢNH CŨ ========= */
+      /* ẢNH CŨ */
       if (editingPost) {
         previewUrls.forEach((url) => {
           if (editingPost.images?.includes(url)) {
-            formData.append('oldImages', url);
+            formData.append('oldImages', JSON.stringify(previewUrls));
           }
         });
 
         adminPreviewUrls.forEach((url) => {
           if (editingPost.adminImages?.includes(url)) {
-            formData.append('oldAdminImages', url);
+            formData.append('oldAdminImages', JSON.stringify(adminPreviewUrls));
           }
         });
       }
 
-      /* ========= 3. ẢNH MỚI ========= */
+      /* ẢNH MỚI */
       if (images instanceof FileList) {
         Array.from(images).forEach((file) => {
           formData.append('images', file);
@@ -180,7 +180,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
         });
       }
 
-      /* ========= 4. CALL API ========= */
+      /* CALL API */
       if (editingPost?._id) {
         await rentalPostAdminService.update(editingPost._id, formData);
       } else {
