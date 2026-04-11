@@ -152,7 +152,7 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
             <div className="flex flex-col">
               <p className="whitespace-nowrap text-xs">
                 <span className="font-semibold uppercase tracking-wider text-slate-400">Diện tích:</span>
-                {/* Chiều ngang - Chiều sâu */}
+                {/* Chiều ngang - Chiều dài */}
                 {post.frontageWidth && post.lotDepth && (
                   <span className="px-1 font-bold text-black">
                     ({post.frontageWidth} x {post.lotDepth})
@@ -192,7 +192,7 @@ const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
       label: 'Chiều ngang',
       value: post?.frontageWidth ? `${post.frontageWidth}m` : null,
     },
-    { icon: <FaRulerVertical size={20} className="text-primary" />, label: 'Chiều sâu', value: post?.lotDepth ? `${post.lotDepth}m` : null },
+    { icon: <FaRulerVertical size={20} className="text-primary" />, label: 'Chiều dài', value: post?.lotDepth ? `${post.lotDepth}m` : null },
     { icon: <FaTools size={20} className="text-primary" />, label: 'Nội thất', value: post?.furnitureStatus },
     { icon: <GiPencilRuler size={20} className="text-primary" />, label: 'Pháp lý', value: post?.legalStatus },
   ];
