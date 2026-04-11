@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Button, Modal } from 'react-daisyui';
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { IRentalAuthor } from '@/types/rentalAdmin/rentalAdmin.types';
@@ -54,9 +54,12 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [showFullExample, setShowFullExample] = useState(false);
 
-  // Tự động Parse dữ liệu theo thời gian thực để tạo Preview
+  // State quản lý việc bôi đen JSON khi focus
+  const [activeField, setActiveField] = useState<{ index: number; key: string } | null>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+
+  // Parse JSON an toàn để hiển thị Preview
   const previewData = useMemo(() => {
     try {
       if (!jsonText.trim()) return [];
@@ -67,9 +70,86 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
       }
       return [];
     } catch {
-      return [];
+      return []; // Trả về rỗng nếu đang gõ sai cú pháp
     }
   }, [jsonText]);
+
+  // Handle Scroll Sync cho Highlighter
+  const handleScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
+    if (backdropRef.current) {
+      backdropRef.current.scrollTop = e.currentTarget.scrollTop;
+      backdropRef.current.scrollLeft = e.currentTarget.scrollLeft;
+    }
+  };
+
+  // Render Highlighted Text
+  const renderHighlightedText = () => {
+    if (!activeField || !jsonText.trim()) return jsonText;
+    const searchStr = `"${activeField.key}":`;
+
+    let startIndex = -1;
+    for (let i = 0; i <= activeField.index; i++) {
+      startIndex = jsonText.indexOf(searchStr, startIndex + 1);
+      if (startIndex === -1) break;
+    }
+
+    if (startIndex !== -1) {
+      let endOfLine = jsonText.indexOf('\n', startIndex);
+      if (endOfLine === -1) endOfLine = jsonText.length;
+
+      const before = jsonText.substring(0, startIndex);
+      const match = jsonText.substring(startIndex, endOfLine);
+      const after = jsonText.substring(endOfLine);
+
+      return (
+        <>
+          {before}
+          <mark className="rounded-[2px] bg-primary/20 text-transparent shadow-[0_0_0_2px_rgba(var(--p),0.2)]">{match}</mark>
+          {after}
+        </>
+      );
+    }
+    return jsonText;
+  };
+
+  // Xử lý thay đổi trực tiếp từ giao diện Preview -> Đồng bộ ngược JSON
+  const handleFieldChange = (index: number, field: string, value: any) => {
+    try {
+      const parsed = JSON.parse(jsonText);
+      let targetArray = [];
+      let isWrapper = false;
+
+      if (Array.isArray(parsed)) {
+        targetArray = [...parsed];
+      } else if (parsed && typeof parsed === 'object' && Array.isArray((parsed as any).rentalPosts)) {
+        targetArray = [...(parsed as any).rentalPosts];
+        isWrapper = true;
+      } else {
+        return;
+      }
+
+      const numericFields = ['price', 'area', 'pricePerM2', 'floorNumber', 'bedroomNumber', 'toiletNumber'];
+      let finalValue = value;
+      if (numericFields.includes(field)) {
+        finalValue = value === '' ? '' : Number(value);
+      }
+
+      targetArray[index] = { ...targetArray[index], [field]: finalValue };
+      const newJson = isWrapper ? { ...parsed, rentalPosts: targetArray } : targetArray;
+
+      setJsonText(JSON.stringify(newJson, null, 2));
+    } catch (e) {
+      console.warn('Lỗi đồng bộ dữ liệu: JSON hiện tại không hợp lệ');
+    }
+  };
+
+  const handleArrayChange = (index: number, field: string, text: string) => {
+    const arr = text
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    handleFieldChange(index, field, arr);
+  };
 
   const handleCopyExample = async () => {
     try {
@@ -77,7 +157,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      setError('Không thể sao chép vào clipboard');
+      setError('Lỗi khi copy');
     }
   };
 
@@ -85,55 +165,42 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
     try {
       setLoading(true);
       setError(null);
-
-      if (!jsonText.trim()) {
-        throw new Error('Vui lòng nhập dữ liệu JSON');
-      }
+      if (!jsonText.trim()) throw new Error('Vui lòng cung cấp dữ liệu JSON');
 
       let parsed: unknown;
       try {
         parsed = JSON.parse(jsonText);
       } catch {
-        throw new Error('Định dạng JSON không hợp lệ');
+        throw new Error('Định dạng JSON không hợp lệ.');
       }
 
       let dataArray: unknown[] = [];
+      if (Array.isArray(parsed)) dataArray = parsed;
+      else if (parsed !== null && typeof parsed === 'object' && 'rentalPosts' in parsed && Array.isArray((parsed as any).rentalPosts)) {
+        dataArray = (parsed as any).rentalPosts;
+      } else throw new Error('Định dạng yêu cầu phải là Array hoặc Object chứa "rentalPosts"');
 
-      if (Array.isArray(parsed)) {
-        dataArray = parsed;
-      } else if (
-        parsed !== null &&
-        typeof parsed === 'object' &&
-        'rentalPosts' in parsed &&
-        Array.isArray((parsed as Record<string, unknown>).rentalPosts)
-      ) {
-        dataArray = (parsed as Record<string, unknown>).rentalPosts as unknown[];
-      } else {
-        throw new Error('Dữ liệu phải là Array hoặc Object chứa mảng "rentalPosts"');
-      }
-
-      if (dataArray.length === 0) {
-        throw new Error('Không tìm thấy dữ liệu bài đăng nào để import');
-      }
+      if (dataArray.length === 0) throw new Error('Dữ liệu trống.');
 
       const normalized = dataArray.map((item, index) => {
-        if (typeof item !== 'object' || item === null) {
-          throw new Error(`Dữ liệu tại vị trí ${index} không phải là object hợp lệ`);
-        }
-
-        const obj = item as Record<string, unknown>;
-
+        if (typeof item !== 'object' || item === null) throw new Error(`Bản ghi ${index + 1} lỗi`);
+        const obj = item as any;
         return {
           ...obj,
           author: authorId._id,
           title: String(obj.title || ''),
           description: String(obj.description || ''),
           categoryName: String(obj.categoryName || ''),
+          propertyType: String(obj.propertyType || ''),
+          locationType: String(obj.locationType || ''),
+          direction: String(obj.direction || ''),
           priceUnit: String(obj.priceUnit || ''),
           province: String(obj.province || ''),
           district: String(obj.district || ''),
+          ward: String(obj.ward || ''),
           address: String(obj.address || ''),
           images: Array.isArray(obj.images) ? obj.images : [],
+          adminImages: Array.isArray(obj.adminImages) ? obj.adminImages : [],
           price: Number(obj.price || 0),
           area: Number(obj.area || 0),
           postType: typeof obj.postType === 'string' && obj.postType ? obj.postType : 'highlight',
@@ -144,9 +211,8 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
       await rentalPostAdminService.importRentalPost(normalized);
       await reload();
       handleClose();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Đã xảy ra lỗi hệ thống khi import';
-      setError(message);
+    } catch (err: any) {
+      setError(err.message || 'Lỗi hệ thống');
     } finally {
       setLoading(false);
     }
@@ -155,276 +221,305 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
   const handleClose = () => {
     setJsonText('');
     setError(null);
-    setShowFullExample(false);
+    setActiveField(null);
     onClose();
   };
+
+  // Base Classes for Luxury Inputs
+  const labelClass = 'text-[10px] font-bold uppercase tracking-widest text-base-content/60 mb-1.5 block';
+  const inputClass =
+    'w-full bg-white/60 dark:bg-black/10 border border-base-content/10 focus:border-primary focus:bg-base-100 dark:focus:bg-base-100 outline-none hover:border-primary/40 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-base-content transition-all placeholder:text-base-content/30 shadow-sm focus:ring-0';
+
+  // Form Field Render Helpers
+  const renderField = (
+    idx: number,
+    item: any,
+    field: string,
+    label: string,
+    options?: { type?: string; placeholder?: string; isTextarea?: boolean; rows?: number; isArray?: boolean }
+  ) => {
+    const { type = 'text', placeholder = '', isTextarea = false, rows = 3, isArray = false } = options || {};
+
+    const commonProps = {
+      className: `${inputClass} ${isTextarea ? 'resize-none' : ''}`,
+      placeholder,
+      onFocus: () => setActiveField({ index: idx, key: field }),
+      onBlur: () => setActiveField(null),
+    };
+
+    return (
+      <div className="w-full flex-1">
+        <label className={labelClass}>{label}</label>
+        {isTextarea ? (
+          <textarea
+            {...commonProps}
+            rows={rows}
+            value={isArray ? (Array.isArray(item[field]) ? item[field].join('\n') : '') : item[field] || ''}
+            onChange={(e) => (isArray ? handleArrayChange(idx, field, e.target.value) : handleFieldChange(idx, field, e.target.value))}
+          />
+        ) : (
+          <input type={type} {...commonProps} value={item[field] || ''} onChange={(e) => handleFieldChange(idx, field, e.target.value)} />
+        )}
+      </div>
+    );
+  };
+
+  const renderSelect = (idx: number, item: any, field: string, label: string, options: { value: string; label: string }[]) => (
+    <div className="w-full flex-1">
+      <label className={labelClass}>{label}</label>
+      <select
+        className={inputClass}
+        value={item[field] || options[0].value}
+        onChange={(e) => handleFieldChange(idx, field, e.target.value)}
+        onFocus={() => setActiveField({ index: idx, key: field })}
+        onBlur={() => setActiveField(null)}
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 
   return (
     <Modal
       open={open}
-      className="flex h-[90vh] max-w-full flex-col overflow-hidden bg-base-100 p-0 shadow-2xl xl:max-w-7xl"
+      className="flex h-[90vh] w-full max-w-full flex-col overflow-hidden bg-base-200/95 p-0 shadow-2xl backdrop-blur-2xl sm:rounded-[2rem] lg:max-w-[95vw] 2xl:max-w-[1500px]"
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
     >
-      {/* Header */}
-      <div className="sticky top-0 z-10 flex-shrink-0 border-b border-base-200 bg-base-100/50 p-6 backdrop-blur-sm">
-        <h2 className="text-2xl font-bold text-base-content">Nhập Dữ Liệu Bất Động Sản Hàng Loạt</h2>
-        <p className="mt-1 text-sm text-base-content/70">
-          Hỗ trợ định dạng Array JSON hoặc Object từ API phản hồi. Paste JSON để xem preview tự động đầy đủ thông tin.
-        </p>
+      {/* --- HEADER --- */}
+      <div className="z-10 flex flex-shrink-0 items-center justify-between border-b border-base-content/5 bg-base-100/90 px-6 py-4">
+        <div>
+          <h2 className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-base-content sm:text-2xl">
+            <span className="bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">Đồng Bộ</span> Bất Động Sản
+          </h2>
+          <p className="mt-1 hidden text-sm font-medium text-base-content/50 sm:block">
+            Sửa trực tiếp trên bảng Xem trước, hệ thống sẽ tự động map (Two-way Sync) vào cấu trúc JSON.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="hidden border-base-content/10 sm:flex" onClick={handleCopyExample}>
+            {copied ? 'Đã lưu mẫu' : 'Copy cấu trúc mẫu'}
+          </Button>
+          <button onClick={handleClose} className="btn btn-circle btn-ghost btn-sm bg-base-200/50 hover:bg-base-300">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {/* Body */}
-      <div className="grid flex-1 grid-cols-1 gap-0 overflow-hidden bg-base-200/30 xl:grid-cols-2">
-        {/* CỘT TRÁI: Nhập JSON */}
-        <div className="flex h-full flex-col overflow-y-auto border-b border-base-200 bg-base-100 p-6 xl:border-b-0 xl:border-r">
+      {/* --- BODY --- */}
+      <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
+        {/* Lõi Nhập Liệu JSON */}
+        <div className="flex h-[35vh] shrink-0 flex-col border-b border-base-content/5 bg-base-100/40 p-4 lg:h-auto lg:h-full lg:w-4/12 lg:shrink lg:overflow-y-auto lg:border-b-0 lg:border-r lg:p-6 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-semibold text-base-content">Dữ liệu JSON của bạn</span>
+            <h3 className="text-xs font-bold uppercase tracking-wide text-base-content/70 sm:text-sm">Trình Biên Tập JSON</h3>
           </div>
-          <textarea
-            className="textarea textarea-bordered min-h-[400px] w-full flex-1 resize-none font-mono text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary/50"
-            placeholder="Dán mảng JSON hoặc object chứa rentalPosts vào đây..."
-            value={jsonText}
-            onChange={(e) => setJsonText(e.target.value)}
-            spellCheck={false}
-          />
+
+          <div className="relative flex-1 overflow-hidden rounded-2xl border border-base-content/10 bg-base-100 shadow-inner">
+            {/* Backdrop Highlighter */}
+            <div
+              ref={backdropRef}
+              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words p-4 font-mono text-[12px] leading-[1.6] text-transparent sm:text-[13px] lg:p-5"
+              aria-hidden="true"
+            >
+              {renderHighlightedText()}
+            </div>
+            {/* Real Textarea */}
+            <textarea
+              className="absolute inset-0 h-full w-full resize-none overflow-auto whitespace-pre-wrap break-words bg-transparent p-4 font-mono text-[12px] leading-[1.6] text-base-content/80 caret-primary outline-none sm:text-[13px] lg:p-5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5"
+              placeholder="Dán mã JSON hoặc sửa bên Preview..."
+              value={jsonText}
+              onChange={(e) => setJsonText(e.target.value)}
+              onScroll={handleScroll}
+              spellCheck={false}
+            />
+          </div>
+
           {error && (
-            <div className="mt-4 flex items-center gap-2 rounded-lg border border-error/20 bg-error/10 p-3 text-sm font-medium text-error">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {error}
+            <div className="mt-4 flex items-start gap-3 rounded-2xl border border-error/20 bg-error/5 p-4 backdrop-blur-sm">
+              <div className="shrink-0 rounded-full bg-error/20 p-1.5 text-error">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <p className="pt-0.5 text-sm font-semibold text-error/90">{error}</p>
             </div>
           )}
         </div>
 
-        {/* CỘT PHẢI: Mẫu JSON & Preview Đầy Đủ Chi Tiết */}
-        <div className="flex h-full flex-col gap-6 overflow-y-auto p-6">
-          {/* Box 1: Cấu trúc mẫu JSON */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-2 text-sm font-semibold text-base-content">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-                Cấu trúc JSON Mẫu
-              </span>
-              <Button size="sm" color={copied ? 'success' : 'ghost'} className="h-8 min-h-8 text-xs font-medium" onClick={handleCopyExample}>
-                {copied ? 'Đã sao chép' : 'Sao chép mẫu'}
-              </Button>
-            </div>
-            <div className="relative rounded-lg border border-neutral/20 bg-neutral shadow-inner transition-all duration-300">
-              <div className={`overflow-hidden transition-all duration-300 ${showFullExample ? 'max-h-[600px] overflow-y-auto' : 'max-h-[160px]'}`}>
-                <pre className="p-4 font-mono text-xs leading-relaxed text-neutral-content">{JSON.stringify(EXAMPLE_JSON, null, 2)}</pre>
-              </div>
+        {/* CỘT PHẢI: Live Preview Bảng Điều Khiển */}
+        <div className="flex flex-1 flex-col overflow-y-auto bg-base-200/20 p-4 lg:w-8/12 lg:p-6 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-base-content/70 sm:text-sm">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-success shadow-[0_0_10px_rgba(0,255,0,0.5)]" />
+              Chỉnh Sửa Trực Tiếp ({previewData.length})
+            </h3>
+          </div>
 
-              {!showFullExample && (
-                <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 rounded-b-lg bg-gradient-to-t from-neutral to-transparent" />
-              )}
-
-              <div className="absolute bottom-2 left-1/2 z-10 -translate-x-1/2">
-                <Button
-                  size="sm"
-                  className="rounded-full border-neutral-content/20 bg-base-100/10 text-xs text-neutral-content shadow-lg backdrop-blur-md hover:bg-base-100 hover:text-base-content"
-                  onClick={() => setShowFullExample(!showFullExample)}
+          {previewData.length > 0 ? (
+            <div className="flex flex-col gap-6 pb-6">
+              {previewData.map((item: any, idx: number) => (
+                <div
+                  key={idx}
+                  className="flex flex-col gap-5 rounded-3xl border border-base-content/5 bg-base-100 p-6 shadow-xl shadow-base-content/5 transition-all hover:border-primary/20"
                 >
-                  {showFullExample ? 'Thu gọn mẫu' : 'Xem thêm mẫu'}
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Box 2: Trực quan hóa dữ liệu CHI TIẾT */}
-          <div className="flex min-h-[300px] flex-1 flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-2 text-sm font-semibold text-base-content">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-                Xem trước Dữ liệu Chi tiết ({previewData.length} bản ghi)
-              </span>
-            </div>
-
-            <div className="flex-1 overflow-y-auto rounded-lg border border-base-300 bg-base-100 p-2 shadow-inner">
-              {previewData.length > 0 ? (
-                <div className="flex flex-col gap-4 p-2">
-                  {previewData.map((item: any, idx: number) => (
-                    <div
-                      key={idx}
-                      className="group relative flex flex-col gap-3 rounded-xl border border-base-200 bg-base-100 p-4 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
-                    >
-                      {/* Tiêu đề & Label */}
-                      <div className="flex items-start justify-between gap-3">
-                        <h4 className="font-semibold leading-snug text-base-content transition-colors group-hover:text-primary">
-                          {item.title || '(Chưa có tiêu đề)'}
-                        </h4>
-                        <div className="flex shrink-0 flex-col items-end gap-1">
-                          {item.postType && (
-                            <span className="badge badge-primary badge-outline badge-sm text-[10px] font-bold uppercase">{item.postType}</span>
-                          )}
-                          {item.status && (
-                            <span className={`badge badge-sm text-[10px] ${item.status === 'active' ? 'badge-success text-white' : 'badge-ghost'}`}>
-                              {item.status}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Mô tả */}
-                      <p className="line-clamp-3 text-xs text-base-content/70">{item.description || 'Không có mô tả...'}</p>
-
-                      {/* Giá & Diện tích nổi bật */}
-                      <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
-                        <span className="inline-flex items-center gap-1 rounded-md bg-success/10 px-2.5 py-1.5 text-success">
-                          <span className="text-sm font-bold">{item.price || 0}</span> {item.priceUnit || 'VNĐ'}
-                        </span>
-                        <span className="inline-flex items-center gap-1 rounded-md bg-info/10 px-2.5 py-1.5 text-info">
-                          <span className="text-sm font-bold">{item.area || 0}</span> m²
-                        </span>
-                        {item.propertyType && (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-base-200 px-2.5 py-1.5 text-base-content/80">
-                            {item.propertyType} {item.categoryName && `• ${item.categoryName}`}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Thông số chi tiết dạng Grid */}
-                      <div className="grid grid-cols-2 gap-3 rounded-lg bg-base-200/50 p-3 text-xs text-base-content/80 md:grid-cols-3">
-                        <div>
-                          <span className="mb-0.5 block text-[10px] font-semibold uppercase text-base-content/50">Kết cấu</span>
-                          <span className="font-medium">
-                            {item.floorNumber ? `${item.floorNumber} Tầng` : '-'} • {item.bedroomNumber ? `${item.bedroomNumber} PN` : '-'} •{' '}
-                            {item.toiletNumber ? `${item.toiletNumber} WC` : '-'}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="mb-0.5 block text-[10px] font-semibold uppercase text-base-content/50">Kích thước (Ngang x Dài)</span>
-                          <span className="font-medium">
-                            {item.frontageWidth || '?'}m x {item.lotDepth || '?'}m {item.backSize ? ` (Nở hậu ${item.backSize}m)` : ''}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="mb-0.5 block text-[10px] font-semibold uppercase text-base-content/50">Vị trí & Hướng</span>
-                          <span className="font-medium">
-                            {item.locationType || 'Chưa rõ'} • Hướng {item.direction || 'Chưa rõ'}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="mb-0.5 block text-[10px] font-semibold uppercase text-base-content/50">Pháp lý</span>
-                          <span className="block truncate font-medium" title={item.legalStatus}>
-                            {item.legalStatus || '-'}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="mb-0.5 block text-[10px] font-semibold uppercase text-base-content/50">Tình trạng nội thất</span>
-                          <span className="block truncate font-medium" title={item.furnitureStatus}>
-                            {item.furnitureStatus || '-'}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="mb-0.5 block text-[10px] font-semibold uppercase text-base-content/50">Giá / m²</span>
-                          <span className="font-medium">{item.pricePerM2 ? item.pricePerM2.toLocaleString() + ' đ' : '-'}</span>
-                        </div>
-                      </div>
-
-                      {/* Tiện ích bổ sung */}
-                      {item.amenities && (
-                        <div className="text-xs text-base-content/80">
-                          <span className="font-semibold">Tiện ích:</span> {item.amenities}
-                        </div>
-                      )}
-
-                      {/* Ghi chú Admin */}
-                      {item.adminNote && (
-                        <div className="rounded-md border border-warning/30 bg-warning/10 p-2.5 text-xs text-warning-content">
-                          <span className="mb-1 flex items-center gap-1 font-bold">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                              <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Admin Note
-                          </span>
-                          <span className="whitespace-pre-wrap leading-relaxed">{item.adminNote}</span>
-                        </div>
-                      )}
-
-                      {/* Địa chỉ (Footer Card) */}
-                      {(item.address || item.district || item.province || item.ward) && (
-                        <div className="mt-1 flex items-start gap-1.5 border-t border-base-200 pt-3 text-xs font-medium text-base-content/60">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 shrink-0 text-error"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                            />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          <span className="line-clamp-2">
-                            {item.address ? `${item.address}, ` : ''}
-                            {item.ward ? `${item.ward}, ` : ''}
-                            {item.district ? `${item.district}, ` : ''}
-                            {item.province}
-                          </span>
-                        </div>
-                      )}
+                  {/* Nhóm 1: Nhận diện (Slate) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-slate-500/10 bg-slate-500/5 p-5">
+                    <div className="absolute left-0 top-0 h-full w-1 bg-slate-500/30"></div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      {renderField(idx, item, 'code', 'Mã BĐS (Code)', { placeholder: 'Mã...' })}
+                      {renderSelect(idx, item, 'postType', 'Loại Tin', [
+                        { value: 'highlight', label: 'HIGHLIGHT' },
+                        { value: 'vip1', label: 'VIP 1' },
+                        { value: 'vip2', label: 'VIP 2' },
+                        { value: 'vip3', label: 'VIP 3' },
+                        { value: 'normal', label: 'NORMAL' },
+                      ])}
+                      {renderSelect(idx, item, 'status', 'Trạng Thái', [
+                        { value: 'active', label: 'HIỂN THỊ (Active)' },
+                        { value: 'hidden', label: 'ĐÃ ẨN (Hidden)' },
+                      ])}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center p-6 text-center opacity-60">
-                  <div className="mb-3 rounded-full bg-base-200 p-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-8 w-8 text-base-content/50"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                      />
-                    </svg>
                   </div>
-                  <p className="text-sm font-medium">Chưa có dữ liệu để xem trước</p>
-                  <p className="mt-1 text-xs">Dán JSON hợp lệ vào khung bên trái để xem giao diện bản ghi</p>
+
+                  {/* Nhóm 2: Cơ bản (Blue) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-blue-500/10 bg-blue-500/5 p-5">
+                    <div className="absolute left-0 top-0 h-full w-1 bg-blue-500/30"></div>
+                    {renderField(idx, item, 'title', 'Tiêu đề bài đăng', { placeholder: 'Nhập tiêu đề...' })}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      {renderField(idx, item, 'categoryName', 'Danh mục', { placeholder: 'Bất động sản bán...' })}
+                      {renderField(idx, item, 'propertyType', 'Loại hình', { placeholder: 'Nhà phố, Căn hộ...' })}
+                    </div>
+                    {renderField(idx, item, 'description', 'Mô tả chi tiết', { isTextarea: true, rows: 3, placeholder: 'Nhập mô tả...' })}
+                  </div>
+
+                  {/* Nhóm 3: Giá & Diện tích (Emerald) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-5">
+                    <div className="absolute left-0 top-0 h-full w-1 bg-emerald-500/30"></div>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                      {renderField(idx, item, 'price', 'Mức giá', { type: 'number', placeholder: '0' })}
+                      {renderField(idx, item, 'priceUnit', 'Đơn vị', { placeholder: 'Tỷ, Triệu' })}
+                      {renderField(idx, item, 'area', 'Diện tích (m²)', { type: 'number', placeholder: '0' })}
+                      {renderField(idx, item, 'pricePerM2', 'Giá / m²', { type: 'number', placeholder: 'VNĐ' })}
+                    </div>
+                  </div>
+
+                  {/* Nhóm 4: Kỹ thuật (Amber) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-amber-500/10 bg-amber-500/5 p-5">
+                    <div className="absolute left-0 top-0 h-full w-1 bg-amber-500/30"></div>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                      {renderField(idx, item, 'floorNumber', 'Số Tầng', { type: 'number', placeholder: '0' })}
+                      {renderField(idx, item, 'bedroomNumber', 'Phòng Ngủ', { type: 'number', placeholder: '0' })}
+                      {renderField(idx, item, 'toiletNumber', 'Phòng Tắm', { type: 'number', placeholder: '0' })}
+                      {renderField(idx, item, 'frontageWidth', 'Ngang (m)', { placeholder: 'Rộng' })}
+                      {renderField(idx, item, 'lotDepth', 'Dài (m)', { placeholder: 'Dài' })}
+                      {renderField(idx, item, 'backSize', 'Nở Hậu (m)', { placeholder: 'Sau' })}
+                      {renderField(idx, item, 'locationType', 'Vị trí', { placeholder: 'Mặt tiền...' })}
+                      {renderField(idx, item, 'direction', 'Hướng', { placeholder: 'Đông...' })}
+                      {renderField(idx, item, 'legalStatus', 'Pháp lý', { placeholder: 'Sổ hồng...' })}
+                      {renderField(idx, item, 'furnitureStatus', 'Nội thất', { placeholder: 'Cơ bản...' })}
+                    </div>
+                  </div>
+
+                  {/* Nhóm 5: Địa chỉ (Purple) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-purple-500/10 bg-purple-500/5 p-5">
+                    <div className="absolute left-0 top-0 h-full w-1 bg-purple-500/30"></div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                      {renderField(idx, item, 'province', 'Tỉnh / Thành', { placeholder: 'Hồ Chí Minh' })}
+                      {renderField(idx, item, 'district', 'Quận / Huyện', { placeholder: 'Quận 1' })}
+                      {renderField(idx, item, 'ward', 'Phường / Xã', { placeholder: 'Bến Nghé' })}
+                      {renderField(idx, item, 'address', 'Đường / Số nhà', { placeholder: 'Lê Lợi' })}
+                    </div>
+                  </div>
+
+                  {/* Nhóm 6: Media & Ghi chú (Rose) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-rose-500/10 bg-rose-500/5 p-5">
+                    <div className="absolute left-0 top-0 h-full w-1 bg-rose-500/30"></div>
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      {renderField(idx, item, 'images', 'Ảnh Hiển Thị (Mỗi link 1 dòng)', {
+                        isTextarea: true,
+                        isArray: true,
+                        rows: 4,
+                        placeholder: 'https://...',
+                      })}
+                      {renderField(idx, item, 'adminImages', 'Ảnh Nội Bộ (Admin Images)', {
+                        isTextarea: true,
+                        isArray: true,
+                        rows: 4,
+                        placeholder: 'https://...',
+                      })}
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      {renderField(idx, item, 'youtubeLink', 'Youtube Link', { placeholder: 'https://...' })}
+                      {renderField(idx, item, 'videoTitle', 'Tiêu đề Video', { placeholder: 'Tiêu đề...' })}
+                      {renderField(idx, item, 'videoDescription', 'Mô tả Video', { placeholder: 'Mô tả...' })}
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 pt-2 lg:grid-cols-2">
+                      {renderField(idx, item, 'amenities', 'Tiện ích (Amenities)', {
+                        isTextarea: true,
+                        rows: 3,
+                        placeholder: 'Trường học, Bệnh viện...',
+                      })}
+                      {renderField(idx, item, 'adminNote', 'Ghi chú kiểm duyệt (Admin Note)', {
+                        isTextarea: true,
+                        rows: 3,
+                        placeholder: 'Thông tin ẩn...',
+                      })}
+                    </div>
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="flex h-[300px] flex-col items-center justify-center rounded-[2rem] border border-dashed border-base-content/10 bg-base-100/50 p-6 text-center sm:h-[400px] sm:p-8">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl" />
+                <div className="relative rounded-2xl border border-base-content/5 bg-base-100 p-5 text-primary shadow-xl">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h4 className="mb-1 text-lg font-bold text-base-content">Trình Xem Trước Trống</h4>
+              <p className="max-w-[300px] text-sm font-medium text-base-content/50">
+                Hãy dán mã JSON hợp lệ vào cột bên trái để hiển thị bảng điều khiển chỉnh sửa.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="flex flex-shrink-0 items-center justify-end gap-3 border-t border-base-200 bg-base-100 p-4">
-        <Button variant="outline" className="min-w-[120px]" onClick={handleClose}>
+      {/* --- FOOTER / ACTIONS --- */}
+      <div className="z-10 flex flex-shrink-0 items-center justify-between gap-4 border-t border-base-content/5 bg-base-100/90 px-6 py-4 backdrop-blur-md sm:justify-end">
+        <Button
+          variant="outline"
+          className="flex-1 rounded-xl border-base-content/10 font-bold hover:bg-base-200 sm:min-w-[130px] sm:flex-none"
+          onClick={handleClose}
+        >
           Huỷ thao tác
         </Button>
-        <Button color="primary" className="min-w-[140px]" loading={loading} onClick={handleImport}>
-          Tiến hành Nhập
+        <Button
+          color="primary"
+          className="flex-1 rounded-xl font-bold tracking-wide shadow-lg shadow-primary/30 transition-shadow hover:shadow-primary/50 sm:min-w-[160px] sm:flex-none"
+          loading={loading}
+          onClick={handleImport}
+        >
+          Xác nhận Import
         </Button>
       </div>
     </Modal>
