@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useMemo, useRef } from 'react';
 import { Button, Modal } from 'react-daisyui';
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
