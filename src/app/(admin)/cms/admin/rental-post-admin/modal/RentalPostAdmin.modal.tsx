@@ -302,7 +302,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       <label className={labelClass}>
                         Diện tích (m²) <span className="text-error">*</span>
                       </label>
-                      <input type="number" min={0.1} className={inputClass} {...register('area', { required: true })} placeholder="0" />
+                      <input type="text"  className={inputClass} {...register('area', { required: true })} placeholder="0" />
                     </div>
                     <div>
                       <label className={labelClass}>Giá / m² (Tự động)</label>
