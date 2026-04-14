@@ -302,7 +302,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       <label className={labelClass}>
                         Diện tích (m²) <span className="text-error">*</span>
                       </label>
-                      <input type="number" className={inputClass} {...register('area', { required: true })} placeholder="0" />
+                      <input type="number" min={0.1} className={inputClass} {...register('area', { required: true })} placeholder="0" />
                     </div>
                     <div>
                       <label className={labelClass}>Giá / m² (Tự động)</label>
@@ -563,13 +563,13 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       <label className={labelClass}>
                         Ngày Đăng <span className="text-error">*</span>
                       </label>
-                      <input type="date" className={inputClass} {...register('postedAt', { required: true })} />
+                      <input type="date" className={inputClass} {...register('postedAt', { required: false })} />
                     </div>
                     <div>
                       <label className={labelClass}>
                         Ngày Hết Hạn <span className="text-error">*</span>
                       </label>
-                      <input type="date" className={inputClass} {...register('expiredAt', { required: true })} />
+                      <input type="date" className={inputClass} {...register('expiredAt', { required: false })} />
                     </div>
                   </div>
                 </div>
