@@ -376,7 +376,6 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                   <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-slate-500/10 bg-slate-500/5 p-5">
                     <div className="absolute left-0 top-0 h-full w-1 bg-slate-500/30"></div>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                      {renderField(idx, item, 'code', 'Mã BĐS (Code)', { placeholder: 'Mã...' })}
                       {renderSelect(idx, item, 'postType', 'Loại Tin', [
                         { value: 'highlight', label: 'HIGHLIGHT' },
                         { value: 'vip1', label: 'VIP 1' },
@@ -396,8 +395,8 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                     <div className="absolute left-0 top-0 h-full w-1 bg-blue-500/30"></div>
                     {renderField(idx, item, 'title', 'Tiêu đề bài đăng', { placeholder: 'Nhập tiêu đề...' })}
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      {renderField(idx, item, 'categoryName', 'Danh mục', { placeholder: 'Bất động sản bán...' })}
-                      {renderField(idx, item, 'propertyType', 'Loại hình', { placeholder: 'Nhà phố, Căn hộ...' })}
+                      {renderField(idx, item, 'categoryName', 'Danh mục', { placeholder: 'Chọn danh mục...' })}
+                      {renderField(idx, item, 'propertyType', 'Loại hình', { placeholder: 'Nhập loại hình (Nhà phố, Căn hộ...)' })}
                     </div>
                     {renderField(idx, item, 'description', 'Mô tả chi tiết', { isTextarea: true, rows: 3, placeholder: 'Nhập mô tả...' })}
                   </div>
@@ -406,9 +405,9 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                   <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-5">
                     <div className="absolute left-0 top-0 h-full w-1 bg-emerald-500/30"></div>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                      {renderField(idx, item, 'price', 'Mức giá', { type: 'number', placeholder: '0' })}
-                      {renderField(idx, item, 'priceUnit', 'Đơn vị', { placeholder: 'Tỷ, Triệu' })}
-                      {renderField(idx, item, 'area', 'Diện tích (m²)', { type: 'number', placeholder: '0' })}
+                      {renderField(idx, item, 'price', 'Mức giá', { type: 'number', placeholder: 'Nhập mức giá...' })}
+                      {renderField(idx, item, 'priceUnit', 'Đơn vị', { placeholder: 'Nhập đơn vị giá...' })}
+                      {renderField(idx, item, 'area', 'Diện tích (m²)', { type: 'number', placeholder: 'Nhập diện tích...' })}
                       {renderField(idx, item, 'pricePerM2', 'Giá / m²', { type: 'number', placeholder: 'VNĐ' })}
                     </div>
                   </div>
@@ -417,16 +416,16 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                   <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-amber-500/10 bg-amber-500/5 p-5">
                     <div className="absolute left-0 top-0 h-full w-1 bg-amber-500/30"></div>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
-                      {renderField(idx, item, 'floorNumber', 'Số Tầng', { type: 'number', placeholder: '0' })}
-                      {renderField(idx, item, 'bedroomNumber', 'Phòng Ngủ', { type: 'number', placeholder: '0' })}
-                      {renderField(idx, item, 'toiletNumber', 'Wc', { type: 'number', placeholder: '0' })}
-                      {renderField(idx, item, 'frontageWidth', 'Ngang (m)', { placeholder: 'Rộng' })}
-                      {renderField(idx, item, 'lotDepth', 'Dài (m)', { placeholder: 'Dài' })}
-                      {renderField(idx, item, 'backSize', 'Nở Hậu (m)', { placeholder: 'Sau' })}
-                      {renderField(idx, item, 'locationType', 'Vị trí', { placeholder: 'Mặt tiền...' })}
-                      {renderField(idx, item, 'direction', 'Hướng', { placeholder: 'Đông...' })}
-                      {renderField(idx, item, 'legalStatus', 'Pháp lý', { placeholder: 'Sổ hồng...' })}
-                      {renderField(idx, item, 'furnitureStatus', 'Nội thất', { placeholder: 'Cơ bản...' })}
+                      {renderField(idx, item, 'floorNumber', 'Số Tầng', { type: 'number', placeholder: 'Nhập số tầng...' })}
+                      {renderField(idx, item, 'bedroomNumber', 'Phòng Ngủ', { type: 'number', placeholder: 'Nhập số phòng ngủ...' })}
+                      {renderField(idx, item, 'toiletNumber', 'Wc', { type: 'number', placeholder: 'Nhập số wc...' })}
+                      {renderField(idx, item, 'frontageWidth', 'Ngang (m)', { placeholder: 'Nhập chiều rộng...' })}
+                      {renderField(idx, item, 'lotDepth', 'Dài (m)', { placeholder: 'Nhập chiều dài...' })}
+                      {renderField(idx, item, 'backSize', 'Nở Hậu (m)', { placeholder: 'Nhập chiều hậu...' })}
+                      {renderField(idx, item, 'locationType', 'Loại Vị Trí', { placeholder: 'Nhập loại vị trí (Mặt tiền, Hẻm, ...)' })}
+                      {renderField(idx, item, 'direction', 'Hướng', { placeholder: 'Nhập hướng...' })}
+                      {renderField(idx, item, 'legalStatus', 'Pháp Lý', { placeholder: 'Nhập pháp lý (Sổ hồng, Sổ đỏ, ...)' })}
+                      {renderField(idx, item, 'furnitureStatus', 'Nội Thất', { placeholder: 'Nhập nội thất...' })}
                     </div>
                   </div>
 
@@ -434,10 +433,10 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                   <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-purple-500/10 bg-purple-500/5 p-5">
                     <div className="absolute left-0 top-0 h-full w-1 bg-purple-500/30"></div>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                      {renderField(idx, item, 'province', 'Tỉnh / Thành', { placeholder: 'Hồ Chí Minh' })}
-                      {renderField(idx, item, 'district', 'Quận / Huyện', { placeholder: 'Quận 1' })}
-                      {renderField(idx, item, 'ward', 'Phường / Xã', { placeholder: 'Bến Nghé' })}
-                      {renderField(idx, item, 'address', 'Đường / Số nhà', { placeholder: 'Lê Lợi' })}
+                      {renderField(idx, item, 'province', 'Tỉnh / Thành', { placeholder: 'Nhập tỉnh/thành...' })}
+                      {renderField(idx, item, 'district', 'Quận / Huyện', { placeholder: 'Nhập quận/huyện...' })}
+                      {renderField(idx, item, 'ward', 'Phường / Xã', { placeholder: 'Nhập phường/xã...' })}
+                      {renderField(idx, item, 'address', 'Đường / Số nhà', { placeholder: 'Nhập đường/số nhà...' })}
                     </div>
                   </div>
 
