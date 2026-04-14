@@ -185,7 +185,7 @@ const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
   const specs = [
     { icon: <BsBuildingFillUp size={20} className="text-primary" />, label: 'Số tầng', value: post?.floorNumber },
     { icon: <FaBed size={20} className="text-primary" />, label: 'Phòng ngủ', value: post?.bedroomNumber },
-    { icon: <FaShower size={20} className="text-primary" />, label: 'WC/Toilet', value: post?.toiletNumber },
+    { icon: <FaShower size={20} className="text-primary" />, label: 'WC', value: post?.toiletNumber },
     { icon: <GiHouse size={20} className="text-primary" />, label: 'Loại BĐS', value: post?.propertyType },
     {
       icon: <FaRulerHorizontal size={20} className="text-primary" />,

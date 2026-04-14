@@ -343,7 +343,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       <input type="number" className={inputClass} {...register('bedroomNumber', { valueAsNumber: true })} min="0" placeholder="0" />
                     </div>
                     <div>
-                      <label className={labelClass}>Phòng Tắm</label>
+                      <label className={labelClass}>Wc</label>
                       <input type="number" className={inputClass} {...register('toiletNumber', { valueAsNumber: true })} min="0" placeholder="0" />
                     </div>
                     <div>

@@ -419,7 +419,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
                       {renderField(idx, item, 'floorNumber', 'Số Tầng', { type: 'number', placeholder: '0' })}
                       {renderField(idx, item, 'bedroomNumber', 'Phòng Ngủ', { type: 'number', placeholder: '0' })}
-                      {renderField(idx, item, 'toiletNumber', 'Phòng Tắm', { type: 'number', placeholder: '0' })}
+                      {renderField(idx, item, 'toiletNumber', 'Wc', { type: 'number', placeholder: '0' })}
                       {renderField(idx, item, 'frontageWidth', 'Ngang (m)', { placeholder: 'Rộng' })}
                       {renderField(idx, item, 'lotDepth', 'Dài (m)', { placeholder: 'Dài' })}
                       {renderField(idx, item, 'backSize', 'Nở Hậu (m)', { placeholder: 'Sau' })}
