@@ -288,7 +288,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       <textarea
                         className={`${inputClass} resize-none`}
                         {...register('description', { required: true })}
-                        rows={4}
+                        rows={10}
                         placeholder="Viết mô tả thu hút khách hàng..."
                       />
                     </div>
