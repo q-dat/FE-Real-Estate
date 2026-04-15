@@ -3,6 +3,7 @@ import { useState, useMemo, useRef } from 'react';
 import { Button, Modal } from 'react-daisyui';
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { IRentalAuthor } from '@/types/rentalAdmin/rentalAdmin.types';
+import { useEscClose } from '@/hooks/useEscClose';
 
 interface Props {
   open: boolean;
@@ -23,7 +24,6 @@ const EXAMPLE_JSON = [
     direction: 'Đông Nam',
     price: 25.5,
     priceUnit: 'Tỷ',
-    pricePerM2: 255000000,
     area: 100,
     frontageWidth: '5',
     lotDepth: '20',
@@ -49,6 +49,7 @@ const EXAMPLE_JSON = [
 ];
 
 export default function ImportRentalPostModal({ open, onClose, reload, authorId }: Props) {
+  useEscClose(open, onClose);
   const [jsonText, setJsonText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -127,7 +128,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
         return;
       }
 
-      const numericFields = ['price', 'area', 'pricePerM2', 'floorNumber', 'bedroomNumber', 'toiletNumber'];
+      const numericFields = ['price', 'area', 'floorNumber', 'bedroomNumber', 'toiletNumber'];
       let finalValue = value;
       if (numericFields.includes(field)) {
         finalValue = value === '' ? '' : Number(value);
@@ -408,7 +409,6 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                       {renderField(idx, item, 'price', 'Mức giá', { type: 'number', placeholder: 'Nhập mức giá...' })}
                       {renderField(idx, item, 'priceUnit', 'Đơn vị', { placeholder: 'Nhập đơn vị giá...' })}
                       {renderField(idx, item, 'area', 'Diện tích (m²)', { type: 'number', placeholder: 'Nhập diện tích...' })}
-                      {renderField(idx, item, 'pricePerM2', 'Giá / m²', { type: 'number', placeholder: 'VNĐ' })}
                     </div>
                   </div>
 
