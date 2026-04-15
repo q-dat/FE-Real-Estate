@@ -218,17 +218,39 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   <div className="absolute left-0 top-0 h-full w-1.5 bg-blue-500/30"></div>
                   <h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-blue-600/80">Nhận diện & Tiêu đề</h4>
                   <div className="flex flex-col gap-4">
+                    {/* Title */}
                     <div className="w-full">
                       <label className={labelClass}>
                         Tiêu đề bài đăng <span className="text-error">*</span>
                       </label>
+                      <input type="text" className={inputClass} {...register('title', { required: true })} placeholder="Nhập tiêu đề..." autoFocus />
+                    </div>
+                    {/* Public Images */}
+                    <div className="w-full">
+                      <label className={labelClass}>Ảnh hiển thị (Public)</label>
                       <input
-                        type="text"
-                        className={inputClass}
-                        {...register('title', { required: true })}
-                        placeholder="Nhập tiêu đề hấp dẫn..."
-                        autoFocus
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => setImages(e.target.files)}
+                        className="file-input file-input-bordered file-input-primary file-input-sm w-full bg-white/60 focus:outline-none"
                       />
+                      {previewUrls.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {previewUrls.map((url, i) => (
+                            <div key={url + i} className="group relative h-16 w-16 overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                              <Image src={url} alt={`preview-${i}`} fill style={{ objectFit: 'cover' }} unoptimized />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(url)}
+                                className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition group-hover:opacity-100"
+                              >
+                                <MdClose size={10} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       <div>
@@ -302,7 +324,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       <label className={labelClass}>
                         Diện tích (m²) <span className="text-error">*</span>
                       </label>
-                      <input type="text"  className={inputClass} {...register('area', { required: true })} placeholder="0" />
+                      <input type="text" className={inputClass} {...register('area', { required: true })} placeholder="0" />
                     </div>
                     <div>
                       <label className={labelClass}>Giá / m² (Tự động)</label>
@@ -336,44 +358,62 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
                     <div>
                       <label className={labelClass}>Số Tầng</label>
-                      <input type="number" className={inputClass} {...register('floorNumber', { valueAsNumber: true })} min="0" placeholder="0" />
+                      <input
+                        type="number"
+                        className={inputClass}
+                        {...register('floorNumber', { valueAsNumber: true })}
+                        min="0"
+                        placeholder="Nhập số tầng..."
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Phòng Ngủ</label>
-                      <input type="number" className={inputClass} {...register('bedroomNumber', { valueAsNumber: true })} min="0" placeholder="0" />
+                      <input
+                        type="number"
+                        className={inputClass}
+                        {...register('bedroomNumber', { valueAsNumber: true })}
+                        min="0"
+                        placeholder="Nhập số phòng ngủ..."
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Wc</label>
-                      <input type="number" className={inputClass} {...register('toiletNumber', { valueAsNumber: true })} min="0" placeholder="0" />
+                      <input
+                        type="number"
+                        className={inputClass}
+                        {...register('toiletNumber', { valueAsNumber: true })}
+                        min="0"
+                        placeholder="Nhập số phòng vệ sinh..."
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Ngang (m)</label>
-                      <input type="text" className={inputClass} {...register('frontageWidth')} placeholder="Rộng" />
+                      <input type="text" className={inputClass} {...register('frontageWidth')} placeholder="Nhập chiều ngang (m)..." />
                     </div>
                     <div>
                       <label className={labelClass}>Dài (m)</label>
-                      <input type="text" className={inputClass} {...register('lotDepth')} placeholder="Sâu" />
+                      <input type="text" className={inputClass} {...register('lotDepth')} placeholder="Nhập chiều dài (m)..." />
                     </div>
                     <div>
                       <label className={labelClass}>Mặt Hậu (m)</label>
-                      <input type="text" className={inputClass} {...register('backSize')} placeholder="Nở hậu" />
+                      <input type="text" className={inputClass} {...register('backSize')} placeholder="Nhập mặt hậu (m)..." />
                     </div>
                     <div>
                       <label className={labelClass}>Vị trí (Loại)</label>
-                      <input type="text" className={inputClass} {...register('locationType')} placeholder="Mặt tiền..." />
+                      <input type="text" className={inputClass} {...register('locationType')} placeholder="Nhập loại vị trí (Mặt tiền, Hẻm)..." />
                     </div>
                     <div>
                       <label className={labelClass}>Hướng nhà</label>
-                      <input type="text" className={inputClass} {...register('direction')} placeholder="Đông Nam..." />
+                      <input type="text" className={inputClass} {...register('direction')} placeholder="Nhập hướng nhà..." />
                     </div>
                     <div>
                       <label className={labelClass}>Pháp lý</label>
-                      <input type="text" className={inputClass} {...register('legalStatus')} placeholder="Sổ hồng..." />
+                      <input type="text" className={inputClass} {...register('legalStatus')} placeholder="Nhập pháp lý (Sổ hồng, Sổ đỏ)..." />
                     </div>
                     <div>
                       <label className={labelClass}>Nội thất</label>
-                      <select className={inputClass} {...register('furnitureStatus')} defaultValue="">
-                        <option value="">Không chọn</option>
+                      <select className={inputClass} {...register('furnitureStatus')} defaultValue="default">
+                        <option value="default">Chọn tình trạng nội thất</option>
                         <option value="Đầy đủ nội thất">Đầy đủ nội thất</option>
                         <option value="Chưa có nội thất">Chưa có nội thất</option>
                         <option value="Nhà cũ cần cải tạo">Nhà cũ cần cải tạo</option>
@@ -473,61 +513,32 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   <div className="absolute left-0 top-0 h-full w-1.5 bg-rose-500/30"></div>
                   <h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-rose-600/80">Media & Ghi chú Nội bộ</h4>
 
-                  <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-                    {/* Public Images */}
-                    <div>
-                      <label className={labelClass}>Ảnh hiển thị (Public)</label>
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={(e) => setImages(e.target.files)}
-                        className="file-input file-input-bordered file-input-sm w-full bg-white/60 focus:outline-none"
-                      />
-                      {previewUrls.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {previewUrls.map((url, i) => (
-                            <div key={url + i} className="group relative h-16 w-16 overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-                              <Image src={url} alt={`preview-${i}`} fill style={{ objectFit: 'cover' }} unoptimized />
-                              <button
-                                type="button"
-                                onClick={() => removeImage(url)}
-                                className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition group-hover:opacity-100"
-                              >
-                                <MdClose size={10} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {/* Admin Images */}
-                    <div>
-                      <label className={labelClass}>Ảnh nội bộ (Sổ, Giấy tờ...)</label>
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={(e) => setAdminImages(e.target.files)}
-                        className="file-input file-input-bordered file-input-info file-input-sm w-full bg-white/60 focus:outline-none"
-                      />
-                      {adminPreviewUrls.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {adminPreviewUrls.map((url, i) => (
-                            <div key={url + i} className="group relative h-16 w-16 overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-                              <Image src={url} alt={`admin-preview-${i}`} fill style={{ objectFit: 'cover' }} unoptimized />
-                              <button
-                                type="button"
-                                onClick={() => removeAdminImage(url)}
-                                className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition group-hover:opacity-100"
-                              >
-                                <MdClose size={10} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                  {/* Admin Images */}
+                  <div className="mb-4">
+                    <label className={labelClass}>Ảnh nội bộ (Sổ, Giấy tờ...)</label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => setAdminImages(e.target.files)}
+                      className="file-input file-input-bordered file-input-secondary file-input-sm w-full bg-white/60 focus:outline-none"
+                    />
+                    {adminPreviewUrls.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {adminPreviewUrls.map((url, i) => (
+                          <div key={url + i} className="group relative h-16 w-16 overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                            <Image src={url} alt={`admin-preview-${i}`} fill style={{ objectFit: 'cover' }} unoptimized />
+                            <button
+                              type="button"
+                              onClick={() => removeAdminImage(url)}
+                              className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition group-hover:opacity-100"
+                            >
+                              <MdClose size={10} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -548,7 +559,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className={labelClass}>Tiện ích (Amenities)</label>
-                      <textarea className={`${inputClass} resize-none`} {...register('amenities')} rows={3} placeholder="Máy lạnh, Chỗ để xe..." />
+                      <textarea className={`${inputClass} resize-none`} {...register('amenities')} rows={3} placeholder="Nhập tiện ích..." />
                     </div>
                     <div>
                       <label className={`${labelClass} text-warning/80`}>Ghi chú Admin (Không hiển thị)</label>
@@ -581,11 +592,11 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
               <CancelBtn onClick={onClose} type="button" value="Hủy thao tác" className="min-w-[120px] rounded-xl font-bold" />
               <Button
                 color="success"
-                size='sm'
+                size="sm"
                 type="submit"
                 form="rental-post-form"
                 disabled={loading}
-                className="min-w-[150px] rounded-xl text-white font-bold tracking-wide shadow-lg shadow-primary/30 transition-shadow hover:shadow-primary/50"
+                className="min-w-[150px] rounded-xl font-bold tracking-wide text-white shadow-lg shadow-primary/30 transition-shadow hover:shadow-primary/50"
               >
                 {loading ? (
                   <>
