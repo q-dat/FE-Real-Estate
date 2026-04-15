@@ -399,7 +399,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                       {renderField(idx, item, 'categoryName', 'Danh mục', { placeholder: 'Chọn danh mục...' })}
                       {renderField(idx, item, 'propertyType', 'Loại hình', { placeholder: 'Nhập loại hình (Nhà phố, Căn hộ...)' })}
                     </div>
-                    {renderField(idx, item, 'description', 'Mô tả chi tiết', { isTextarea: true, rows: 3, placeholder: 'Nhập mô tả...' })}
+                    {renderField(idx, item, 'description', 'Mô tả chi tiết', { isTextarea: true, rows: 10, placeholder: 'Nhập mô tả...' })}
                   </div>
 
                   {/* Nhóm 3: Giá & Diện tích (Emerald) */}
