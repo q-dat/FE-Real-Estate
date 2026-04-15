@@ -447,13 +447,13 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                       {renderField(idx, item, 'images', 'Ảnh Hiển Thị (Mỗi link 1 dòng)', {
                         isTextarea: true,
                         isArray: true,
-                        rows: 4,
+                        rows: 10,
                         placeholder: 'https://...',
                       })}
                       {renderField(idx, item, 'adminImages', 'Ảnh Nội Bộ (Admin Images)', {
                         isTextarea: true,
                         isArray: true,
-                        rows: 4,
+                        rows: 10,
                         placeholder: 'https://...',
                       })}
                     </div>
@@ -465,12 +465,12 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                     <div className="grid grid-cols-1 gap-4 pt-2 lg:grid-cols-2">
                       {renderField(idx, item, 'amenities', 'Tiện ích (Amenities)', {
                         isTextarea: true,
-                        rows: 3,
+                        rows: 10,
                         placeholder: 'Trường học, Bệnh viện...',
                       })}
                       {renderField(idx, item, 'adminNote', 'Ghi chú kiểm duyệt (Admin Note)', {
                         isTextarea: true,
-                        rows: 3,
+                        rows: 10,
                         placeholder: 'Thông tin ẩn...',
                       })}
                     </div>

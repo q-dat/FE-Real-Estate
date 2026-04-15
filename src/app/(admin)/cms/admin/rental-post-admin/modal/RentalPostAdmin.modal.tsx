@@ -552,21 +552,21 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     </div>
                     <div className="sm:col-span-2 lg:col-span-4">
                       <label className={labelClass}>Mô tả Video</label>
-                      <textarea className={`${inputClass} resize-none`} {...register('videoDescription')} rows={2} placeholder="Mô tả video..." />
+                      <textarea className={`${inputClass} resize-none`} {...register('videoDescription')} rows={10} placeholder="Mô tả video..." />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className={labelClass}>Tiện ích (Amenities)</label>
-                      <textarea className={`${inputClass} resize-none`} {...register('amenities')} rows={3} placeholder="Nhập tiện ích..." />
+                      <textarea className={`${inputClass} resize-none`} {...register('amenities')} rows={10} placeholder="Nhập tiện ích..." />
                     </div>
                     <div>
                       <label className={`${labelClass} text-warning/80`}>Ghi chú Admin (Không hiển thị)</label>
                       <textarea
                         className={`${inputClass} resize-none border-warning/20 bg-warning/5 text-warning-content focus:border-warning/50`}
                         {...register('adminNote')}
-                        rows={3}
+                        rows={10}
                         placeholder="Ghi chú hoa hồng, thông tin chủ nhà..."
                       />
                     </div>
