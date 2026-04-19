@@ -54,8 +54,8 @@ export default function AuthorProfileCard({ author }: Props) {
             {/* Mini Social Icons Row */}
             <div className="flex items-end gap-1.5">
               <span className="text-[10px] font-semibold">Theo dõi</span>
-              {profile.facebook && <MiniSocialBtn href={profile.facebook} icon={<FaFacebookF />} color="text-blue-600 bg-blue-50" />}
-              {profile.instagram && <MiniSocialBtn href={profile.instagram} icon={<FaInstagram />} color="text-pink-600 bg-pink-50" />}
+              {profile.facebook && <MiniSocialBtn href={`/${profile.facebook}`} icon={<FaFacebookF />} color="text-blue-600 bg-blue-50" />}
+              {profile.instagram && <MiniSocialBtn href={`/${profile.instagram}`} icon={<FaInstagram />} color="text-pink-600 bg-pink-50" />}
             </div>
           </div>
         </div>
