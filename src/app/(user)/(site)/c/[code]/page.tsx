@@ -1,8 +1,9 @@
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
-import ClientRentalPostDetailPage from '../../[slug]/[id]/ClientRentalPostDetailPage';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { slugify } from '@/lib/slugify';
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic'; //cache dev
+export const revalidate = 86400; //24h
 
 interface PageProps {
   params: Promise<{
@@ -14,14 +15,21 @@ export default async function PostByCodePage({ params }: PageProps) {
   const { code } = await params;
 
   if (!code) {
-    notFound();
+    return notFound();
   }
 
   const post = await rentalPostAdminService.getByCode(code);
 
-  if (!post) {
-    notFound();
+  if (!post || !post._id) {
+    return notFound();
   }
 
-  return <ClientRentalPostDetailPage post={post} />;
+  const correctSlug = slugify(post.title || '');
+  const canonicalUrl = `/${correctSlug}-${post._id}`;
+
+  // // Log ra terminal để chắc chắn code đã chạy đến đây và URL tạo ra chính xác
+  // console.log('=== REDIRECTING TO ===', canonicalUrl);
+
+  // Dùng redirect thay cho permanentRedirect để test
+  redirect(canonicalUrl);
 }

@@ -8,10 +8,10 @@ import { IPost } from '@/types/post/post.types';
 import { IPostCategory } from '@/types/post/post-category.types';
 import { useNavigateToPostDetail } from '@/hooks/useNavigateToPostDetail';
 import TimeAgo from '@/components/orther/timeAgo/TimeAgo';
-import CatalogSidebar from './[id]/CatalogSidebar';
-import PostDetailContent from './[id]/PostDetailContent';
-import PostNotFound from './[id]/PostNotFound';
-import RelatedPosts from './[id]/RelatedPosts';
+import CatalogSidebar from './CatalogSidebar';
+import PostDetailContent from './PostDetailContent';
+import PostNotFound from './PostNotFound';
+import RelatedPosts from './RelatedPosts';
 
 interface ClientPostDetailPageProps {
   post: IPost | null;

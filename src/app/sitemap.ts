@@ -3,23 +3,28 @@ import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { IPost } from '@/types/post/post.types';
 import { postService } from '@/services/post/post.service';
-import { encodeObjectId } from '@/utils/DetailPage/objectIdCodec.utils';
 import { slugify } from '@/lib/slugify';
 
-const DOMAIN = 'https://www.nguonnhagiare.vn';
+const DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nguonnhagiare.vn';
 
-const DAILY: MetadataRoute.Sitemap[number]['changeFrequency'] = 'daily';
-
-const createEntry = (url: string, lastModified: Date, priority = 0.7): MetadataRoute.Sitemap[number] => ({
+// Hàm helper chuẩn hóa
+const createEntry = (
+  url: string,
+  lastModified: Date,
+  priority: number,
+  changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] = 'daily'
+): MetadataRoute.Sitemap[number] => ({
   url,
   lastModified,
-  changeFrequency: DAILY,
+  changeFrequency,
   priority,
 });
 
 /* Rental Posts */
 async function getRentalPostSitemap(): Promise<MetadataRoute.Sitemap> {
   try {
+    // Lưu ý kiến trúc: Ở dự án lớn, không nên dùng getAll() nếu vượt quá 10.000 record.
+    // Nên gọi API lấy ra mảng chứa { _id, title, updatedAt } thôi để tối ưu RAM.
     const rentalPosts: IRentalPostAdmin[] = await rentalPostAdminService.getAll();
 
     if (!rentalPosts?.length) return [];
@@ -28,13 +33,12 @@ async function getRentalPostSitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((post) => post._id && post.title && (!post.status || post.status === 'active'))
       .map((post) => {
         const slug = slugify(post.title);
-        const encodedId = encodeObjectId(post._id);
-
         const lastModified = post.updatedAt ? new Date(post.updatedAt) : new Date();
 
-        const url = `${DOMAIN}/${slug}/${encodedId}`;
+        // CẬP NHẬT: Khớp chuẩn xác với file [..slug]/page.tsx (để ở root domain)
+        const url = `${DOMAIN}/${slug}-${post._id}`;
 
-        return createEntry(url, lastModified, 0.8);
+        return createEntry(url, lastModified, 0.8, 'daily');
       });
   } catch (error) {
     console.error('[SITEMAP] Rental posts failed:', error);
@@ -53,13 +57,11 @@ async function getNewsPostSitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((post) => post._id && post.slug)
       .map((post) => {
         const slug = post.slug;
-
         const lastModified = post.updatedAt ? new Date(post.updatedAt) : new Date();
 
-        // const url = `${DOMAIN}/tin-tuc/${slug}/${post._id}`;
-        const url = `${DOMAIN}/tin-tuc/${slug}`;
+        const url = `${DOMAIN}/tin-tuc/${slug}-${post._id}`;
 
-        return createEntry(url, lastModified, 0.7);
+        return createEntry(url, lastModified, 0.7, 'daily');
       });
   } catch (error) {
     console.error('[SITEMAP] News posts failed:', error);
@@ -70,25 +72,24 @@ async function getNewsPostSitemap(): Promise<MetadataRoute.Sitemap> {
 /* Root Sitemap */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
-    createEntry(`${DOMAIN}`, new Date(), 1),
-    createEntry(`${DOMAIN}/tin-tuc`, new Date(), 0.9),
+    // Trang chủ: Tần suất thay đổi liên tục, độ ưu tiên cao nhất
+    createEntry(`${DOMAIN}`, new Date(), 1.0, 'hourly'),
 
-    createEntry(`${DOMAIN}/can-ho`, new Date()),
-    createEntry(`${DOMAIN}/mat-bang`, new Date()),
-    createEntry(`${DOMAIN}/nha-nguyen-can`, new Date()),
+    // Các trang danh mục: Chứa danh sách bài viết mới mỗi ngày
+    createEntry(`${DOMAIN}/tin-tuc`, new Date(), 0.9, 'hourly'),
+    createEntry(`${DOMAIN}/can-ho`, new Date(), 0.9, 'hourly'),
+    createEntry(`${DOMAIN}/mat-bang`, new Date(), 0.9, 'hourly'),
+    createEntry(`${DOMAIN}/nha-nguyen-can`, new Date(), 0.9, 'hourly'),
+    createEntry(`${DOMAIN}/bat-dong-san-ban`, new Date(), 0.9, 'hourly'),
+    createEntry(`${DOMAIN}/bat-dong-san-du-an`, new Date(), 0.9, 'hourly'),
 
-    createEntry(`${DOMAIN}/bat-dong-san-ban`, new Date()),
-    createEntry(`${DOMAIN}/bat-dong-san-du-an`, new Date()),
-
-    createEntry(`${DOMAIN}/thiet-ke-noi-that`, new Date(), 0.6),
-    createEntry(`${DOMAIN}/tu-van-tim-nha`, new Date(), 0.6),
-    createEntry(`${DOMAIN}/lien-he-ky-gui`, new Date(), 0.6),
+    // Các trang tĩnh ít thay đổi
+    createEntry(`${DOMAIN}/thiet-ke-noi-that`, new Date(), 0.6, 'monthly'),
+    createEntry(`${DOMAIN}/tu-van-tim-nha`, new Date(), 0.6, 'monthly'),
+    createEntry(`${DOMAIN}/lien-he-ky-gui`, new Date(), 0.6, 'monthly'),
   ];
 
   const [rentalPages, newsPages] = await Promise.all([getRentalPostSitemap(), getNewsPostSitemap()]);
-  // console.log('____Static Pages Count:', staticPages.length);
-  // console.log('____Dynamic Pages Count:', rentalPages.length + newsPages.length);
-  // console.log('____Total Pages:', [...staticPages, ...rentalPages, ...newsPages].length);
 
   return [...staticPages, ...rentalPages, ...newsPages];
 }

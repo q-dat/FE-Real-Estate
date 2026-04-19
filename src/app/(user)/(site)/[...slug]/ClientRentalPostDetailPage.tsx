@@ -1,4 +1,5 @@
 'use client';
+
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
@@ -8,6 +9,7 @@ import { IoShareSocial } from 'react-icons/io5';
 import { GiHouse, GiPencilRuler, GiStarsStack } from 'react-icons/gi';
 import { BsBuildingFillUp } from 'react-icons/bs';
 import { SiGooglemaps } from 'react-icons/si';
+
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';
 import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
@@ -51,42 +53,30 @@ const getStatusLabel = (status: IRentalPostAdmin['postType']): string => {
   return map[status] || 'Tin đăng';
 };
 
-// SUB COMPONENTS
-
-// New Modern Header Component
 const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
   const slug = slugify(post.title);
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/${slug}/${post._id}`;
+  // Cập nhật cấu trúc URL mới
+  const relativePath = `/${slug}-${post._id}`;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL}${relativePath}`;
+
   return (
     <div className="mb-6">
-      {/* Top Meta: Badges & Code */}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-1 xl:gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <Badge color={getStatusColor(post.postType)} className="whitespace-nowrap border border-white px-3 py-4 font-medium text-white">
             {post.postType === 'highlight' && <GiStarsStack className="mr-1" />}
             {getStatusLabel(post.postType)}
           </Badge>
-
-          {/* <span className="flex items-center text-xs text-neutral-400">
-            <FaClock className="mr-1" />
-            {new Date(post.updatedAt).toLocaleDateString('vi-VN')}
-          </span> */}
         </div>
         <div className="z-50 flex flex-row items-center justify-center gap-1 xl:gap-2">
-          {/* Copy Code */}
           <CopyCodeBadgeBtn code={post.code} />
-          {/* DownloadImages */}
           <DownloadImagesBtn images={post.images} filePrefix={post.code} />
-          {/* Copy URL */}
           <CopyUrlBtn url={url} size="sm" />
-          {/* Share */}
-          <SocialShareBtn fullPath={`/${slug}/${post._id}`} title={post.title} />
-          {/* Favorite */}
+          <SocialShareBtn fullPath={relativePath} title={post.title} />
           <FavoriteBtn scaleOnHover={true} border={true} post={post} size={0} color="text-primary" />
         </div>
       </div>
 
-      {/* Title */}
       <motion.h1
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -95,15 +85,12 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
         {post.title}
       </motion.h1>
 
-      {/* Address */}
       <div className="flex w-full flex-wrap items-start justify-between gap-3 text-sm font-medium xl:text-xl">
-        {/*  */}
         <p className="flex-1 break-words text-gray-600">
           <b className="mr-2 text-gray-800">Địa chỉ:</b>
           <span className="text-primary">{post?.address}</span>
         </p>
 
-        {/*  */}
         <Link
           href="#map"
           onClick={(e) => {
@@ -119,21 +106,16 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
 
       <Divider className="my-2" />
 
-      {/* Price & Area Section */}
       <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100 p-5 shadow-inner">
-        {/* Background grid */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.6]"
           style={{
             backgroundImage: `linear-gradient(to right, rgba(148,163,184,0.15) 1px, transparent 1px),
-                             linear-gradient(to bottom, rgba(148,163,184,0.15) 1px, transparent 1px)`,
+                              linear-gradient(to bottom, rgba(148,163,184,0.15) 1px, transparent 1px)`,
             backgroundSize: '20px 20px',
           }}
         />
-
-        {/* Content */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          {/* Price - Highlighted */}
           <div className="flex w-full flex-col items-center xl:items-start">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Mức giá</span>
             <motion.div
@@ -148,25 +130,21 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
           </div>
 
           <div className="flex w-full flex-row items-start justify-between gap-10 xl:items-center">
-            {/* Area - Secondary */}
             <div className="flex flex-col">
               <p className="whitespace-nowrap text-xs">
                 <span className="font-semibold uppercase tracking-wider text-slate-400">Diện tích:</span>
-                {/* Chiều ngang - Chiều dài */}
                 {post.frontageWidth && post.lotDepth && (
                   <span className="px-1 font-bold text-black">
                     ({post.frontageWidth} x {post.lotDepth})
                   </span>
                 )}
               </p>
-
               <div className="flex items-baseline gap-1 text-slate-700">
                 <span className="text-3xl font-bold">{post.area}</span>
                 <span className="text-lg font-medium">m²</span>
               </div>
             </div>
 
-            {/* Price per m2 (Optional calculation) */}
             <div className="flex flex-col">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Đơn giá</span>
               <div className="text-lg font-semibold text-slate-600">
@@ -180,7 +158,6 @@ const PropertyHeader = ({ post }: { post: IRentalPostAdmin }) => {
   );
 };
 
-// Property Specs Grid (Clean & Minimal)
 const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
   const specs = [
     { icon: <BsBuildingFillUp size={20} className="text-primary" />, label: 'Số tầng', value: post?.floorNumber },
@@ -220,7 +197,6 @@ const PropertySpecGrid = ({ post }: { post: IRentalPostAdmin }) => {
   );
 };
 
-// MAIN PAGE
 export default function ClientRentalPostDetailPage({ post }: Props) {
   const { isAdmin, loading } = useAdminRole();
   const imagesRental = useMemo(() => post?.images || [], [post?.images]);
@@ -232,10 +208,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
       <Breadcrumbs label={post.title} />
       <div className="text-black xl:px-desktop-padding">
         <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
-          {/* LEFT COLUMN (Main Content) - 8/12 */}
           <div className="flex flex-col gap-6 xl:col-span-8">
-            {/* Gallery Wrapper */}
-            {/* Title */}
             <motion.h1
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -251,14 +224,10 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
               )}
             </div>
 
-            {/* Main Info Card */}
             <div className="rounded-none bg-white p-0 md:p-2 xl:rounded-xl">
-              {/* NEW HEADER HERE */}
               <PropertyHeader post={post} />
-
               <Divider className="my-2" />
 
-              {/* Description */}
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-slate-900">Mô tả bất động sản</h2>
                 <div
@@ -267,12 +236,9 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                 />
               </div>
 
-              {/* Specs Grid */}
               <PropertySpecGrid post={post} />
-
               <Divider className="my-2" />
 
-              {/* Amenities */}
               {post?.amenities && (
                 <div className="mb-6">
                   <h2 className="mb-4 text-lg font-bold text-slate-900">Tiện ích đi kèm</h2>
@@ -292,7 +258,6 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                 </div>
               )}
 
-              {/* Video Section */}
               {youtubeId && (
                 <div className="mb-6">
                   <h2 className="mb-4 text-lg font-bold text-slate-900">Video giới thiệu</h2>
@@ -307,7 +272,6 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                 </div>
               )}
 
-              {/* Maps */}
               {post?.address && (
                 <div id="map" className="bg-white">
                   <div className="p-2">
@@ -320,7 +284,7 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
                       height="400"
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}
+                      src={`https://maps.google.com/maps?q=${encodedAddress}&output=embed`}
                     ></iframe>
                   </div>
                 </div>
@@ -328,21 +292,15 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
             </div>
           </div>
 
-          {/* === RIGHT COLUMN */}
           <aside className="xl:col-span-4">
             <div className="sticky top-24 flex flex-col gap-5">
-              {/* Author Card */}
               <AuthorProfileCard author={post.author} />
-
-              {/* Safety Card (Functional & Warning) */}
               <div className="rounded-xl border border-amber-200 bg-amber-50 p-2 shadow-sm">
                 <p className="text-sm font-bold text-amber-800">Lưu ý an toàn</p>
                 <p className="mt-1 text-xs leading-relaxed text-amber-700/80">
                   KHÔNG đóng phí đặt cọc khi chưa xem nhà. Kiểm tra kỹ giấy tờ pháp lý (Sổ đỏ/Sổ hồng) và CMND/CCCD chính chủ trước khi giao dịch.
                 </p>
               </div>
-
-              {/* Feedback*/}
               <div className="text-center">
                 <button className="text-xs font-medium text-slate-400 hover:text-slate-600 hover:underline">Báo cáo tin đăng sai sự thật</button>
               </div>
@@ -350,7 +308,6 @@ export default function ClientRentalPostDetailPage({ post }: Props) {
           </aside>
         </div>
       </div>
-      {/* Admin internal section */}
       {!loading && isAdmin && <AdminPostInternalSection adminNote={post.adminNote} adminImages={post.adminImages} />}
     </main>
   );

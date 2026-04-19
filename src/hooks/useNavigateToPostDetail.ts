@@ -12,9 +12,7 @@ export function useNavigateToPostDetail() {
 
   const navigateToPostDetail = (post: IPost, options?: NavigateOptions): void => {
     const titleSlug = slugify(post.title);
-    // router.push(`${NEWS_BASE_PATH}/${titleSlug}/${post._id}`);
-    router.push(`${NEWS_BASE_PATH}/${titleSlug}`);
-
+    router.push(`${NEWS_BASE_PATH}/${titleSlug}/${post._id}`);
     if (options?.scroll !== false) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
