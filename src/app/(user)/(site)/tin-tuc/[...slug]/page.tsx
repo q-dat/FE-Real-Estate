@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   const parts = paramsArray.length > 1 ? paramsArray : paramsArray[0].split('-');
   const potentialId = parts[parts.length - 1];
-  
+
   const isMongoId = /^[a-fA-F0-9]{24}$/.test(potentialId);
 
   if (!isMongoId) {
@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   // Gọi hàm build meta chuẩn SEO
   return generateNewsPostMetadata(post);
+}
 
 export default async function NewsDetailPage({ params }: PageProps) {
   const { slug: paramsArray } = await params;
