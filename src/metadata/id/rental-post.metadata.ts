@@ -2,57 +2,32 @@ import { slugify } from '@/lib/slugify';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { Metadata } from 'next';
 
+// TỐI ƯU 1: Bỏ hàm split để giữ nguyên cụm từ khóa dài (long-tail keywords)
 function normalizeKeywords(input: string[]): string[] {
-  return Array.from(
-    new Set(
-      input.flatMap((item) =>
-        item
-          .toLowerCase()
-          .split(/[\s,]+/)
-          .map((word) => word.trim())
-          .filter(Boolean)
-      )
-    )
-  );
+  return Array.from(new Set(input.map((item) => item.toLowerCase().trim()).filter(Boolean)));
 }
 
 function buildKeywords(post: IRentalPostAdmin): string[] {
-  const base: string[] = [
-    post.title,
-    post.district,
-    post.province,
-    post.area ? `${post.area}m2` : '',
-    post.price ? post.price.toString() : '',
-    post.priceUnit,
-  ].filter(Boolean) as string[];
+  const base: string[] = [post.title, `${post.district} ${post.province}`, post.category?.name].filter(Boolean) as string[];
 
   const categoryCode = post.category?.categoryCode;
-
   let rawKeywords: string[] = [];
 
   switch (categoryCode) {
-    // Mua bán nhà đất
     case 0:
-      rawKeywords = [...base, 'mua ban nha dat', 'ban nha dat', `ban nha ${post.district}`, `bat dong san ban ${post.province}`];
+      rawKeywords = [...base, 'mua bán nhà đất', 'bán nhà đất', `bán nhà ${post.district}`, `bất động sản bán ${post.province}`];
       break;
-
-    // Căn hộ cho thuê
     case 1:
-      rawKeywords = [...base, 'can ho cho thue', 'thue can ho', `cho thue can ho ${post.district}`, `can ho cho thue ${post.province}`];
+      rawKeywords = [...base, 'căn hộ cho thuê', 'thuê căn hộ', `cho thuê căn hộ ${post.district}`, `căn hộ cho thuê ${post.province}`];
       break;
-
-    // Nhà nguyên căn cho thuê
     case 2:
-      rawKeywords = [...base, 'nha nguyen can cho thue', 'thue nha nguyen can', `cho thue nha ${post.district}`, `nha cho thue ${post.province}`];
+      rawKeywords = [...base, 'nhà nguyên căn cho thuê', 'thuê nhà nguyên căn', `cho thuê nhà ${post.district}`, `nhà cho thuê ${post.province}`];
       break;
-
-    // Cho thuê mặt bằng
     case 3:
-      rawKeywords = [...base, 'cho thue mat bang', 'mat bang kinh doanh', `thue mat bang ${post.district}`, `mat bang ${post.province}`];
+      rawKeywords = [...base, 'cho thuê mặt bằng', 'mặt bằng kinh doanh', `thuê mặt bằng ${post.district}`, `mặt bằng ${post.province}`];
       break;
-
     default:
-      rawKeywords = [...base, 'bat dong san', 'nha dat'];
+      rawKeywords = [...base, 'bất động sản', 'nhà đất'];
   }
 
   return normalizeKeywords(rawKeywords);
@@ -61,25 +36,24 @@ function buildKeywords(post: IRentalPostAdmin): string[] {
 export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nguonnhagiare.vn';
 
-  const slug = slugify(post.title);
-  const canonicalUrl = `${siteUrl}/${slug}/${post._id}`;
+  // TỐI ƯU 2: Sửa lại Canonical URL thành chuẩn định dạng nối ID bằng gạch ngang
+  const slug = slugify(post.title || '');
+  const canonicalUrl = `${siteUrl}/${slug}-${post._id}`;
 
-  const keywords = buildKeywords(post).slice(0, 16); // Giới hạn từ khóa tối đa
+  // Giới hạn từ khóa tối đa
+  const keywords = buildKeywords(post).slice(0, 15);
 
-  const title = [
-    post.title,
-    post.area ? `${post.area}m²` : null,
-    post.price ? `${post.price.toLocaleString()} ${post.priceUnit}` : null,
-    `${post.district}, ${post.province}`,
-  ]
-    .filter(Boolean)
-    .join(' | ');
+  // TỐI ƯU 3: Rút gọn Title thông minh để tránh bị Google cắt cụt (Limit ~65 chars)
+  // Ưu tiên: Title gốc > Giá > Diện tích > Quận
+  const titleParts = [post.title, post.price ? `${post.price} ${post.priceUnit}` : null, post.area ? `${post.area}m²` : null].filter(Boolean);
+
+  const title = titleParts.join(' | ');
 
   const description =
-    post.description?.slice(0, 160) ||
-    `${post.category?.name || 'Bất động sản'} tại ${post.district}, ${post.province}. ${
+    post.description?.slice(0, 155) ||
+    `${post.title}. ${post.category?.name || 'Bất động sản'} tại ${post.district}, ${post.province}. ${
       post.area ? `Diện tích ${post.area}m².` : ''
-    } ${post.price ? `Giá ${post.price.toLocaleString()} ${post.priceUnit}.` : ''}`;
+    } ${post.price ? `Giá: ${post.price} ${post.priceUnit}.` : ''} Liên hệ ngay!`;
 
   const images =
     post.images?.length > 0
@@ -87,9 +61,17 @@ export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
           url: img.startsWith('http') ? img : `${siteUrl}${img}`,
           width: 1200,
           height: 630,
-          alt: post.title,
+          alt: post.title || 'Bất động sản Nguồn Nhà Giá Rẻ',
         }))
-      : [];
+      : [
+          {
+            // Nên cung cấp 1 ảnh fallback mặc định nếu bài đăng không có ảnh
+            url: `${siteUrl}/images/default-thumbnail.jpg`,
+            width: 1200,
+            height: 630,
+            alt: 'Nguồn Nhà Giá Rẻ',
+          },
+        ];
 
   return {
     title,
@@ -98,6 +80,14 @@ export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
     robots: {
       index: true,
       follow: true,
+      nocache: false, // Cho phép Google lưu cache
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
     alternates: {
       canonical: canonicalUrl,
@@ -106,8 +96,8 @@ export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
       title,
       description,
       url: canonicalUrl,
-      siteName: siteUrl,
-      type: 'website',
+      siteName: 'Nguồn Nhà Giá Rẻ',
+      type: 'article', // Bài viết cụ thể nên dùng 'article' tốt hơn 'website'
       locale: 'vi_VN',
       images,
     },
@@ -117,6 +107,7 @@ export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
       description,
       images: images.map((i) => i.url),
     },
+    // Giữ nguyên các tag hỗ trợ indexing local của bạn
     other: {
       audience: 'general',
       'resource-type': 'document',

@@ -1,10 +1,40 @@
 import { permanentRedirect, notFound } from 'next/navigation';
 import { postService } from '@/services/post/post.service';
 import ClientPostDetailPage from './ClientPostDetailPage';
+import { generateNewsPostMetadata } from '@/metadata/news/news-post.metadata';
 
 type PageProps = {
   params: Promise<{ slug: string[] }>;
 };
+export async function generateMetadata({ params }: PageProps) {
+  const { slug: paramsArray } = await params;
+
+  if (!paramsArray || paramsArray.length === 0) return {};
+
+  const parts = paramsArray.length > 1 ? paramsArray : paramsArray[0].split('-');
+  const potentialId = parts[parts.length - 1];
+  
+  const isMongoId = /^[a-fA-F0-9]{24}$/.test(potentialId);
+
+  if (!isMongoId) {
+    return {
+      title: 'Không tìm thấy bài viết - Nguồn Nhà Giá Rẻ',
+      description: 'Bài viết không tồn tại hoặc đã bị xóa.',
+      robots: 'noindex, nofollow',
+    };
+  }
+
+  const post = await postService.getFallback(potentialId);
+
+  if (!post) {
+    return {
+      title: 'Không tìm thấy bài viết - Nguồn Nhà Giá Rẻ',
+      robots: 'noindex, nofollow',
+    };
+  }
+
+  // Gọi hàm build meta chuẩn SEO
+  return generateNewsPostMetadata(post);
 
 export default async function NewsDetailPage({ params }: PageProps) {
   const { slug: paramsArray } = await params;
