@@ -4,5 +4,5 @@ export interface BaseLocationModalProps {
 }
 export interface BasePropertyTypeModalProps {
   onClose: () => void;
-  onSelect?: (value: string) => void; 
+  onSelect?: (value: string) => void;
 }

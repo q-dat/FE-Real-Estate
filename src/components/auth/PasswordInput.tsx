@@ -9,7 +9,7 @@ interface PasswordInputProps {
   disabled?: boolean;
 }
 
-export const PasswordInput = ({ value, onChange, placeholder = "••••••••", disabled }: PasswordInputProps) => {
+export const PasswordInput = ({ value, onChange, placeholder = '••••••••', disabled }: PasswordInputProps) => {
   const [show, setShow] = useState(false);
 
   return (
@@ -20,7 +20,7 @@ export const PasswordInput = ({ value, onChange, placeholder = "•••••�
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
-        className="w-full pr-12 focus:ring-2 focus:ring-primary transition-all duration-300"
+        className="w-full pr-12 transition-all duration-300 focus:ring-2 focus:ring-primary"
       />
       <Button
         size="sm"

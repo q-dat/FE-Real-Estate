@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Input } from 'react-daisyui';
 import { BaseLocationModalProps } from './types';

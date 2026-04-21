@@ -5,9 +5,8 @@ export default async function Page() {
   const projects = await realEstateProjectService.getAll();
 
   return (
- <>
- <ClientRealEstateProjectPage projects={projects}/>
- </>
+    <>
+      <ClientRealEstateProjectPage projects={projects} />
+    </>
   );
 }
-

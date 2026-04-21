@@ -1,9 +1,6 @@
 // src/constants/filterOptions.ts
 
-export const DIRECTIONS = [
-  'Đông', 'Tây', 'Nam', 'Bắc',
-  'Đông Nam', 'Đông Bắc', 'Tây Nam', 'Tây Bắc'
-];
+export const DIRECTIONS = ['Đông', 'Tây', 'Nam', 'Bắc', 'Đông Nam', 'Đông Bắc', 'Tây Nam', 'Tây Bắc'];
 
 export const FURNITURE_STATUS = [
   { label: 'Nội thất đầy đủ', value: 'Đầy đủ' },
@@ -11,9 +8,7 @@ export const FURNITURE_STATUS = [
   { label: 'Nhà trống', value: 'Không có' },
 ];
 
-export const LEGAL_STATUS = [
-  'Sổ hồng', 'Sổ đỏ', 'Hợp đồng mua bán', 'Đang chờ sổ'
-];
+export const LEGAL_STATUS = ['Sổ hồng', 'Sổ đỏ', 'Hợp đồng mua bán', 'Đang chờ sổ'];
 
 export const LOCATION_TYPE = [
   { label: 'Mặt tiền', value: 'Mặt tiền' },

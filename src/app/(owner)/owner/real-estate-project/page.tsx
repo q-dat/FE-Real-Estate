@@ -1,14 +1,10 @@
-export const revalidate = 0
+export const revalidate = 0;
 
-import { realEstateProjectService } from '@/services/real-estate-project/realEstateProject.service'
-import ClientRealEstateProjectAdminPage from './ClientRealEstateProjectAdminPage'
+import { realEstateProjectService } from '@/services/real-estate-project/realEstateProject.service';
+import ClientRealEstateProjectAdminPage from './ClientRealEstateProjectAdminPage';
 
 export default async function RealEstateProjectAdminPage() {
-  const projects = await realEstateProjectService.getAll()
+  const projects = await realEstateProjectService.getAll();
 
-  return (
-    <ClientRealEstateProjectAdminPage
-      projects={Array.isArray(projects) ? projects : []}
-    />
-  )
+  return <ClientRealEstateProjectAdminPage projects={Array.isArray(projects) ? projects : []} />;
 }

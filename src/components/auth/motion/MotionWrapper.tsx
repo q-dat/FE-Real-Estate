@@ -11,9 +11,9 @@ export const fadeInUp = {
 export const staggerContainer = {
   animate: {
     transition: {
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 export default function MotionPage({ children, className }: { children: ReactNode; className?: string }) {
@@ -23,7 +23,7 @@ export default function MotionPage({ children, className }: { children: ReactNod
       animate="animate"
       exit="exit"
       variants={fadeInUp}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       className={className}
     >
       {children}

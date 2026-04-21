@@ -184,22 +184,22 @@ export default function AdvancedProfilePage() {
               </span>
             </div>
             {/*  */}
-           <div className='mt-4'>
-             <Button
-              size="xs"
-              onClick={onSave}
-              disabled={isSaving}
-              className="rounded-lg text-sm font-bold text-green-600 shadow-sm shadow-primary/20 transition-transform hover:scale-[1.05]"
-            >
-              {isSaving ? (
-                <span className="loading loading-spinner"></span>
-              ) : (
-                <>
-                  <FiSave /> Lưu hồ sơ
-                </>
-              )}
-            </Button>
-           </div>
+            <div className="mt-4">
+              <Button
+                size="xs"
+                onClick={onSave}
+                disabled={isSaving}
+                className="rounded-lg text-sm font-bold text-green-600 shadow-sm shadow-primary/20 transition-transform hover:scale-[1.05]"
+              >
+                {isSaving ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  <>
+                    <FiSave /> Lưu hồ sơ
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Tab Navigation */}

@@ -1,16 +1,6 @@
-export type SharePlatform =
-  | 'facebook'
-  | 'zalo'
-  | 'twitter'
-  | 'linkedin'
-  | 'reddit'
-  | 'whatsapp'
-  | 'telegram'
-  | 'pinterest'
-  | 'email';
+export type SharePlatform = 'facebook' | 'zalo' | 'twitter' | 'linkedin' | 'reddit' | 'whatsapp' | 'telegram' | 'pinterest' | 'email';
 
-const getSiteUrl = (): string =>
-  (process.env.NEXT_PUBLIC_SITE_URL ?? '').replace(/\/+$/, '');
+const getSiteUrl = (): string => (process.env.NEXT_PUBLIC_SITE_URL ?? '').replace(/\/+$/, '');
 
 const PREFIX_MAP: Record<SharePlatform, string> = {
   facebook: process.env.NEXT_PUBLIC_FACEBOOK_SHARE_URL ?? '',
@@ -34,18 +24,12 @@ export const buildFullUrl = (pathOrUrl: string): string => {
   if (pathOrUrl.startsWith('http')) return pathOrUrl;
 
   const base = getSiteUrl();
-  const normalizedPath = pathOrUrl.startsWith('/')
-    ? pathOrUrl
-    : `/${pathOrUrl}`;
+  const normalizedPath = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
 
   return `${base}${normalizedPath}`;
 };
 
-export const buildShareLink = (
-  platform: SharePlatform,
-  pathOrUrl: string,
-  title?: string
-): string => {
+export const buildShareLink = (platform: SharePlatform, pathOrUrl: string, title?: string): string => {
   const fullUrl = buildFullUrl(pathOrUrl);
   const trackedUrl = appendUtm(fullUrl, platform);
   const prefix = PREFIX_MAP[platform];
@@ -60,9 +44,7 @@ export const buildShareLink = (
       return `${prefix}${encodedTitle}%20${encodedUrl}`;
 
     case 'whatsapp':
-      return `${prefix}${encodeURIComponent(
-        `${title ?? ''} ${trackedUrl}`
-      )}`;
+      return `${prefix}${encodeURIComponent(`${title ?? ''} ${trackedUrl}`)}`;
 
     case 'twitter':
       return `${prefix}${encodedUrl}&text=${encodedTitle}`;

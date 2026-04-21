@@ -1,6 +1,6 @@
 'use client';
-import { AuthSession } from "@/types/auth/auth.types";
-import { getAuthToken } from "./getAuthToken";
+import { AuthSession } from '@/types/auth/auth.types';
+import { getAuthToken } from './getAuthToken';
 
 export function getAuthSession(): AuthSession | null {
   if (typeof window === 'undefined') return null;

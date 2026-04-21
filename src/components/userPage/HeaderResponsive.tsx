@@ -111,7 +111,7 @@ export default function HeaderResponsive({ user, onLogout }: HeaderResponsivePro
           <>
             {/* Overlay background */}
             <motion.div
-              className="bg-overlay fixed inset-0 z-[999999] backdrop-blur-sm"
+              className="fixed inset-0 z-[999999] bg-overlay backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

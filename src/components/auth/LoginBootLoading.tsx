@@ -26,9 +26,7 @@ const LoginBootLoading: React.FC = () => {
       <div className="relative z-10 flex w-full max-w-md flex-col items-center px-6">
         {/* Header */}
         <div className="mb-12 text-center">
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.4em] text-primary/70">
-            Secure Authentication
-          </p>
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.4em] text-primary/70">Secure Authentication</p>
           <h1 className="text-4xl font-black tracking-tight text-white">
             CMS <span className="text-primary">LOGIN</span>
           </h1>
@@ -41,7 +39,7 @@ const LoginBootLoading: React.FC = () => {
           <div className="absolute inset-4 animate-[spin_6s_linear_infinite] rounded-full border border-dashed border-primary/40" />
 
           {/* Core */}
-          <div className="relative flex h-20 w-20 items-center justify-center rounded-xl bg-slate-900/80 backdrop-blur-md shadow-[0_0_40px_rgba(var(--p),0.35)]">
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-xl bg-slate-900/80 shadow-[0_0_40px_rgba(var(--p),0.35)] backdrop-blur-md">
             <div className="h-8 w-8 animate-pulse rounded-md bg-primary" />
           </div>
         </div>
@@ -66,9 +64,7 @@ const LoginBootLoading: React.FC = () => {
         </div>
 
         {/* Hint */}
-        <p className="mt-6 text-center text-[11px] text-slate-500">
-          Hệ thống đang khởi động · Vui lòng chờ trong giây lát
-        </p>
+        <p className="mt-6 text-center text-[11px] text-slate-500">Hệ thống đang khởi động · Vui lòng chờ trong giây lát</p>
       </div>
 
       {/* Footer */}
