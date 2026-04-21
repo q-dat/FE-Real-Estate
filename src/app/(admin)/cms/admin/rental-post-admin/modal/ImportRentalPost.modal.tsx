@@ -15,7 +15,7 @@ interface Props {
 const EXAMPLE_JSON = [
   {
     code: '',
-    images: ['https://example.com/image1.jpg'],
+    images: [''],
     title: 'Nhà phố thương mại trung tâm Quận 1',
     description: 'Kết cấu 1 trệt 2 lầu, phù hợp kinh doanh hoặc mở văn phòng.',
     categoryName: 'Bất động sản bán',
@@ -33,7 +33,7 @@ const EXAMPLE_JSON = [
     toiletNumber: 5,
     legalStatus: 'Sổ hồng riêng',
     furnitureStatus: 'Hoàn thiện cơ bản',
-    province: 'Hồ Chí Minh',
+    province: 'Thành phố Hồ Chí Minh',
     district: 'Quận 1',
     ward: 'Phường Bến Nghé',
     address: 'Đường Lê Lợi',

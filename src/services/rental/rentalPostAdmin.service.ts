@@ -74,6 +74,7 @@ const rentalPostAdminService = {
       cache: 'force-cache',
       next: { revalidate: 60 },
     });
+    console.log('Response Debug:', res);
 
     if (!res.ok) {
       throw new Error(`GetAll failed: ${res.status}`);
