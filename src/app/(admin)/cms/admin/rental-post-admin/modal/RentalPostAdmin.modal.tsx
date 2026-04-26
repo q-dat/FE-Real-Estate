@@ -388,15 +388,33 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                     </div>
                     <div>
                       <label className={labelClass}>Ngang (m)</label>
-                      <input type="number" className={inputClass} {...register('frontageWidth')} placeholder="Nhập chiều ngang (m)..." />
+                      <input
+                        type="number"
+                        step="any"
+                        className={inputClass}
+                        {...register('frontageWidth', { valueAsNumber: true })}
+                        placeholder="Nhập chiều ngang (m)..."
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Dài (m)</label>
-                      <input type="number" className={inputClass} {...register('lotDepth')} placeholder="Nhập chiều dài (m)..." />
+                      <input
+                        type="number"
+                        step="any"
+                        className={inputClass}
+                        {...register('lotDepth', { valueAsNumber: true })}
+                        placeholder="Nhập chiều dài (m)..."
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Mặt Hậu (m)</label>
-                      <input type="number" className={inputClass} {...register('backSize')} placeholder="Nhập mặt hậu (m)..." />
+                      <input
+                        type="number"
+                        step="any"
+                        className={inputClass}
+                        {...register('backSize', { valueAsNumber: true })}
+                        placeholder="Nhập mặt hậu (m)..."
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Vị trí (Loại)</label>
