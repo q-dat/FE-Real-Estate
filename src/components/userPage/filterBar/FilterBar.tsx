@@ -23,6 +23,10 @@ interface FilterValues {
   areaFrom?: number;
   areaTo?: number;
 
+  frontageWidth?: string;
+  lotDepth?: string;
+  backSize?: string;
+
   displayPrice?: string;
   displayArea?: string;
   location?: string;
@@ -92,15 +96,17 @@ export default function FilterBar() {
     setActiveModal(null);
   };
   //  handle select Area
-  const handleSelectArea = (data: { label: string; from?: number; to?: number }) => {
+  const handleSelectArea = (data: { label: string; from?: number; to?: number; frontageWidth?: string; lotDepth?: string; backSize?: string }) => {
     setFilters((prev) => ({
       ...prev,
-      displayArea: data.label, // areaFrom sẽ là undefined nếu min = 0
-      areaFrom: data.from, // areaTo sẽ là undefined nếu max = 1000
+      displayArea: data.label,
+      areaFrom: data.from,
       areaTo: data.to,
       area: undefined,
+      frontageWidth: data.frontageWidth,
+      lotDepth: data.lotDepth,
+      backSize: data.backSize,
     }));
-
     setActiveModal(null);
   };
   // handle select Location
@@ -169,6 +175,9 @@ export default function FilterBar() {
       area: undefined,
       areaFrom: undefined,
       areaTo: undefined,
+      frontageWidth: undefined,
+      lotDepth: undefined,
+      backSize: undefined,
     });
     setActiveModal(null);
   };
