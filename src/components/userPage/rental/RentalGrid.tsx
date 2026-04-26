@@ -75,9 +75,16 @@ export default function RentalGrid({ posts }: RentalGridProps) {
                     {formatCurrency(post.price)} {post.priceUnit}
                   </div>
 
-                  <div className="inline-flex items-center text-sm text-gray-600">
+                  <div className="inline-flex items-center text-gray-600">
                     <IoMdExpand />
-                    <span>{post.area} m²</span>
+                    <span className="text-sm">{post.area} m²</span>
+                    {post.frontageWidth && post.lotDepth && (
+                      <p className='text-gray-500'>
+                        (<span className="text-xs">{post.frontageWidth}</span>
+                        <span>x</span>
+                        <span className="text-xs">{post.lotDepth}</span>)
+                      </p>
+                    )}
                   </div>
                 </div>
 

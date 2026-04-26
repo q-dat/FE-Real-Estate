@@ -23,9 +23,9 @@ interface FilterValues {
   areaFrom?: number;
   areaTo?: number;
 
-  frontageWidth?: string;
-  lotDepth?: string;
-  backSize?: string;
+  frontageWidth?: number;
+  lotDepth?: number;
+  backSize?: number;
 
   displayPrice?: string;
   displayArea?: string;
@@ -103,10 +103,10 @@ export default function FilterBar() {
       areaFrom: data.from,
       areaTo: data.to,
       area: undefined,
-      // Convert về chuỗi để FilterValues nhận diện, lưu ý giữ undefined nếu Modal không truyền
-      frontageWidth: data.frontageWidth ? String(data.frontageWidth) : undefined,
-      lotDepth: data.lotDepth ? String(data.lotDepth) : undefined,
-      backSize: data.backSize ? String(data.backSize) : undefined,
+
+      frontageWidth: data.frontageWidth,
+      lotDepth: data.lotDepth,
+      backSize: data.backSize,
     }));
     setActiveModal(null);
   };
@@ -139,31 +139,27 @@ export default function FilterBar() {
     }));
     setActiveModal(null);
   };
-  useEffect(() => {
-    // Tạo danh sách các key KHÔNG muốn đưa lên URL
-    const excludedKeys: (keyof FilterValues)[] = ['displayPrice', 'displayArea', 'location'];
 
-    const params = new URLSearchParams(); // Duyệt qua các key trong filters với Type Assertion an toàn
+  useEffect(() => {
+    const excludedKeys: (keyof FilterValues)[] = ['displayPrice', 'displayArea', 'location'];
+    const params = new URLSearchParams();
 
     (Object.keys(filters) as Array<keyof FilterValues>).forEach((key) => {
-      const value = filters[key]; // Chỉ set param nếu:
-      // - Key không nằm trong danh sách loại trừ
-      // - Value có giá trị (khác undefined, null, rỗng)
+      const value = filters[key];
 
       if (!excludedKeys.includes(key) && value !== undefined && value !== null && value !== '') {
         params.set(key, String(value));
       }
     });
 
-    const queryString = params.toString(); // Chỉ push nếu có params hoặc muốn clear params (tùy logic business của bạn)
-
+    const queryString = params.toString();
     if (queryString) {
       router.push(`${pathname}?${queryString}`);
     } else {
-      // Nếu không có params nào (đã reset hết), trả về pathname gốc
       router.push(pathname);
     }
-  }, [filters, pathname, router]); // -----------------------------
+  }, [filters, pathname, router]);
+
   const resetFilters = () => {
     setFilters({
       displayPrice: undefined,
