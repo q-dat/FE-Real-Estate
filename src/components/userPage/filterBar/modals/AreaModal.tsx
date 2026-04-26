@@ -9,9 +9,9 @@ interface AreaOutput {
   label: string;
   from?: number;
   to?: number;
-  frontageWidth?: string;
-  lotDepth?: string;
-  backSize?: string;
+  frontageWidth?: number;
+  lotDepth?: number;
+  backSize?: number;
 }
 
 interface AreaModalProps {
@@ -31,10 +31,10 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
   const [tempMax, setTempMax] = useState(MAX_LIMIT);
   const [activeLabel, setActiveLabel] = useState<string>('Tất cả');
 
-  /* States quản lý kích thước dưới dạng string */
-  const [frontageWidth, setFrontageWidth] = useState<string>(initialFrontage || '');
-  const [lotDepth, setLotDepth] = useState<string>(initialDepth || '');
-  const [backSize, setBackSize] = useState<string>(initialBack || '');
+  // Dùng number | '' thay vì number | undefined cho Input control dễ hơn (tránh lỗi warning uncontrolled input)
+  const [frontageWidth, setFrontageWidth] = useState<number | ''>(initialFrontage ? Number(initialFrontage) : '');
+  const [lotDepth, setLotDepth] = useState<number | ''>(initialDepth ? Number(initialDepth) : '');
+  const [backSize, setBackSize] = useState<number | ''>(initialBack ? Number(initialBack) : '');
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -97,9 +97,10 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
       label: finalLabel,
       from: isAll ? undefined : tempMin,
       to: isAll ? undefined : tempMax,
-      frontageWidth: frontageWidth.trim() !== '' ? frontageWidth : undefined,
-      lotDepth: lotDepth.trim() !== '' ? lotDepth : undefined,
-      backSize: backSize.trim() !== '' ? backSize : undefined,
+      // Đẩy về dạng number hoặc undefined theo interface output
+      frontageWidth: frontageWidth !== '' ? Number(frontageWidth) : undefined,
+      lotDepth: lotDepth !== '' ? Number(lotDepth) : undefined,
+      backSize: backSize !== '' ? Number(backSize) : undefined,
     });
 
     onClose();
@@ -110,7 +111,6 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
   return (
     <div className="fixed inset-0 z-[9999991] flex items-center justify-center bg-overlay px-2" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in w-full max-w-lg rounded-2xl bg-white shadow-xl transition-all duration-200">
-        {/* Header */}
         <div className="flex items-center justify-between border-b p-2">
           <h5 className="text-lg font-bold uppercase text-gray-800">Diện tích & Kích thước</h5>
           <button onClick={onClose} className="btn btn-ghost btn-sm h-8 w-8 rounded-full p-0 text-gray-500 hover:bg-gray-100">
@@ -118,7 +118,6 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
           </button>
         </div>
 
-        {/* Body */}
         <div className="max-h-[75vh] overflow-y-auto p-2 pb-6 scrollbar-hide">
           <div className="mb-6 flex items-center justify-center gap-2 text-sm text-gray-700">
             <span>Khoảng diện tích:</span>
@@ -133,7 +132,6 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
             </div>
           </div>
 
-          {/* SLIDER AREA */}
           <div className="relative mb-8 h-2 w-full select-none rounded bg-gray-200">
             <div
               className="absolute top-0 h-2 rounded bg-blue-600"
@@ -169,7 +167,6 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
             </div>
           </div>
 
-          {/* QUICK SELECT GRID */}
           <div className="mt-6">
             <p className="mb-3 text-sm font-semibold text-gray-700">Chọn nhanh khoảng diện tích</p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -190,7 +187,6 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
             </div>
           </div>
 
-          {/* INPUT KÍCH THƯỚC STRING */}
           <div className="mt-8 border-t border-gray-100 pt-6">
             <p className="mb-3 text-sm font-semibold text-gray-700">Kích thước (m)</p>
             <div className="flex flex-wrap gap-3">
@@ -202,7 +198,7 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
                   min={0}
                   step={0.1}
                   value={frontageWidth}
-                  onChange={(e) => setFrontageWidth(e.target.value)}
+                  onChange={(e) => setFrontageWidth(e.target.value === '' ? '' : Number(e.target.value))}
                   placeholder="Chiều ngang..."
                   className="w-full rounded-md border border-primary bg-white font-bold text-primary placeholder:font-light placeholder:text-black focus:outline-none"
                 />
@@ -215,8 +211,9 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
                   min={0}
                   step={0.1}
                   value={lotDepth}
-                  onChange={(e) => setLotDepth(e.target.value)}
+                  onChange={(e) => setLotDepth(e.target.value === '' ? '' : Number(e.target.value))}
                   placeholder="Chiều dài..."
+                  className="w-full rounded-md border border-primary bg-white font-bold text-primary placeholder:font-light placeholder:text-black focus:outline-none"
                 />
               </div>
               <div className="w-full">
@@ -227,15 +224,15 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
                   min={0}
                   step={0.1}
                   value={backSize}
-                  onChange={(e) => setBackSize(e.target.value)}
+                  onChange={(e) => setBackSize(e.target.value === '' ? '' : Number(e.target.value))}
                   placeholder="Mặt hậu..."
+                  className="w-full rounded-md border border-primary bg-white font-bold text-primary placeholder:font-light placeholder:text-black focus:outline-none"
                 />
               </div> */}
             </div>
           </div>
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-between rounded-b-2xl border-t bg-primary px-5 py-4">
           <button className="flex items-center gap-1 text-sm font-medium text-white xl:hover:scale-105" onClick={handleReset}>
             Đặt lại

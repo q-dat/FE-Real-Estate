@@ -96,19 +96,21 @@ export default function FilterBar() {
     setActiveModal(null);
   };
   //  handle select Area
-  const handleSelectArea = (data: { label: string; from?: number; to?: number; frontageWidth?: string; lotDepth?: string; backSize?: string }) => {
+  const handleSelectArea = (data: { label: string; from?: number; to?: number; frontageWidth?: number; lotDepth?: number; backSize?: number }) => {
     setFilters((prev) => ({
       ...prev,
       displayArea: data.label,
       areaFrom: data.from,
       areaTo: data.to,
       area: undefined,
-      frontageWidth: data.frontageWidth,
-      lotDepth: data.lotDepth,
-      backSize: data.backSize,
+      // Convert về chuỗi để FilterValues nhận diện, lưu ý giữ undefined nếu Modal không truyền
+      frontageWidth: data.frontageWidth ? String(data.frontageWidth) : undefined,
+      lotDepth: data.lotDepth ? String(data.lotDepth) : undefined,
+      backSize: data.backSize ? String(data.backSize) : undefined,
     }));
     setActiveModal(null);
   };
+
   // handle select Location
   const handleSelectLocation = (v: { province: string; district?: string }) => {
     setFilters((prev) => ({
@@ -272,7 +274,15 @@ export default function FilterBar() {
       {activeModal === 'type' && <PropertyTypeModal onSelect={() => handleSelectType} onClose={() => setActiveModal(null)} />}
       {activeModal === 'location' && <LocationModal onSelect={handleSelectLocation} onClose={() => setActiveModal(null)} />}
       {activeModal === 'price' && <PriceModal onSelect={handleSelectPrice} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'area' && <AreaModal onSelect={handleSelectArea} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'area' && (
+        <AreaModal
+          initialFrontage={filters.frontageWidth}
+          initialDepth={filters.lotDepth}
+          initialBack={filters.backSize}
+          onSelect={handleSelectArea}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
       {activeModal === 'reset' && <FilterResetModal onConfirm={resetFilters} onClose={() => setActiveModal(null)} />}
     </div>
   );
