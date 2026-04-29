@@ -96,7 +96,7 @@ export default function AdminInternalModal({ open, onClose, post, reload }: Prop
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-2">
               <div>
                 <LabelForm title="Ghi chú nội bộ" />
-                <TextareaForm {...register('adminNote')} rows={4} />
+                <TextareaForm  {...register('adminNote')} rows={20} />
               </div>
 
               <div>
