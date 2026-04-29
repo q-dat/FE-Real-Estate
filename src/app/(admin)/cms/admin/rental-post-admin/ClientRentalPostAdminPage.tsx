@@ -61,7 +61,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   return (
     <div className="min-h-screen w-full bg-[#FCFCFC]">
       {/* HEADER: Minimalist Luxury */}
-      <div className="sticky top-0 z-20 flex flex-col gap-4 border-b border-neutral-200/60 bg-[#FCFCFC]/80 px-2 pb-5 pt-6 backdrop-blur-xl sm:px-6 md:flex-row md:items-end md:justify-between xl:px-8">
+      <div className="sticky top-0 flex flex-col gap-4 border-b border-neutral-200/60 bg-[#FCFCFC]/80 px-2 pb-5 pt-6 backdrop-blur-xl sm:px-6 md:flex-row md:items-end md:justify-between xl:px-8">
         <div>
           <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-400">Portfolio</span>
           <h1 className="text-2xl font-light tracking-tight text-neutral-900 xl:text-3xl">
@@ -88,7 +88,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
             className="group flex h-10 items-center gap-2 rounded-none bg-neutral-900 px-6 text-[11px] font-bold uppercase tracking-widest text-white shadow-lg shadow-neutral-900/10 transition-all hover:bg-primary hover:shadow-primary/20"
           >
             <FaPlus size={12} className="transition-transform group-hover:rotate-90" />
-            Tạo tài sản
+            Thêm
           </button>
         </div>
       </div>
@@ -132,22 +132,20 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                   <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
                     {post.postType && (
                       <span
-                        className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] shadow-sm backdrop-blur-md ${
-                          isHighlight ? 'bg-black/80 text-white' : isVip ? 'bg-white/90 text-neutral-900' : 'bg-neutral-500/80 text-white'
-                        }`}
+                        className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] shadow-sm backdrop-blur-md ${isHighlight ? 'bg-black/80 text-white' : isVip ? 'bg-white/90 text-neutral-900' : 'bg-neutral-500/80 text-white'
+                          }`}
                       >
                         {post.postType}
                       </span>
                     )}
                     {post.status && (
                       <span
-                        className={`flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] backdrop-blur-md ${
-                          post.status === 'active'
-                            ? 'bg-emerald-500/90 text-white'
-                            : post.status === 'pending'
-                              ? 'bg-amber-500/90 text-white'
-                              : 'bg-red-500/90 text-white'
-                        }`}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] backdrop-blur-md ${post.status === 'active'
+                          ? 'bg-emerald-500/90 text-white'
+                          : post.status === 'pending'
+                            ? 'bg-amber-500/90 text-white'
+                            : 'bg-red-500/90 text-white'
+                          }`}
                       >
                         <span className="h-1 w-1 animate-pulse rounded-full bg-white"></span>
                         {post.status}
@@ -172,10 +170,15 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                 </div>
 
                 {/* 2. Content Area */}
-                <div className="flex flex-1 flex-col p-4 sm:p-5">
+                <div className="flex  flex-col  gap-2 p-2">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-400">REF: {post.code || 'N/A'}</span>
-                    <span className="text-[10px] font-medium text-neutral-500">{post.area} m²</span>
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-400">CODE: {post.code || 'N/A'}</span>
+
+                    <span className="text-[10px] font-medium text-neutral-500">{post.propertyType} </span>
+
+                    <p className="text-[10px] font-medium text-neutral-500">
+                      <span>{post.area} m²( <b>{post.frontageWidth}</b>x <b>{post.lotDepth}</b> )</span>
+                    </p>
                   </div>
 
                   <h2
@@ -183,14 +186,18 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                       setEditingPost(post);
                       setOpenModal(true);
                     }}
-                    className="mb-3 line-clamp-2 min-h-[2.75rem] cursor-pointer text-[15px] font-medium leading-snug tracking-tight text-neutral-900 transition-colors hover:text-primary"
+                    className="cursor-pointer text-[15px] font-bold leading-snug tracking-tight text-neutral-900 transition-colors hover:text-primary"
                   >
                     {post.title}
                   </h2>
 
-                  <p className="mb-4 truncate text-[11px] font-medium uppercase tracking-wide text-neutral-500">
-                    {post.district}, {post.province}
+                  <p className="truncate text-[11px] font-medium uppercase tracking-wide text-neutral-500">
+                    {post.ward}, {post.district}, {post.province}
                   </p>
+                  <p className='text-xs'>
+                    Đia chỉ: {post.address}
+                  </p>
+
 
                   <div className="mt-auto flex items-end justify-between border-t border-neutral-100 pt-4">
                     <div>

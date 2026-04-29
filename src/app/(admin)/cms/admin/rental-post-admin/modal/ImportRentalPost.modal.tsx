@@ -36,7 +36,7 @@ const EXAMPLE_JSON = [
     province: 'Thành phố Hồ Chí Minh',
     district: 'Quận 1',
     ward: 'Phường Bến Nghé',
-    address: 'Đường Lê Lợi',
+    address: 'Đường Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
     amenities: 'Thang máy, hầm để xe',
     youtubeLink: '',
     videoTitle: '',
@@ -314,9 +314,9 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
       </div>
 
       {/* --- BODY --- */}
-      <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
+      <div className="flex flex-1 flex-row overflow-hidden ">
         {/* Lõi Nhập Liệu JSON */}
-        <div className="flex h-[35vh] shrink-0 flex-col border-b border-base-content/5 bg-base-100/40 p-4 lg:h-full lg:w-4/12 lg:shrink lg:overflow-y-auto lg:border-b-0 lg:border-r lg:p-6 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
+        <div className="flex h-[35vh] shrink-0 flex-col border-b border-base-content/5 bg-base-100/40 p-2 lg:h-full lg:w-4/12 lg:shrink lg:overflow-y-auto lg:border-b-0 lg:border-r lg:p-6 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wide text-base-content/70 sm:text-sm">Trình Biên Tập JSON</h3>
           </div>
@@ -325,14 +325,14 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
             {/* Backdrop Highlighter */}
             <div
               ref={backdropRef}
-              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words p-4 font-mono text-[12px] leading-[1.6] text-transparent sm:text-[13px] lg:p-5"
+              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words p-2 font-mono text-[12px] leading-[1.6] text-transparent sm:text-[13px] "
               aria-hidden="true"
             >
               {renderHighlightedText()}
             </div>
             {/* Real Textarea */}
             <textarea
-              className="absolute inset-0 h-full w-full resize-none overflow-auto whitespace-pre-wrap break-words bg-transparent p-4 font-mono text-[12px] leading-[1.6] text-base-content/80 caret-primary outline-none sm:text-[13px] lg:p-5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5"
+              className="absolute inset-0 h-full w-full resize-none overflow-auto whitespace-pre-wrap break-words bg-transparent p-2 font-mono text-[12px] leading-[1.6] text-base-content/80 caret-primary outline-none sm:text-[13px]  [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5"
               placeholder="Dán mã JSON hoặc sửa bên Preview..."
               value={jsonText}
               onChange={(e) => setJsonText(e.target.value)}
@@ -342,7 +342,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
           </div>
 
           {error && (
-            <div className="mt-4 flex items-start gap-3 rounded-2xl border border-error/20 bg-error/5 p-4 backdrop-blur-sm">
+            <div className="mt-4 flex items-start gap-3 rounded-2xl border border-error/20 bg-error/5 p-2 backdrop-blur-sm">
               <div className="shrink-0 rounded-full bg-error/20 p-1.5 text-error">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -358,7 +358,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
         </div>
 
         {/* CỘT PHẢI: Live Preview Bảng Điều Khiển */}
-        <div className="flex flex-1 flex-col overflow-y-auto bg-base-200/20 p-4 lg:w-8/12 lg:p-6 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
+        <div className="flex flex-1 flex-col overflow-y-auto bg-base-200/20 p-2 lg:w-8/12 lg:p-6 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-base-content/70 sm:text-sm">
               <span className="h-2 w-2 animate-pulse rounded-full bg-success shadow-[0_0_10px_rgba(0,255,0,0.5)]" />
