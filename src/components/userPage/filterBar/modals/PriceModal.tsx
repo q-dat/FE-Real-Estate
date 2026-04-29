@@ -85,11 +85,11 @@ export default function PriceModal({ onSelect, onClose }: PriceModalProps) {
       if (isFullRange) {
         finalLabel = 'Tất cả';
       } else if (min === MIN_LIMIT) {
-        finalLabel = `Dưới ${max} triệu`;
+        finalLabel = `Dưới ${max}`;
       } else if (max === MAX_LIMIT) {
-        finalLabel = `Trên ${min} triệu`;
+        finalLabel = `Trên ${min}`;
       } else {
-        finalLabel = `${min} - ${max} triệu`;
+        finalLabel = `${min} - ${max}`;
       }
     }
 
