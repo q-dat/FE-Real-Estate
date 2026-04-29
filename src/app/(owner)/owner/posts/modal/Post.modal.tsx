@@ -119,7 +119,7 @@ export default function PostModal({ open, editingItem, categories, onCategoriesC
           >
             <motion.div
               key="post-modal"
-              className="flex h-[90vh] w-full max-w-[1400px] flex-col overflow-hidden rounded-sm bg-[#FCFCFC] shadow-2xl ring-1 ring-white/20"
+              className="flex h-[90dvh] w-full max-w-[1400px] flex-col overflow-hidden rounded-sm bg-[#FCFCFC] shadow-2xl ring-1 ring-white/20"
               initial={{ y: 40, scale: 0.98 }}
               animate={{ y: 0, scale: 1 }}
               exit={{ y: 40, scale: 0.98 }}

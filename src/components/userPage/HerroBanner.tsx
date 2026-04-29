@@ -20,7 +20,7 @@ export default function HeroBanner() {
     <section ref={sectionRef} className="w-full overflow-hidden">
       <Image src={images.HerroBanner} alt="Luxury space" width={9999} height={9999} priority className="h-auto w-full object-contain" />
     </section>
-    // <section ref={sectionRef} className="relative h-[92vh] w-full overflow-hidden bg-neutral-950 xl:h-[98vh]">
+    // <section ref={sectionRef} className="relative h-[92dvh] w-full overflow-hidden bg-neutral-950 xl:h-[98dvh]">
     //   {/* Background */}
     //   <motion.div style={{ y: bgY, scale: bgScale }} className="absolute inset-0 z-0">
     //     <Image

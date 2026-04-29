@@ -137,7 +137,7 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
           />
 
           {/* Danh sách Quận/Huyện */}
-          <div className="grid max-h-[60vh] grid-cols-2 gap-2 overflow-y-auto scrollbar-hide xl:grid-cols-5">
+          <div className="grid max-h-[60dvh] grid-cols-2 gap-2 overflow-y-auto scrollbar-hide xl:grid-cols-5">
             {filteredDistricts.map((item) => (
               <button
                 type="button"

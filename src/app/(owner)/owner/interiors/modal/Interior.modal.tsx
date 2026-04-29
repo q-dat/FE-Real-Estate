@@ -184,7 +184,7 @@ export default function InteriorModal({ open, onClose, editingItem, categories, 
         >
           <motion.div
             onClick={(e) => e.stopPropagation()}
-            className="flex h-[90vh] w-full flex-col overflow-hidden rounded-md bg-white shadow-2xl sm:h-auto sm:max-h-[85vh] sm:max-w-4xl"
+            className="flex h-[90dvh] w-full flex-col overflow-hidden rounded-md bg-white shadow-2xl sm:h-auto sm:max-h-[85dvh] sm:max-w-4xl"
             initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}

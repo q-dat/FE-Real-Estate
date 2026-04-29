@@ -24,7 +24,7 @@ export function PropertyGallery({ images }: { images: string[] }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className={isSingle ? 'h-[70vh]' : 'grid h-[70vh] grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'}
+          className={isSingle ? 'h-[70dvh]' : 'grid h-[70dvh] grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'}
         >
           {visible.map((src, index) => (
             <motion.div

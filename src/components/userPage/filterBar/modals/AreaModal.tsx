@@ -129,7 +129,7 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
         </div>
 
         {/* Body */}
-        <div className="max-h-[75vh] overflow-y-auto p-2 pb-6 scrollbar-hide">
+        <div className="max-h-[75dvh] overflow-y-auto p-2 pb-6 scrollbar-hide">
           {/* Label hiển thị khoảng diện tích đang chọn */}
           <div className="mb-6 flex items-center justify-center gap-2 text-sm text-gray-700">
             <span>Khoảng diện tích:</span>

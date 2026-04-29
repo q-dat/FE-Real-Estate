@@ -188,7 +188,7 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="flex h-[90vh] w-full flex-col overflow-hidden rounded-md bg-white shadow-2xl sm:max-w-5xl"
+          className="flex h-[90dvh] w-full flex-col overflow-hidden rounded-md bg-white shadow-2xl sm:max-w-5xl"
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}

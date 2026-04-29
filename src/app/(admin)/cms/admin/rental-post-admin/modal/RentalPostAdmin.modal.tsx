@@ -182,11 +182,11 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {/* Cố định chiều cao Modal h-[90vh] để không tràn Viewport */}
+          {/* Cố định chiều cao Modal h-[90dvh] để không tràn Viewport */}
           <motion.div
             key="modal"
             onClick={(e) => e.stopPropagation()}
-            className="relative flex h-[90vh] w-full max-w-7xl flex-col overflow-hidden rounded-[2rem] bg-base-100 shadow-2xl ring-1 ring-white/20"
+            className="relative flex h-[90dvh] w-full max-w-7xl flex-col overflow-hidden rounded-[2rem] bg-base-100 shadow-2xl ring-1 ring-white/20"
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}

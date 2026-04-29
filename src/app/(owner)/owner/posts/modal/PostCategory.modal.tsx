@@ -74,7 +74,7 @@ export default function PostCategoryModal({ open, categories, onClose, onChange 
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="flex max-h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-primary-lighter shadow-xl"
+            className="flex max-h-[90dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-primary-lighter shadow-xl"
             initial={{ y: 40 }}
             animate={{ y: 0 }}
             exit={{ y: 40 }}

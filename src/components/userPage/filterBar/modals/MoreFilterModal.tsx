@@ -123,7 +123,7 @@ export default function MoreFilterModal({ initialValues, onSelect, onClose }: Mo
 
   return (
     <div className="fixed inset-0 z-[9999991] flex items-center justify-center bg-overlay px-2" onClick={handleClickOutside}>
-      <div ref={modalRef} className="animate-in fade-in zoom-in flex max-h-[75vh] w-full max-w-xl flex-col rounded-2xl bg-white shadow-xl">
+      <div ref={modalRef} className="animate-in fade-in zoom-in flex max-h-[75dvh] w-full max-w-xl flex-col rounded-2xl bg-white shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b p-4">
           <h5 className="text-lg font-bold uppercase text-gray-800">Bộ lọc nâng cao</h5>
