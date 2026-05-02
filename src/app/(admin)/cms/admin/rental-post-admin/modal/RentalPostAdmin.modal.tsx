@@ -239,7 +239,9 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                         <div className="mt-3 flex flex-wrap gap-2">
                           {previewUrls.map((url, i) => (
                             <div key={url + i} className="group relative h-16 w-16 overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-                              <Image src={url} alt={`preview-${i}`} fill style={{ objectFit: 'cover' }} unoptimized />
+                              <Zoom>
+                                <Image src={url} alt={`preview-${i}`} fill style={{ objectFit: 'cover' }} unoptimized />
+                              </Zoom>
                               <button
                                 type="button"
                                 onClick={() => removeImage(url)}
@@ -251,6 +253,14 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                           ))}
                         </div>
                       )}
+                    </div>
+                    {/* Status */}
+                    <div>
+                      <label className={labelClass}>Trạng thái bài đăng</label>
+                      <select className={inputClass} {...register('status')}>
+                        <option value="active">HIỂN THỊ (Active)</option>
+                        <option value="hidden">ĐÃ ẨN (Hidden)</option>
+                      </select>
                     </div>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       <div>
@@ -276,6 +286,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                           <option value="basic">Cơ bản</option>
                         </select>
                       </div>
+
                       <div>
                         <label className={labelClass}>Loại hình BĐS</label>
                         <input type="text" className={inputClass} {...register('propertyType')} placeholder="Nhà phố, Căn hộ..." />
