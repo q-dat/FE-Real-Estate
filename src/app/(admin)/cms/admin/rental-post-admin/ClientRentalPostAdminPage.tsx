@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { FaImages, FaPlus } from 'react-icons/fa';
 import { FiEdit3, FiTrash2, FiLock, FiUploadCloud } from 'react-icons/fi';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation'; // <-- Import thêm hooks
 import { IRentalAuthor, IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import RentalPostAdminModal from './modal/RentalPostAdmin.modal';
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
@@ -20,6 +21,9 @@ interface Props {
 
 export default function ClientRentalPostAdminPage({ posts: initialPosts, categories, categoryCode }: Props) {
   const { user } = useAdminAuth();
+  const searchParams = useSearchParams();
+  const searchTitle = searchParams.get('title') || undefined;
+
   const authorRef: IRentalAuthor = { _id: user.id };
 
   const [posts, setPosts] = useState<IRentalPostAdmin[]>(initialPosts);
@@ -31,14 +35,22 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   const [internalOpen, setInternalOpen] = useState(false);
   const [internalPost, setInternalPost] = useState<IRentalPostAdmin | null>(null);
 
-  useEffect(() => {
-    if (initialPosts.length === 0) reload();
-  }, [categoryCode]);
-
+  // Cập nhật hàm reload để nhận thêm title
   const reload = async () => {
-    const data: IRentalPostAdmin[] = await rentalPostAdminService.getMyPosts({ categoryCode });
+    const data: IRentalPostAdmin[] = await rentalPostAdminService.getMyPosts({
+      categoryCode,
+      title: searchTitle // Truyền thêm title vào API
+    });
     setPosts(Array.isArray(data) ? data : []);
   };
+
+  // Khi categoryCode hoặc searchTitle trên URL thay đổi, sẽ tự động fetch lại
+  useEffect(() => {
+    // Nếu có searchTitle hoặc data ban đầu trống, gọi reload
+    if (initialPosts.length === 0 || searchTitle !== undefined) {
+      reload();
+    }
+  }, [categoryCode, searchTitle]); // <-- Thêm searchTitle vào deps
 
   const handleDelete = (id: string) => {
     setDeletingId(id);

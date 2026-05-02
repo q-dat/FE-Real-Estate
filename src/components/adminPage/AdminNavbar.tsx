@@ -11,6 +11,8 @@ import { Navbar, Button, Indicator, Dropdown, Avatar } from 'react-daisyui';
 import { motion } from 'framer-motion';
 import { MeResponse } from '@/types/auth/auth.types';
 import { useLogout } from '@/hooks/useLogout';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 interface AdminNavbarProps {
   title: string;
@@ -20,6 +22,31 @@ interface AdminNavbarProps {
 
 export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarProps) {
   const onLogout = useLogout();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Lấy giá trị search hiện tại từ URL (nếu có)
+  const currentSearch = searchParams.get('title') || '';
+  const [searchTerm, setSearchTerm] = useState(currentSearch);
+
+  // Đồng bộ state khi URL thay đổi (VD: user bấm back/forward trên trình duyệt)
+  useEffect(() => {
+    setSearchTerm(currentSearch);
+  }, [currentSearch]);
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const params = new URLSearchParams(searchParams);
+      if (searchTerm.trim()) {
+        params.set('title', searchTerm.trim());
+      } else {
+        params.delete('title'); // Xóa param nếu input rỗng
+      }
+
+      // Đẩy param mới lên URL, Next.js sẽ tự động trigger render lại
+      router.push(`?${params.toString()}`);
+    }
+  };
 
   return (
     <Navbar className="sticky top-0 z-[999999] w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">
@@ -55,12 +82,15 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
           />
           <input
             type="text"
-            placeholder="Tìm kiếm nhanh (Ctrl + F)..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleSearch}
+            placeholder="Tìm kiếm theo tiêu đề (Nhấn Enter để tìm)..."
             className="w-full rounded-2xl border border-white/5 bg-white/5 py-2.5 pl-11 pr-4 text-sm text-slate-200 outline-none transition-all placeholder:text-slate-600 focus:border-primary/30 focus:bg-white/10 focus:ring-4 focus:ring-primary/5"
           />
           <div className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-bold text-slate-500 group-focus-within:hidden md:flex">
-            <span>⌘</span>
-            <span>F</span>
+            <span>↵</span>
+            <span>Enter</span>
           </div>
         </div>
       </Navbar.Center>
