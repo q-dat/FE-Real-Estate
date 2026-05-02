@@ -213,7 +213,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
             {/* Body (Scrollable) */}
             <div className="flex-1 overflow-y-auto bg-base-200/20 p-4 sm:p-6 lg:p-8 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
               <form id="rental-post-form" onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-6 lg:gap-8">
-                {/* 1. Nhận diện & Cơ bản (Blue/Slate) */}
+                {/* Nhận diện & Cơ bản (Blue/Slate) */}
                 <div className="relative overflow-hidden rounded-3xl border border-blue-500/10 bg-blue-500/5 p-6 shadow-sm transition-colors hover:border-blue-500/20">
                   <div className="absolute left-0 top-0 h-full w-1.5 bg-blue-500/30"></div>
                   <h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-blue-600/80">Nhận diện & Tiêu đề</h4>
@@ -262,6 +262,95 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                         <option value="hidden">ĐÃ ẨN (Hidden)</option>
                       </select>
                     </div>
+
+
+                    {/* Giá & Diện tích (Red) */}
+                    <div className="relative overflow-hidden rounded-3xl border border-red-500/10 bg-red-200 p-6 shadow-sm transition-colors hover:border-red-500/20">
+                      <div className="absolute left-0 top-0 h-full w-1.5 bg-red-500/30"></div>
+                      <h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-red-600/80">Giá cả & Diện tích</h4>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                        <div className="lg:col-span-3">
+                          <label className={labelClass}>
+                            Mức giá <span className="text-error">*</span>
+                          </label>
+                          <div className="flex gap-2">
+                            <input
+                              type="number"
+                              step="0.01"
+                              className={`${inputClass}`}
+                              {...register('price', { required: true, valueAsNumber: true })}
+                              placeholder="0"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className={labelClass}>
+                            Đơn vị giá <span className="text-error">*</span>
+                          </label>
+                          <input type="text" className={inputClass} {...register('priceUnit', { required: true })} placeholder="VD: /tháng" />
+                        </div>
+                        <div>
+                          <label className={labelClass}>Giá / m² (Tự động)</label>
+                          <div className="flex items-center">
+                            <input
+                              type="number"
+                              className={`${inputClass} rounded-r-none border-none bg-transparent font-black text-emerald-600`}
+                              {...register('pricePerM2', { valueAsNumber: true })}
+                              readOnly
+                              placeholder="0"
+                            />
+                            <select
+                              className={`${inputClass} w-1/3 rounded-l-none bg-primary/10 text-primary`}
+                              value={priceMultiplier}
+                              onChange={(e) => setPriceMultiplier(Number(e.target.value))}
+                            >
+                              <option value={1}>Nghìn</option>
+                              <option value={1_000}>Triệu</option>
+                              <option value={1_000_000}>Tỷ</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className={labelClass}>
+                            Diện tích (m²) <span className="text-error">*</span>
+                          </label>
+                          <input type="text" className={inputClass} {...register('area', { required: true })} placeholder="0" />
+                        </div>
+                        <div>
+                          <label className={labelClass}>Ngang (m)</label>
+                          <input
+                            type="number"
+                            step="any"
+                            className={inputClass}
+                            {...register('frontageWidth', { valueAsNumber: true })}
+                            placeholder="Nhập chiều ngang (m)..."
+                          />
+                        </div>
+                        <div>
+                          <label className={labelClass}>Dài (m)</label>
+                          <input
+                            type="number"
+                            step="any"
+                            className={inputClass}
+                            {...register('lotDepth', { valueAsNumber: true })}
+                            placeholder="Nhập chiều dài (m)..."
+                          />
+                        </div>
+                        <div>
+                          <label className={labelClass}>Mặt Hậu (m)</label>
+                          <input
+                            type="number"
+                            step="any"
+                            className={inputClass}
+                            {...register('backSize', { valueAsNumber: true })}
+                            placeholder="Nhập mặt hậu (m)..."
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+
+                    {/* Danh mục */}
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       <div>
                         <label className={labelClass}>
@@ -306,63 +395,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   </div>
                 </div>
 
-                {/* 2. Giá & Diện tích (Emerald) */}
-                <div className="relative overflow-hidden rounded-3xl border border-emerald-500/10 bg-emerald-500/5 p-6 shadow-sm transition-colors hover:border-emerald-500/20">
-                  <div className="absolute left-0 top-0 h-full w-1.5 bg-emerald-500/30"></div>
-                  <h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-emerald-600/80">Giá cả & Diện tích</h4>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                    <div className="lg:col-span-2">
-                      <label className={labelClass}>
-                        Mức giá <span className="text-error">*</span>
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="number"
-                          step="0.01"
-                          className={`${inputClass}`}
-                          {...register('price', { required: true, valueAsNumber: true })}
-                          placeholder="0"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className={labelClass}>
-                        Đơn vị giá <span className="text-error">*</span>
-                      </label>
-                      <input type="text" className={inputClass} {...register('priceUnit', { required: true })} placeholder="VD: /tháng" />
-                    </div>
-                    <div>
-                      <label className={labelClass}>
-                        Diện tích (m²) <span className="text-error">*</span>
-                      </label>
-                      <input type="text" className={inputClass} {...register('area', { required: true })} placeholder="0" />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Giá / m² (Tự động)</label>
-
-                      <div className="flex items-center">
-                        <input
-                          type="number"
-                          className={`${inputClass} rounded-r-none border-none bg-transparent font-black text-emerald-600`}
-                          {...register('pricePerM2', { valueAsNumber: true })}
-                          readOnly
-                          placeholder="0"
-                        />
-                        <select
-                          className={`${inputClass} w-1/3 rounded-l-none bg-primary/10 text-primary`}
-                          value={priceMultiplier}
-                          onChange={(e) => setPriceMultiplier(Number(e.target.value))}
-                        >
-                          <option value={1}>Nghìn</option>
-                          <option value={1_000}>Triệu</option>
-                          <option value={1_000_000}>Tỷ</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. Kỹ thuật & Chi tiết (Amber) */}
+                {/* Kỹ thuật & Chi tiết (Amber) */}
                 <div className="relative overflow-hidden rounded-3xl border border-amber-500/10 bg-amber-500/5 p-6 shadow-sm transition-colors hover:border-amber-500/20">
                   <div className="absolute left-0 top-0 h-full w-1.5 bg-amber-500/30"></div>
                   <h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-amber-600/80">Thông số Kỹ thuật</h4>
@@ -398,36 +431,6 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                       />
                     </div>
                     <div>
-                      <label className={labelClass}>Ngang (m)</label>
-                      <input
-                        type="number"
-                        step="any"
-                        className={inputClass}
-                        {...register('frontageWidth', { valueAsNumber: true })}
-                        placeholder="Nhập chiều ngang (m)..."
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Dài (m)</label>
-                      <input
-                        type="number"
-                        step="any"
-                        className={inputClass}
-                        {...register('lotDepth', { valueAsNumber: true })}
-                        placeholder="Nhập chiều dài (m)..."
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Mặt Hậu (m)</label>
-                      <input
-                        type="number"
-                        step="any"
-                        className={inputClass}
-                        {...register('backSize', { valueAsNumber: true })}
-                        placeholder="Nhập mặt hậu (m)..."
-                      />
-                    </div>
-                    <div>
                       <label className={labelClass}>Vị trí (Loại)</label>
                       <input type="text" className={inputClass} {...register('locationType')} placeholder="Nhập loại vị trí (Mặt tiền, Hẻm)..." />
                     </div>
@@ -452,7 +455,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   </div>
                 </div>
 
-                {/* 4. Vị trí (Purple) */}
+                {/* Vị trí (Purple) */}
                 <div className="relative overflow-hidden rounded-3xl border border-purple-500/10 bg-purple-500/5 p-6 shadow-sm transition-colors hover:border-purple-500/20">
                   <div className="absolute left-0 top-0 h-full w-1.5 bg-purple-500/30"></div>
                   <h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-purple-600/80">Địa chỉ Tài sản</h4>
@@ -537,7 +540,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   </div>
                 </div>
 
-                {/* 5. Media & Khác (Rose) */}
+                {/* Media & Khác (Rose) */}
                 <div className="relative overflow-hidden rounded-3xl border border-rose-500/10 bg-rose-500/5 p-6 shadow-sm transition-colors hover:border-rose-500/20">
                   <div className="absolute left-0 top-0 h-full w-1.5 bg-rose-500/30"></div>
                   <h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-rose-600/80">Media & Ghi chú Nội bộ</h4>
