@@ -276,7 +276,7 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                           <div className="flex gap-2">
                             <input
                               type="number"
-                              step="0.01"
+                              step="0.001"
                               className={`${inputClass}`}
                               {...register('price', { required: true, valueAsNumber: true })}
                               placeholder="0"
