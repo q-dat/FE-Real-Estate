@@ -321,18 +321,18 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
             <h3 className="text-xs font-bold uppercase tracking-wide text-base-content/70 sm:text-sm">Trình Biên Tập JSON</h3>
           </div>
 
-          <div className="relative flex-1 overflow-hidden rounded-2xl border border-base-content/10 bg-base-100 shadow-inner">
+          <div className="relative flex-1 overflow-hidden rounded-xl border border-base-content/10 bg-base-100 shadow-inner">
             {/* Backdrop Highlighter */}
             <div
               ref={backdropRef}
-              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words p-2 font-mono text-[12px] leading-[1.6] text-transparent sm:text-[13px] "
+              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words p-2 font-mono text-xs leading-[1.6] text-transparent sm:text-[13px] "
               aria-hidden="true"
             >
               {renderHighlightedText()}
             </div>
             {/* Real Textarea */}
             <textarea
-              className="absolute inset-0 h-full w-full resize-none overflow-auto whitespace-pre-wrap break-words bg-transparent p-2 font-mono text-[12px] leading-[1.6] text-base-content/80 caret-primary outline-none sm:text-[13px]  [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5"
+              className="absolute inset-0 h-full w-full resize-none overflow-auto whitespace-pre-wrap break-words bg-transparent p-2 font-mono text-xs leading-[1.6] text-base-content/80 caret-primary outline-none sm:text-[13px]  [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5"
               placeholder="Dán mã JSON hoặc sửa bên Preview..."
               value={jsonText}
               onChange={(e) => setJsonText(e.target.value)}
@@ -342,7 +342,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
           </div>
 
           {error && (
-            <div className="mt-4 flex items-start gap-3 rounded-2xl border border-error/20 bg-error/5 p-2 backdrop-blur-sm">
+            <div className="mt-2 flex items-start gap-3 rounded-xl border border-error/20 bg-error/5 p-2 backdrop-blur-sm">
               <div className="shrink-0 rounded-full bg-error/20 p-1.5 text-error">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -373,10 +373,12 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                   key={idx}
                   className="flex flex-col gap-5 rounded-3xl border border-base-content/5 bg-base-100 p-6 shadow-xl shadow-base-content/5 transition-all hover:border-primary/20"
                 >
-                  {/* Nhóm 1: Nhận diện (Slate) */}
-                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-slate-500/10 bg-slate-500/5 p-5">
+                  {/* Nhận diện (Slate) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-xl border border-slate-500/10 bg-slate-500/5 p-5">
                     <div className="absolute left-0 top-0 h-full w-1 bg-slate-500/30"></div>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      {renderField(idx, item, 'price', 'Mức giá', { type: 'number', placeholder: 'Nhập mức giá...' })}
+                      {renderField(idx, item, 'priceUnit', 'Đơn vị', { placeholder: 'Nhập đơn vị giá...' })}
                       {renderSelect(idx, item, 'postType', 'Loại Tin', [
                         { value: 'highlight', label: 'HIGHLIGHT' },
                         { value: 'vip1', label: 'VIP 1' },
@@ -391,37 +393,37 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                     </div>
                   </div>
 
-                  {/* Nhóm 2: Cơ bản (Blue) */}
-                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-blue-500/10 bg-blue-500/5 p-5">
+                  {/* Giá & Diện tích (Red) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-xl border border-red-500/10 bg-red-200 p-5">
+                    <div className="absolute left-0 top-0 h-full w-1 bg-red-500/30"></div>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                      {renderField(idx, item, 'area', 'Diện tích (m²)', { type: 'number', placeholder: 'Nhập diện tích...' })}
+                      {renderField(idx, item, 'frontageWidth', 'Ngang (m)', { placeholder: 'Nhập chiều rộng...' })}
+                      {renderField(idx, item, 'lotDepth', 'Dài (m)', { placeholder: 'Nhập chiều dài...' })}
+                      {renderField(idx, item, 'backSize', 'Nở Hậu (m)', { placeholder: 'Nhập chiều hậu...' })}
+                    </div>
+                  </div>
+
+                  {/* Cơ bản (Blue) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-xl border border-blue-500/10 bg-blue-500/5 p-5">
                     <div className="absolute left-0 top-0 h-full w-1 bg-blue-500/30"></div>
                     {renderField(idx, item, 'title', 'Tiêu đề bài đăng', { placeholder: 'Nhập tiêu đề...' })}
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       {renderField(idx, item, 'categoryName', 'Danh mục', { placeholder: 'Chọn danh mục...' })}
                       {renderField(idx, item, 'propertyType', 'Loại hình', { placeholder: 'Nhập loại hình (Nhà phố, Căn hộ...)' })}
                     </div>
-                    {renderField(idx, item, 'description', 'Mô tả chi tiết', { isTextarea: true, rows: 10, placeholder: 'Nhập mô tả...' })}
+                    {renderField(idx, item, 'description', 'Mô tả chi tiết', { isTextarea: true, rows: 15, placeholder: 'Nhập mô tả...' })}
                   </div>
 
-                  {/* Nhóm 3: Giá & Diện tích (Emerald) */}
-                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-5">
-                    <div className="absolute left-0 top-0 h-full w-1 bg-emerald-500/30"></div>
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                      {renderField(idx, item, 'price', 'Mức giá', { type: 'number', placeholder: 'Nhập mức giá...' })}
-                      {renderField(idx, item, 'priceUnit', 'Đơn vị', { placeholder: 'Nhập đơn vị giá...' })}
-                      {renderField(idx, item, 'area', 'Diện tích (m²)', { type: 'number', placeholder: 'Nhập diện tích...' })}
-                    </div>
-                  </div>
 
-                  {/* Nhóm 4: Kỹ thuật (Amber) */}
-                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-amber-500/10 bg-amber-500/5 p-5">
+
+                  {/* Kỹ thuật (Amber) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-xl border border-amber-500/10 bg-amber-500/5 p-5">
                     <div className="absolute left-0 top-0 h-full w-1 bg-amber-500/30"></div>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
                       {renderField(idx, item, 'floorNumber', 'Số Tầng', { type: 'number', placeholder: 'Nhập số tầng...' })}
                       {renderField(idx, item, 'bedroomNumber', 'Phòng Ngủ', { type: 'number', placeholder: 'Nhập số phòng ngủ...' })}
                       {renderField(idx, item, 'toiletNumber', 'Wc', { type: 'number', placeholder: 'Nhập số wc...' })}
-                      {renderField(idx, item, 'frontageWidth', 'Ngang (m)', { placeholder: 'Nhập chiều rộng...' })}
-                      {renderField(idx, item, 'lotDepth', 'Dài (m)', { placeholder: 'Nhập chiều dài...' })}
-                      {renderField(idx, item, 'backSize', 'Nở Hậu (m)', { placeholder: 'Nhập chiều hậu...' })}
                       {renderField(idx, item, 'locationType', 'Loại Vị Trí', { placeholder: 'Nhập loại vị trí (Mặt tiền, Hẻm, ...)' })}
                       {renderField(idx, item, 'direction', 'Hướng', { placeholder: 'Nhập hướng...' })}
                       {renderField(idx, item, 'legalStatus', 'Pháp Lý', { placeholder: 'Nhập pháp lý (Sổ hồng, Sổ đỏ, ...)' })}
@@ -429,31 +431,31 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                     </div>
                   </div>
 
-                  {/* Nhóm 5: Địa chỉ (Purple) */}
-                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-purple-500/10 bg-purple-500/5 p-5">
+                  {/* Địa chỉ (Purple) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-xl border border-purple-500/10 bg-purple-500/5 p-5">
                     <div className="absolute left-0 top-0 h-full w-1 bg-purple-500/30"></div>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                       {renderField(idx, item, 'province', 'Tỉnh / Thành', { placeholder: 'Nhập tỉnh/thành...' })}
                       {renderField(idx, item, 'district', 'Quận / Huyện', { placeholder: 'Nhập quận/huyện...' })}
                       {renderField(idx, item, 'ward', 'Phường / Xã', { placeholder: 'Nhập phường/xã...' })}
-                      {renderField(idx, item, 'address', 'Đường / Số nhà', { placeholder: 'Nhập đường/số nhà...' })}
+                      {renderField(idx, item, 'address', 'Địa chỉ cụ thể', { placeholder: 'Nhập đường/số nhà...' })}
                     </div>
                   </div>
 
-                  {/* Nhóm 6: Media & Ghi chú (Rose) */}
-                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-rose-500/10 bg-rose-500/5 p-5">
+                  {/* Media & Ghi chú (Rose) */}
+                  <div className="relative flex flex-col gap-4 overflow-hidden rounded-xl border border-rose-500/10 bg-rose-500/5 p-5">
                     <div className="absolute left-0 top-0 h-full w-1 bg-rose-500/30"></div>
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                       {renderField(idx, item, 'images', 'Ảnh Hiển Thị (Mỗi link 1 dòng)', {
                         isTextarea: true,
                         isArray: true,
-                        rows: 10,
+                        rows: 15,
                         placeholder: 'https://...',
                       })}
                       {renderField(idx, item, 'adminImages', 'Ảnh Nội Bộ (Admin Images)', {
                         isTextarea: true,
                         isArray: true,
-                        rows: 10,
+                        rows: 15,
                         placeholder: 'https://...',
                       })}
                     </div>
@@ -465,12 +467,12 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
                     <div className="grid grid-cols-1 gap-4 pt-2 lg:grid-cols-2">
                       {renderField(idx, item, 'amenities', 'Tiện ích (Amenities)', {
                         isTextarea: true,
-                        rows: 10,
+                        rows: 15,
                         placeholder: 'Trường học, Bệnh viện...',
                       })}
                       {renderField(idx, item, 'adminNote', 'Ghi chú kiểm duyệt (Admin Note)', {
                         isTextarea: true,
-                        rows: 10,
+                        rows: 15,
                         placeholder: 'Thông tin ẩn...',
                       })}
                     </div>
@@ -482,7 +484,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
             <div className="flex h-[300px] flex-col items-center justify-center rounded-[2rem] border border-dashed border-base-content/10 bg-base-100/50 p-6 text-center sm:h-[400px] sm:p-8">
               <div className="relative mb-6">
                 <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl" />
-                <div className="relative rounded-2xl border border-base-content/5 bg-base-100 p-5 text-primary shadow-xl">
+                <div className="relative rounded-xl border border-base-content/5 bg-base-100 p-5 text-primary shadow-xl">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       strokeLinecap="round"

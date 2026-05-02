@@ -78,7 +78,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
             className="group flex h-10 items-center gap-2 rounded-none border border-neutral-300 bg-transparent px-5 text-[11px] font-bold uppercase tracking-widest text-neutral-600 transition-all hover:border-neutral-900 hover:text-neutral-900"
           >
             <FiUploadCloud size={14} className="transition-transform group-hover:-translate-y-0.5" />
-            Đồng bộ JSON
+            import JSON
           </button>
           <button
             onClick={() => {
