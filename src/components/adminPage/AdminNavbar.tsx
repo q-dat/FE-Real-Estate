@@ -12,7 +12,7 @@ import { motion } from 'framer-motion';
 import { MeResponse } from '@/types/auth/auth.types';
 import { useLogout } from '@/hooks/useLogout';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface AdminNavbarProps {
   title: string;
@@ -25,14 +25,36 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Lấy giá trị search hiện tại từ URL (nếu có)
   const currentSearch = searchParams.get('title') || '';
   const [searchTerm, setSearchTerm] = useState(currentSearch);
 
-  // Đồng bộ state khi URL thay đổi (VD: user bấm back/forward trên trình duyệt)
+  // Khởi tạo ref để điều khiển thẻ input
+  const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     setSearchTerm(currentSearch);
   }, [currentSearch]);
+
+  // Lắng nghe phím tắt toàn cục
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Bỏ qua nếu đang gõ trong một input hoặc textarea khác
+      const activeTag = document.activeElement?.tagName.toLowerCase();
+      const isInputActive = activeTag === 'input' || activeTag === 'textarea';
+
+      if (e.key.toLowerCase() === 'f' && !isInputActive) {
+        e.preventDefault(); // Ngăn ký tự 'f' bị nhập thẳng vào ô search
+        inputRef.current?.focus();
+      }
+
+      if (e.key === 'Escape') {
+        inputRef.current?.blur();
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -40,11 +62,12 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
       if (searchTerm.trim()) {
         params.set('title', searchTerm.trim());
       } else {
-        params.delete('title'); // Xóa param nếu input rỗng
+        params.delete('title');
       }
 
-      // Đẩy param mới lên URL, Next.js sẽ tự động trigger render lại
       router.push(`?${params.toString()}`);
+
+      inputRef.current?.blur();
     }
   };
 
@@ -62,7 +85,7 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
           <motion.h2
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="max-w-xsfont-semibold line-clamp-1 uppercase tracking-tight"
+            className="max-w-xs font-semibold line-clamp-1 uppercase tracking-tight"
           >
             <span className="text-xs text-white">Trang </span> <span className="text-lg font-black text-primary">{title}</span>
           </motion.h2>
@@ -73,7 +96,7 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
         </div>
       </Navbar.Start>
 
-      {/* CENTER SECTION: Search Bar - International UI Standard */}
+      {/* CENTER SECTION: Search Bar */}
       <Navbar.Center className="hidden w-1/2 max-w-md lg:flex">
         <div className="group relative w-full">
           <HiOutlineMagnifyingGlass
@@ -81,16 +104,22 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
             size={18}
           />
           <input
+            ref={inputRef}
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleSearch}
-            placeholder="Tìm kiếm theo tiêu đề (Nhấn Enter để tìm)..."
-            className="w-full rounded-2xl border border-white/5 bg-white/5 py-2.5 pl-11 pr-4 text-sm text-slate-200 outline-none transition-all placeholder:text-slate-600 focus:border-primary/30 focus:bg-white/10 focus:ring-4 focus:ring-primary/5"
+            onFocus={(e) => e.target.select()}
+            placeholder="Tìm kiếm nhanh..."
+            className="w-full rounded-2xl border border-white/5 bg-white/5 py-2.5 pl-11 pr-12 text-sm text-slate-200 outline-none transition-all placeholder:text-slate-600 focus:border-primary/30 focus:bg-white/10 focus:ring-4 focus:ring-primary/5"
           />
-          <div className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-bold text-slate-500 group-focus-within:hidden md:flex">
-            <span>↵</span>
-            <span>Enter</span>
+
+          {/* Cập nhật UI hiển thị phím tắt */}
+          <div className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-bold text-slate-500 transition-opacity group-focus-within:opacity-0 md:flex">
+            <span>F</span>
+          </div>
+          <div className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-bold text-slate-500 opacity-0 transition-opacity group-focus-within:opacity-100 md:flex">
+            <span>Esc</span>
           </div>
         </div>
       </Navbar.Center>
