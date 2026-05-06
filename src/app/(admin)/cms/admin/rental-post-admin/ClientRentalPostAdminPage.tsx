@@ -13,6 +13,7 @@ import AdminInternalModal from './modal/AdminInternal.modal';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import ImportRentalPostModal from './modal/ImportRentalPost.modal';
 import ContentGeneratorModal from './modal/ContentGenerator';
+import TimeAgo from '@/components/orther/timeAgo/TimeAgo';
 
 
 interface Props {
@@ -205,7 +206,22 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                         <span className="font-medium">{formatCurrency(post.price)}</span> {post.priceUnit}
                       </div>
                     </div>
+                    <div className='text-xs'>
+                      <p>
+                        Sửa:&nbsp;
+                        <span className="text-red-500 font-bold">
+                          <TimeAgo date={post.updatedAt} />
+                        </span>
 
+                      </p>
+                      <span>
+                        Ngày tạo:
+                        ({post.createdAt ? new Date(post.createdAt).toLocaleDateString('vi-VN') : ''})
+                        <br />
+                        <TimeAgo date={post.createdAt} />
+                      </span>
+
+                    </div>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={(e) => {
