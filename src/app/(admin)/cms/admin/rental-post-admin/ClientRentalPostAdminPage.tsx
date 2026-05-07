@@ -1,7 +1,17 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useEffect, useMemo, useState } from 'react';
 import { FaImages, FaPlus } from 'react-icons/fa';
-import { FiEdit3, FiTrash2, FiLock, FiUploadCloud, FiFilm } from 'react-icons/fi';
+import {
+  FiEdit3,
+  FiFilm,
+  FiGrid,
+  FiHome,
+  FiLock,
+  FiMapPin,
+  FiTrash2,
+  FiUploadCloud,
+} from 'react-icons/fi';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { IRentalAuthor, IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
@@ -15,14 +25,80 @@ import ImportRentalPostModal from './modal/ImportRentalPost.modal';
 import ContentGeneratorModal from './modal/ContentGenerator';
 import TimeAgo from '@/components/orther/timeAgo/TimeAgo';
 
-
 interface Props {
   posts: IRentalPostAdmin[];
   categories: { _id: string; name: string }[];
   categoryCode?: number;
 }
 
-export default function ClientRentalPostAdminPage({ posts: initialPosts, categories, categoryCode }: Props) {
+type PostStatusTone = {
+  label: string;
+  className: string;
+};
+
+const getPostStatusTone = (status?: string): PostStatusTone => {
+  if (status === 'active') {
+    return {
+      label: 'Đang hiển thị',
+      className: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    };
+  }
+
+  if (status === 'pending') {
+    return {
+      label: 'Chờ duyệt',
+      className: 'border-amber-200 bg-amber-50 text-amber-700',
+    };
+  }
+
+  if (status === 'hidden') {
+    return {
+      label: 'Đã ẩn',
+      className: 'border-neutral-200 bg-neutral-100 text-neutral-600',
+    };
+  }
+
+  return {
+    label: status || 'Không rõ',
+    className: 'border-red-200 bg-red-50 text-red-700',
+  };
+};
+
+const getPostTypeTone = (postType?: string): string => {
+  if (postType === 'highlight') return 'border-primary/15 bg-primary/5 text-primary';
+  if (postType?.startsWith('vip')) return 'border-amber-200 bg-amber-50 text-amber-700';
+  return 'border-neutral-200 bg-neutral-50 text-neutral-600';
+};
+
+const getThumbnail = (post: IRentalPostAdmin): string => {
+  return post.images?.[0] || '/no-image.png';
+};
+
+const getAreaText = (post: IRentalPostAdmin): string => {
+  if (!post.area) return 'Chưa cập nhật';
+
+  if (post.frontageWidth && post.lotDepth) {
+    return `${post.area} m² · ${post.frontageWidth} x ${post.lotDepth}`;
+  }
+
+  return `${post.area} m²`;
+};
+
+const getLocationText = (post: IRentalPostAdmin): string => {
+  const parts = [post.ward, post.district, post.province].filter(Boolean);
+  return parts.length > 0 ? parts.join(', ') : 'Chưa cập nhật vị trí';
+};
+
+const getDisplayDate = (date?: string | Date): string => {
+  if (!date) return '';
+  return new Date(date).toLocaleDateString('vi-VN');
+};
+
+export default function ClientRentalPostAdminPage({
+  posts: initialPosts,
+  categories,
+  categoryCode,
+}: Props) {
   const { user } = useAdminAuth();
   const searchParams = useSearchParams();
   const searchTitle = searchParams.get('title') || undefined;
@@ -31,7 +107,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
 
   const [posts, setPosts] = useState<IRentalPostAdmin[]>(initialPosts);
   const [importOpen, setImportOpen] = useState(false);
-  const [openContentGenerator, setOpenContentGenerator] = useState(false); // State quản lý modal
+  const [openContentGenerator, setOpenContentGenerator] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [editingPost, setEditingPost] = useState<IRentalPostAdmin | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -39,17 +115,30 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   const [internalOpen, setInternalOpen] = useState(false);
   const [internalPost, setInternalPost] = useState<IRentalPostAdmin | null>(null);
 
+  const activeCount = useMemo(() => {
+    return posts.filter((post) => post.status === 'active').length;
+  }, [posts]);
+
+  const hiddenCount = useMemo(() => {
+    return posts.filter((post) => post.status === 'hidden').length;
+  }, [posts]);
+
+  const pendingCount = useMemo(() => {
+    return posts.filter((post) => post.status === 'pending').length;
+  }, [posts]);
+
   const reload = async () => {
     const data: IRentalPostAdmin[] = await rentalPostAdminService.getMyPosts({
       categoryCode,
-      title: searchTitle
+      title: searchTitle,
     });
+
     setPosts(Array.isArray(data) ? data : []);
   };
 
   useEffect(() => {
     if (initialPosts.length === 0 || searchTitle !== undefined) {
-      reload();
+      void reload();
     }
   }, [categoryCode, searchTitle]);
 
@@ -60,6 +149,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
 
   const confirmDelete = async () => {
     if (!deletingId) return;
+
     try {
       await rentalPostAdminService.delete(deletingId);
       await reload();
@@ -71,190 +161,344 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
     }
   };
 
+  const openCreateModal = () => {
+    setEditingPost(null);
+    setOpenModal(true);
+  };
+
+  const openEditModal = (post: IRentalPostAdmin) => {
+    setEditingPost(post);
+    setOpenModal(true);
+  };
+
   return (
-    <div className="min-h-screen w-full bg-[#FCFCFC]">
-      {/* HEADER: Minimalist Luxury */}
-      <div className="sticky top-0 z-10 flex flex-col gap-4 border-b border-neutral-200/60 bg-[#FCFCFC]/80 px-2 pb-5 pt-6 backdrop-blur-xl sm:px-6 md:flex-row md:items-end md:justify-between xl:px-8">
-        <div>
-          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-400">Portfolio</span>
-          <h1 className="text-2xl font-light tracking-tight text-neutral-900 xl:text-3xl">
-            Quản lý Tài sản
-            <span className="ml-3 inline-flex items-center justify-center rounded-full bg-neutral-100 px-2.5 py-0.5 align-middle text-xs font-medium text-neutral-500">
-              {posts.length}
-            </span>
-          </h1>
-        </div>
+    <div className="min-h-screen w-full bg-neutral-100">
+      <div className=" border-b border-neutral-200 bg-white/95 shadow-sm backdrop-blur-xl">
+        <div className="px-2 py-2 xl:px-4">
+          <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-primary/10 bg-primary/5 text-primary">
+                  <FiHome size={17} />
+                </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setImportOpen(true)}
-            className="group flex h-10 items-center gap-2 rounded-none border border-neutral-300 bg-transparent px-5 text-[11px] font-bold uppercase tracking-widest text-neutral-600 transition-all hover:border-neutral-900 hover:text-neutral-900"
-          >
-            <FiUploadCloud size={14} className="transition-transform group-hover:-translate-y-0.5" />
-            Import JSON
-          </button>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">
+                    Portfolio Admin
+                  </p>
 
-          <button
-            onClick={() => setOpenContentGenerator(true)}
-            className="group flex h-10 items-center gap-2 rounded-none border border-neutral-300 bg-transparent px-5 text-[11px] font-bold uppercase tracking-widest text-neutral-600 transition-all hover:border-neutral-900 hover:text-neutral-900"
-          >
-            <FiFilm size={14} className="transition-transform group-hover:scale-110" />
-            Media Gen
-          </button>
+                  <h1 className="truncate text-lg font-black tracking-tight text-neutral-950 xl:text-2xl">
+                    Quản lý bất động sản
+                  </h1>
+                </div>
 
-          <button
-            onClick={() => {
-              setEditingPost(null);
-              setOpenModal(true);
-            }}
-            className="group flex h-10 items-center gap-2 rounded-none bg-neutral-900 px-6 text-[11px] font-bold uppercase tracking-widest text-white shadow-lg shadow-neutral-900/10 transition-all hover:bg-primary hover:shadow-primary/20"
-          >
-            <FaPlus size={12} className="transition-transform group-hover:rotate-90" />
-            Thêm
-          </button>
+                <span className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1 text-xs font-black text-neutral-700">
+                  {posts.length}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-1.5 xl:flex xl:items-center xl:gap-2">
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-2 py-1.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">
+                  Active
+                </p>
+                <p className="text-sm font-black text-emerald-700">{activeCount}</p>
+              </div>
+
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-2 py-1.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">
+                  Pending
+                </p>
+                <p className="text-sm font-black text-amber-700">{pendingCount}</p>
+              </div>
+
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-2 py-1.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">
+                  Hidden
+                </p>
+                <p className="text-sm font-black text-neutral-700">{hiddenCount}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-1.5 xl:flex xl:items-center xl:gap-2">
+              <button
+                type="button"
+                onClick={() => setImportOpen(true)}
+                className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-2 text-[10px] font-black uppercase tracking-[0.14em] text-neutral-700 transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary xl:px-3"
+              >
+                <FiUploadCloud size={14} />
+                Import
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOpenContentGenerator(true)}
+                className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-2 text-[10px] font-black uppercase tracking-[0.14em] text-neutral-700 transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary xl:px-3"
+              >
+                <FiFilm size={14} />
+                Media
+              </button>
+
+              <button
+                type="button"
+                onClick={openCreateModal}
+                className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-primary bg-primary px-2 text-[10px] font-black uppercase tracking-[0.14em] text-white shadow-sm transition hover:bg-primary/90 xl:px-4"
+              >
+                <FaPlus size={12} />
+                Thêm
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* BODY: Editorial Grid Layout */}
-      <div className="p-2 sm:p-6 xl:p-8">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-          {posts.map((post) => {
-            const thumbnail = post.images?.[0] || '/no-image.png';
-            const isHighlight = post.postType === 'highlight';
-            const isVip = post.postType?.startsWith('vip');
+      <main className="px-2">
+        {posts.length > 0 ? (
+          <div className="grid grid-cols-1 gap-2 xl:grid-cols-4 xl:gap-3 2xl:grid-cols-5">
+            {posts.map((post) => {
+              const thumbnail = getThumbnail(post);
+              const statusTone = getPostStatusTone(post.status);
+              const postTypeClassName = getPostTypeTone(post.postType);
+              const imagesCount = post.images?.length || 0;
 
-            return (
-              <div
-                key={post._id}
-                className="group relative flex flex-col overflow-hidden rounded-sm border border-neutral-200/60 bg-white shadow-sm transition-all duration-500 hover:border-neutral-300 hover:shadow-2xl hover:shadow-neutral-900/5"
-              >
-                <div
-                  onClick={() => {
-                    setEditingPost(post);
-                    setOpenModal(true);
-                  }}
-                  className="relative aspect-[4/3] w-full cursor-pointer overflow-hidden bg-neutral-100"
+              return (
+                <article
+                  key={post._id}
+                  className="group overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm transition hover:border-primary/20 hover:shadow-md"
                 >
-                  <Image
-                    src={thumbnail}
-                    alt={post.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    unoptimized
-                    className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-80" />
-
-                  <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
-                    {post.postType && (
-                      <span className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] shadow-sm backdrop-blur-md ${isHighlight ? 'bg-black/80 text-white' : isVip ? 'bg-white/90 text-neutral-900' : 'bg-neutral-500/80 text-white'}`}>
-                        {post.postType}
-                      </span>
-                    )}
-                    {post.status && (
-                      <span className={`flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] backdrop-blur-md ${post.status === 'active' ? 'bg-emerald-500/90 text-white' : post.status === 'pending' ? 'bg-amber-500/90 text-white' : 'bg-red-500/90 text-white'}`}>
-                        <span className="h-1 w-1 animate-pulse rounded-full bg-white"></span>
-                        {post.status}
-                      </span>
-                    )}
-                  </div>
-
-                  {post.images && post.images.length > 0 && (
-                    <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/40 px-2 py-1 text-white backdrop-blur-md">
-                      <FaImages size={10} className="opacity-80" />
-                      <span className="text-[10px] font-medium">{post.images.length}</span>
-                    </div>
-                  )}
-
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover:opacity-100">
-                    <span className="flex translate-y-4 transform items-center gap-2 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-neutral-900 transition-transform duration-500 group-hover:translate-y-0">
-                      <FiEdit3 size={14} /> Chỉnh sửa
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2 p-2">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-neutral-400">CODE: {post.code || 'N/A'}</span>
-                    <span className="text-[10px] font-medium text-neutral-500">{post.propertyType}</span>
-                    <p className="text-[10px] font-medium text-neutral-500">
-                      <span>{post.area} m²( <b>{post.frontageWidth}</b>x<b>{post.lotDepth}</b> )</span>
-                    </p>
-                  </div>
-
-                  <h2
-                    onClick={() => {
-                      setEditingPost(post);
-                      setOpenModal(true);
-                    }}
-                    className="cursor-pointer text-[15px] font-bold leading-snug tracking-tight text-neutral-900 transition-colors hover:text-primary"
+                  <button
+                    type="button"
+                    onClick={() => openEditModal(post)}
+                    className="relative block aspect-[4/3] w-full overflow-hidden bg-neutral-100 text-left"
                   >
-                    {post.title}
-                  </h2>
+                    <Image
+                      src={thumbnail}
+                      alt={post.title}
+                      fill
+                      sizes="(min-width: 1536px) 20vw, (min-width: 1280px) 25vw, 100vw"
+                      unoptimized
+                      className="object-cover transition duration-700 group-hover:scale-[1.04]"
+                    />
 
-                  <p className="truncate text-[11px] font-medium uppercase tracking-wide text-neutral-500">
-                    {post.ward}, {post.district}, {post.province}
-                  </p>
-                  <p className='text-xs text-neutral-500 truncate'>
-                    Địa chỉ: {post.address}
-                  </p>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                  <div className="mt-auto flex items-end justify-between border-t border-neutral-100 pt-4">
-                    <div>
-                      <span className="mb-0.5 block text-[9px] font-semibold uppercase tracking-widest text-neutral-400">Mức giá</span>
-                      <div className="text-xl font-light tracking-tighter text-neutral-900">
-                        <span className="font-medium">{formatCurrency(post.price)}</span> {post.priceUnit}
+                    <div className="absolute left-2 top-2 flex max-w-[calc(100%-4rem)] flex-wrap gap-1">
+                      {post.postType ? (
+                        <span
+                          className={`rounded-md border px-1.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] ${postTypeClassName}`}
+                        >
+                          {post.postType}
+                        </span>
+                      ) : null}
+
+                      {post.status ? (
+                        <span
+                          className={`rounded-md border px-1.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] ${statusTone.className}`}
+                        >
+                          {statusTone.label}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {imagesCount > 0 ? (
+                      <div className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-black/55 px-1.5 py-1 text-white backdrop-blur-sm">
+                        <FaImages size={10} />
+                        <span className="text-[10px] font-black">{imagesCount}</span>
+                      </div>
+                    ) : null}
+
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <div className="flex items-end justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="mb-1 text-[9px] font-black uppercase tracking-[0.16em] text-white/70">
+                            CODE: {post.code || 'N/A'}
+                          </p>
+
+                          <div className="inline-flex max-w-full rounded-md bg-white px-2 py-1 shadow-sm">
+                            <span className="truncate text-sm font-black text-primary">
+                              {formatCurrency(post.price)} {post.priceUnit}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span className="rounded-md bg-white/15 px-2 py-1 text-[10px] font-bold text-white ring-1 ring-white/20 backdrop-blur-sm">
+                          {post.propertyType || 'N/A'}
+                        </span>
                       </div>
                     </div>
-                    <div className='text-xs'>
-                      <p>
-                        Sửa:&nbsp;
-                        <span className="text-red-500 font-bold">
-                          <TimeAgo date={post.updatedAt} />
-                        </span>
 
-                      </p>
-                      <span>
-                        Ngày tạo:
-                        ({post.createdAt ? new Date(post.createdAt).toLocaleDateString('vi-VN') : ''})
-                        <br />
-                        <TimeAgo date={post.createdAt} />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/25 opacity-0 backdrop-blur-[1px] transition group-hover:opacity-100">
+                      <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-neutral-950 shadow-sm">
+                        <FiEdit3 size={13} />
+                        Chỉnh sửa
                       </span>
-
                     </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setInternalPost(post);
-                          setInternalOpen(true);
-                        }}
-                        className="group/btn flex h-8 w-8 items-center justify-center border border-neutral-200 bg-transparent text-neutral-500 transition-all hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
-                        title="Tài liệu nội bộ"
-                      >
-                        <FiLock size={13} className="transition-transform group-hover/btn:scale-110" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(post._id);
-                        }}
-                        className="group/btn flex h-8 w-8 items-center justify-center border border-transparent bg-neutral-50 text-neutral-400 transition-all hover:bg-red-50 hover:text-red-600"
-                        title="Xóa tài sản"
-                      >
-                        <FiTrash2 size={13} className="transition-transform group-hover/btn:scale-110" />
-                      </button>
+                  </button>
+
+                  <div className="flex min-h-[260px] flex-col p-2">
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(post)}
+                      className="text-left"
+                    >
+                      <h2 className="line-clamp-2 min-h-[2.6rem] text-[14px] font-black leading-snug text-neutral-950 transition hover:text-primary">
+                        {post.title}
+                      </h2>
+                    </button>
+
+                    <div className="mt-2 grid grid-cols-2 gap-1.5">
+                      <div className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5">
+                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
+                          Diện tích
+                        </p>
+                        <p className="truncate text-[11px] font-bold text-neutral-800">
+                          {getAreaText(post)}
+                        </p>
+                      </div>
+
+                      <div className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5">
+                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
+                          Loại vị trí
+                        </p>
+                        <p className="truncate text-[11px] font-bold text-neutral-800">
+                          {post.locationType || 'Chưa cập nhật'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 rounded-md border border-neutral-200 bg-white px-2 py-1.5">
+                      <p className="mb-1 flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
+                        <FiMapPin size={11} />
+                        Vị trí
+                      </p>
+                      <p className="line-clamp-2 text-[11px] font-medium leading-relaxed text-neutral-600">
+                        {getLocationText(post)}
+                      </p>
+                    </div>
+
+                    {post.address ? (
+                      <div className="mt-1.5 rounded-md border border-neutral-200 bg-white px-2 py-1.5">
+                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
+                          Địa chỉ
+                        </p>
+                        <p className="truncate text-[11px] font-medium text-neutral-600">
+                          {post.address}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    <div className="mt-auto pt-2">
+                      <div className="grid grid-cols-2 gap-1.5 border-t border-neutral-100 pt-2">
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
+                            Cập nhật
+                          </p>
+                          <p className="text-[11px] font-bold text-red-600">
+                            <TimeAgo date={post.updatedAt} />
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
+                            Ngày tạo
+                          </p>
+                          <p className="text-[11px] font-bold text-neutral-700">
+                            {getDisplayDate(post.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-2 flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => openEditModal(post)}
+                          className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md border border-primary bg-primary text-[10px] font-black uppercase tracking-[0.14em] text-white transition hover:bg-primary/90"
+                        >
+                          <FiEdit3 size={13} />
+                          Sửa
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setInternalPost(post);
+                            setInternalOpen(true);
+                          }}
+                          className="flex h-9 w-9 items-center justify-center rounded-md border border-neutral-200 bg-white text-neutral-600 transition hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
+                          title="Tài liệu nội bộ"
+                        >
+                          <FiLock size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleDelete(post._id);
+                          }}
+                          className="flex h-9 w-9 items-center justify-center rounded-md border border-red-100 bg-red-50 text-red-600 transition hover:bg-red-600 hover:text-white"
+                          title="Xóa tài sản"
+                        >
+                          <FiTrash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex min-h-[60dvh] items-center justify-center">
+            <div className="w-full max-w-md rounded-lg border border-neutral-200 bg-white p-4 text-center shadow-sm">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/5 text-primary">
+                <FiGrid size={22} />
               </div>
-            );
-          })}
-        </div>
-      </div>
 
-      <ImportRentalPostModal open={importOpen} onClose={() => setImportOpen(false)} reload={reload} authorId={authorRef} />
-      <AdminInternalModal open={internalOpen} onClose={() => setInternalOpen(false)} post={internalPost} reload={reload} />
+              <h2 className="text-base font-black text-neutral-950">Chưa có bài đăng</h2>
+
+              <p className="mt-1 text-sm font-medium leading-relaxed text-neutral-500">
+                Tạo bài đăng mới hoặc import dữ liệu JSON để bắt đầu quản lý danh sách bất động sản.
+              </p>
+
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setImportOpen(true)}
+                  className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-neutral-700 transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+                >
+                  Import JSON
+                </button>
+
+                <button
+                  type="button"
+                  onClick={openCreateModal}
+                  className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-primary/90"
+                >
+                  Thêm mới
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <ImportRentalPostModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        reload={reload}
+        authorId={authorRef}
+      />
+
+      <AdminInternalModal
+        open={internalOpen}
+        onClose={() => setInternalOpen(false)}
+        post={internalPost}
+        reload={reload}
+      />
+
       <RentalPostAdminModal
         key={editingPost?._id ?? 'create'}
         open={openModal}
@@ -267,9 +511,17 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
         reload={reload}
         authorId={authorRef}
       />
-      <DeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />
-      <ContentGeneratorModal open={openContentGenerator} onClose={() => setOpenContentGenerator(false)} />
 
+      <DeleteModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={confirmDelete}
+      />
+
+      <ContentGeneratorModal
+        open={openContentGenerator}
+        onClose={() => setOpenContentGenerator(false)}
+      />
     </div>
   );
 }

@@ -60,7 +60,7 @@ export default function AdminCrawlerPage() {
   return (
     <div className="min-h-screen w-full bg-[#FCFCFC]">
       {/* HEADER: Minimalist Editorial */}
-      <div className="sticky top-0 z-20 flex flex-col gap-4 border-b border-neutral-200/60 bg-[#FCFCFC]/80 px-4 pb-5 pt-6 backdrop-blur-xl sm:px-6 xl:px-8">
+      <div className="sticky top-0  flex flex-col gap-4 border-b border-neutral-200/60 bg-[#FCFCFC]/80 px-4 pb-5 pt-6 backdrop-blur-xl sm:px-6 xl:px-8">
         <div>
           <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-400">System Operations</span>
           <h1 className="text-2xl font-light tracking-tight text-neutral-900 xl:text-3xl">Crawler & Đồng bộ dữ liệu</h1>

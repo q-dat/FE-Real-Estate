@@ -47,7 +47,7 @@ export default function ClientPostAdminPage({ posts: initialPosts, categories: i
   return (
     <div className="w-full space-y-4">
       {/* Header */}
-      <div className="sticky top-0 z-10 flex items-center justify-between rounded-lg bg-white/80 px-5 py-4 shadow backdrop-blur">
+      <div className="sticky top-0 flex items-center justify-between rounded-lg bg-white/80 px-5 py-4 shadow backdrop-blur">
         <div>
           <h1 className="text-xl font-semibold">Quản lý bài viết</h1>
           <p className="text-sm text-gray-500">Tổng số: {posts.length}</p>
