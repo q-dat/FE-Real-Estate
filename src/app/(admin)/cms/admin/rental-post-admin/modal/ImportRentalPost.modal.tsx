@@ -291,7 +291,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
         if (e.target === e.currentTarget) handleClose();
       }}
     >
-      {/* --- HEADER --- */}
+      {/* HEADER */}
       <div className="z-10 flex flex-shrink-0 items-center justify-between border-b border-base-content/5 bg-base-100/90 px-6 py-4">
         <div>
           <h2 className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-base-content sm:text-2xl">
@@ -313,7 +313,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
         </div>
       </div>
 
-      {/* --- BODY --- */}
+      {/* BODY */}
       <div className="flex flex-1 flex-row overflow-hidden ">
         {/* Lõi Nhập Liệu JSON */}
         <div className="flex h-[90dvh] shrink-0 flex-col border-b border-base-content/5 bg-base-100/40 p-2 lg:h-full lg:w-4/12 lg:shrink lg:overflow-y-auto lg:border-b-0 lg:border-r lg:p-6 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300 [&::-webkit-scrollbar]:w-2">
@@ -504,7 +504,7 @@ export default function ImportRentalPostModal({ open, onClose, reload, authorId 
         </div>
       </div>
 
-      {/* --- FOOTER / ACTIONS --- */}
+      {/* FOOTER / ACTIONS */}
       <div className="z-10 flex flex-shrink-0 items-center justify-between gap-4 border-t border-base-content/5 bg-base-100/90 px-6 py-4 backdrop-blur-md sm:justify-end">
         <Button
           variant="outline"
