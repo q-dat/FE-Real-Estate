@@ -71,14 +71,14 @@ export default function AdminInternalModal({ open, onClose, post, reload }: Prop
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[999999] flex items-center justify-center bg-overlay backdrop-blur-sm "
+          className="fixed inset-0 flex items-center justify-center bg-overlay backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
             onClick={(e) => e.stopPropagation()}
-            className="w-[90dvw] rounded-2xl bg-white shadow-2xl h-[90dvh] overflow-y-auto"
+            className="h-[90dvh] w-[90dvw] overflow-y-auto rounded-2xl bg-white shadow-2xl"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -96,7 +96,7 @@ export default function AdminInternalModal({ open, onClose, post, reload }: Prop
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-2">
               <div>
                 <LabelForm title="Ghi chú nội bộ" />
-                <TextareaForm  {...register('adminNote')} rows={20} />
+                <TextareaForm {...register('adminNote')} rows={20} />
               </div>
 
               <div>

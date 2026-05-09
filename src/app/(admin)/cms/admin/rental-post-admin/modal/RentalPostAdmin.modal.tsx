@@ -6,13 +6,7 @@ import Image from 'next/image';
 import { MdClose } from 'react-icons/md';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  District,
-  IRentalAuthor,
-  IRentalPostAdmin,
-  Province,
-  Ward,
-} from '@/types/rentalAdmin/rentalAdmin.types';
+import { District, IRentalAuthor, IRentalPostAdmin, Province, Ward } from '@/types/rentalAdmin/rentalAdmin.types';
 import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { useEscClose } from '@/hooks/useEscClose';
 import Zoom from '@/lib/Zoom';
@@ -27,11 +21,7 @@ interface Props {
   authorId: IRentalAuthor;
 }
 
-interface RentalPostFormData
-  extends Omit<
-    IRentalPostAdmin,
-    'author' | 'category' | 'images' | 'adminImages' | 'postedAt' | 'expiredAt'
-  > {
+interface RentalPostFormData extends Omit<IRentalPostAdmin, 'author' | 'category' | 'images' | 'adminImages' | 'postedAt' | 'expiredAt'> {
   author: string;
   category: string;
   postedAt: string;
@@ -55,14 +45,7 @@ const getSectionToneClass = (tone: SectionTone): string => {
   return tones[tone];
 };
 
-export default function RentalPostAdminModal({
-  open,
-  onClose,
-  editingPost,
-  categories,
-  reload,
-  authorId,
-}: Props) {
+export default function RentalPostAdminModal({ open, onClose, editingPost, categories, reload, authorId }: Props) {
   const { register, handleSubmit, reset, watch, setValue } = useForm<RentalPostFormData>();
 
   const [images, setImages] = useState<FileList | null>(null);
@@ -156,14 +139,9 @@ export default function RentalPostAdminModal({
     reset({
       ...editingPost,
       author: typeof editingPost.author === 'object' ? editingPost.author._id : editingPost.author,
-      category:
-        typeof editingPost.category === 'object' ? editingPost.category._id : editingPost.category,
-      postedAt: editingPost.postedAt
-        ? new Date(editingPost.postedAt).toISOString().split('T')[0]
-        : '',
-      expiredAt: editingPost.expiredAt
-        ? new Date(editingPost.expiredAt).toISOString().split('T')[0]
-        : '',
+      category: typeof editingPost.category === 'object' ? editingPost.category._id : editingPost.category,
+      postedAt: editingPost.postedAt ? new Date(editingPost.postedAt).toISOString().split('T')[0] : '',
+      expiredAt: editingPost.expiredAt ? new Date(editingPost.expiredAt).toISOString().split('T')[0] : '',
     });
 
     setPreviewUrls(editingPost.images || []);
@@ -248,40 +226,26 @@ export default function RentalPostAdminModal({
     }
   };
 
-  const labelClass =
-    'mb-1 block text-[10px] font-black uppercase tracking-[0.14em] text-neutral-500';
+  const labelClass = 'mb-1 block text-[10px] font-black uppercase tracking-[0.14em] text-neutral-500';
 
   const inputClass =
     'w-full rounded-md border border-neutral-200 bg-white px-2 py-2 text-[13px] font-semibold text-neutral-900 outline-none transition placeholder:text-neutral-400 hover:border-primary/40 focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-400';
 
-  const fileInputClass =
-    'file-input file-input-bordered file-input-sm w-full rounded-md border-neutral-200 bg-white text-[13px] focus:outline-none';
+  const fileInputClass = 'file-input file-input-bordered file-input-sm w-full rounded-md border-neutral-200 bg-white text-[13px] focus:outline-none';
 
-  const sectionTitleClass =
-    'mb-2 flex items-center justify-between border-b border-current/10 pb-2 text-xs font-black uppercase tracking-[0.16em]';
+  const sectionTitleClass = 'mb-2 flex items-center justify-between border-b border-current/10 pb-2 text-xs font-black uppercase tracking-[0.16em]';
 
   const renderSectionClass = (tone: SectionTone) => {
     return `relative overflow-hidden rounded-lg border p-2 shadow-sm before:absolute before:left-0 before:top-0 before:h-full before:w-1 ${getSectionToneClass(tone)}`;
   };
 
-  const PreviewImageGrid = ({
-    urls,
-    onRemove,
-    isZoom,
-  }: {
-    urls: string[];
-    onRemove: (url: string) => void;
-    isZoom?: boolean;
-  }) => {
+  const PreviewImageGrid = ({ urls, onRemove, isZoom }: { urls: string[]; onRemove: (url: string) => void; isZoom?: boolean }) => {
     if (urls.length === 0) return null;
 
     return (
       <div className="mt-2 flex flex-wrap gap-2">
         {urls.map((url, index) => (
-          <div
-            key={`${url}-${index}`}
-            className="group relative h-16 w-16 overflow-hidden rounded-md border border-neutral-200 bg-white shadow-sm"
-          >
+          <div key={`${url}-${index}`} className="group relative h-16 w-16 overflow-hidden rounded-md border border-neutral-200 bg-white shadow-sm">
             {isZoom ? (
               <Zoom>
                 <Image src={url} alt={`preview-${index}`} fill className="object-cover" unoptimized />
@@ -308,7 +272,7 @@ export default function RentalPostAdminModal({
       {open && (
         <motion.div
           key="overlay"
-          className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/55 p-2 backdrop-blur-sm"
+          className="fixed inset-0 flex items-center justify-center bg-black/55 p-2 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -322,7 +286,7 @@ export default function RentalPostAdminModal({
             exit={{ scale: 0.98, opacity: 0, y: 12 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
           >
-            <div className="z-10 flex shrink-0 items-center justify-between border-b border-neutral-200 bg-white px-2 py-2">
+            <div className="flex shrink-0 items-center justify-between border-b border-neutral-200 bg-white px-2 py-2">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="truncate text-base font-black tracking-tight text-neutral-950">
@@ -336,9 +300,7 @@ export default function RentalPostAdminModal({
                   )}
                 </div>
 
-                <p className="mt-0.5 text-xs font-medium text-neutral-500">
-                  Nhập liệu theo từng nhóm để dễ kiểm tra và quản lý.
-                </p>
+                <p className="mt-0.5 text-xs font-medium text-neutral-500">Nhập liệu theo từng nhóm để dễ kiểm tra và quản lý.</p>
               </div>
 
               <button
@@ -351,17 +313,11 @@ export default function RentalPostAdminModal({
             </div>
 
             <div className="flex-1 overflow-y-auto bg-neutral-100 p-2 [scrollbar-width:thin]">
-              <form
-                id="rental-post-form"
-                onSubmit={handleSubmit(handleFormSubmit)}
-                className="flex flex-col gap-2"
-              >
+              <form id="rental-post-form" onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-2">
                 <section className={renderSectionClass('blue')}>
                   <h4 className={sectionTitleClass}>
                     <span>Nhận diện & tiêu đề</span>
-                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">
-                      Thông tin hiển thị chính
-                    </span>
+                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">Thông tin hiển thị chính</span>
                   </h4>
 
                   <div className="grid grid-cols-1 gap-2 xl:grid-cols-4">
@@ -369,13 +325,7 @@ export default function RentalPostAdminModal({
                       <label className={labelClass}>
                         Tiêu đề bài đăng <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('title', { required: true })}
-                        placeholder="Nhập tiêu đề..."
-                        autoFocus
-                      />
+                      <input type="text" className={inputClass} {...register('title', { required: true })} placeholder="Nhập tiêu đề..." autoFocus />
                     </div>
 
                     <div>
@@ -388,13 +338,7 @@ export default function RentalPostAdminModal({
 
                     <div className="xl:col-span-4">
                       <label className={labelClass}>Ảnh hiển thị</label>
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={(event) => setImages(event.target.files)}
-                        className={fileInputClass}
-                      />
+                      <input type="file" multiple accept="image/*" onChange={(event) => setImages(event.target.files)} className={fileInputClass} />
                       <PreviewImageGrid urls={previewUrls} onRemove={removeImage} isZoom />
                     </div>
                   </div>
@@ -403,9 +347,7 @@ export default function RentalPostAdminModal({
                 <section className={renderSectionClass('red')}>
                   <h4 className={sectionTitleClass}>
                     <span>Giá & diện tích</span>
-                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">
-                      Dữ liệu định giá
-                    </span>
+                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">Dữ liệu định giá</span>
                   </h4>
 
                   <div className="grid grid-cols-1 gap-2 xl:grid-cols-6">
@@ -426,12 +368,7 @@ export default function RentalPostAdminModal({
                       <label className={labelClass}>
                         Đơn vị <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('priceUnit', { required: true })}
-                        placeholder="Tỷ, Triệu..."
-                      />
+                      <input type="text" className={inputClass} {...register('priceUnit', { required: true })} placeholder="Tỷ, Triệu..." />
                     </div>
 
                     <div className="xl:col-span-2">
@@ -461,12 +398,7 @@ export default function RentalPostAdminModal({
                       <label className={labelClass}>
                         Diện tích <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('area', { required: true })}
-                        placeholder="m²"
-                      />
+                      <input type="text" className={inputClass} {...register('area', { required: true })} placeholder="m²" />
                     </div>
 
                     <div>
@@ -482,24 +414,12 @@ export default function RentalPostAdminModal({
 
                     <div>
                       <label className={labelClass}>Dài</label>
-                      <input
-                        type="number"
-                        step="any"
-                        className={inputClass}
-                        {...register('lotDepth', { valueAsNumber: true })}
-                        placeholder="m"
-                      />
+                      <input type="number" step="any" className={inputClass} {...register('lotDepth', { valueAsNumber: true })} placeholder="m" />
                     </div>
 
                     <div>
                       <label className={labelClass}>Mặt hậu</label>
-                      <input
-                        type="number"
-                        step="any"
-                        className={inputClass}
-                        {...register('backSize', { valueAsNumber: true })}
-                        placeholder="m"
-                      />
+                      <input type="number" step="any" className={inputClass} {...register('backSize', { valueAsNumber: true })} placeholder="m" />
                     </div>
                   </div>
                 </section>
@@ -507,9 +427,7 @@ export default function RentalPostAdminModal({
                 <section className={renderSectionClass('slate')}>
                   <h4 className={sectionTitleClass}>
                     <span>Danh mục & nội dung</span>
-                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">
-                      Phân loại và mô tả
-                    </span>
+                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">Phân loại và mô tả</span>
                   </h4>
 
                   <div className="grid grid-cols-1 gap-2 xl:grid-cols-3">
@@ -517,10 +435,7 @@ export default function RentalPostAdminModal({
                       <label className={labelClass}>
                         Danh mục <span className="text-red-500">*</span>
                       </label>
-                      <select
-                        className={`${inputClass} font-black text-primary`}
-                        {...register('category', { required: true })}
-                      >
+                      <select className={`${inputClass} font-black text-primary`} {...register('category', { required: true })}>
                         <option value="">Chọn danh mục</option>
                         {categories.map((category) => (
                           <option key={category._id} value={category._id}>
@@ -532,11 +447,7 @@ export default function RentalPostAdminModal({
 
                     <div>
                       <label className={labelClass}>Loại tin</label>
-                      <select
-                        className={inputClass}
-                        {...register('postType', { required: true })}
-                        defaultValue="highlight"
-                      >
+                      <select className={inputClass} {...register('postType', { required: true })} defaultValue="highlight">
                         <option value="highlight">Nổi bật</option>
                         <option value="vip1">VIP 1</option>
                         <option value="vip2">VIP 2</option>
@@ -547,12 +458,7 @@ export default function RentalPostAdminModal({
 
                     <div>
                       <label className={labelClass}>Loại hình BĐS</label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('propertyType')}
-                        placeholder="Nhà phố, căn hộ..."
-                      />
+                      <input type="text" className={inputClass} {...register('propertyType')} placeholder="Nhà phố, căn hộ..." />
                     </div>
 
                     <div className="xl:col-span-3">
@@ -572,82 +478,43 @@ export default function RentalPostAdminModal({
                 <section className={renderSectionClass('amber')}>
                   <h4 className={sectionTitleClass}>
                     <span>Thông số kỹ thuật</span>
-                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">
-                      Công năng và pháp lý
-                    </span>
+                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">Công năng và pháp lý</span>
                   </h4>
 
                   <div className="grid grid-cols-2 gap-2 xl:grid-cols-7">
                     <div>
                       <label className={labelClass}>Số tầng</label>
-                      <input
-                        type="number"
-                        className={inputClass}
-                        {...register('floorNumber', { valueAsNumber: true })}
-                        min="0"
-                        placeholder="0"
-                      />
+                      <input type="number" className={inputClass} {...register('floorNumber', { valueAsNumber: true })} min="0" placeholder="0" />
                     </div>
 
                     <div>
                       <label className={labelClass}>Phòng ngủ</label>
-                      <input
-                        type="number"
-                        className={inputClass}
-                        {...register('bedroomNumber', { valueAsNumber: true })}
-                        min="0"
-                        placeholder="0"
-                      />
+                      <input type="number" className={inputClass} {...register('bedroomNumber', { valueAsNumber: true })} min="0" placeholder="0" />
                     </div>
 
                     <div>
                       <label className={labelClass}>WC</label>
-                      <input
-                        type="number"
-                        className={inputClass}
-                        {...register('toiletNumber', { valueAsNumber: true })}
-                        min="0"
-                        placeholder="0"
-                      />
+                      <input type="number" className={inputClass} {...register('toiletNumber', { valueAsNumber: true })} min="0" placeholder="0" />
                     </div>
 
                     <div>
                       <label className={labelClass}>Vị trí</label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('locationType')}
-                        placeholder="Mặt tiền, hẻm..."
-                      />
+                      <input type="text" className={inputClass} {...register('locationType')} placeholder="Mặt tiền, hẻm..." />
                     </div>
 
                     <div>
                       <label className={labelClass}>Hướng</label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('direction')}
-                        placeholder="Hướng nhà"
-                      />
+                      <input type="text" className={inputClass} {...register('direction')} placeholder="Hướng nhà" />
                     </div>
 
                     <div>
                       <label className={labelClass}>Pháp lý</label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('legalStatus')}
-                        placeholder="Sổ hồng..."
-                      />
+                      <input type="text" className={inputClass} {...register('legalStatus')} placeholder="Sổ hồng..." />
                     </div>
 
                     <div>
                       <label className={labelClass}>Nội thất</label>
-                      <select
-                        className={inputClass}
-                        {...register('furnitureStatus')}
-                        defaultValue="default"
-                      >
+                      <select className={inputClass} {...register('furnitureStatus')} defaultValue="default">
                         <option value="default">Chọn nội thất</option>
                         <option value="Đầy đủ nội thất">Đầy đủ nội thất</option>
                         <option value="Chưa có nội thất">Chưa có nội thất</option>
@@ -661,9 +528,7 @@ export default function RentalPostAdminModal({
                 <section className={renderSectionClass('purple')}>
                   <h4 className={sectionTitleClass}>
                     <span>Địa chỉ tài sản</span>
-                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">
-                      Khu vực và vị trí
-                    </span>
+                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">Khu vực và vị trí</span>
                   </h4>
 
                   <div className="grid grid-cols-1 gap-2 xl:grid-cols-4">
@@ -756,12 +621,7 @@ export default function RentalPostAdminModal({
                       <label className={labelClass}>
                         Địa chỉ cụ thể <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('address', { required: true })}
-                        placeholder="Số nhà, tên đường..."
-                      />
+                      <input type="text" className={inputClass} {...register('address', { required: true })} placeholder="Số nhà, tên đường..." />
                     </div>
                   </div>
                 </section>
@@ -769,9 +629,7 @@ export default function RentalPostAdminModal({
                 <section className={renderSectionClass('rose')}>
                   <h4 className={sectionTitleClass}>
                     <span>Media & ghi chú nội bộ</span>
-                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">
-                      Video, tiện ích, ngày đăng
-                    </span>
+                    <span className="text-[10px] font-bold normal-case tracking-normal opacity-70">Video, tiện ích, ngày đăng</span>
                   </h4>
 
                   <div className="grid grid-cols-1 gap-2 xl:grid-cols-4">
@@ -789,48 +647,26 @@ export default function RentalPostAdminModal({
 
                     <div className="xl:col-span-2">
                       <label className={labelClass}>Link Youtube</label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('youtubeLink')}
-                        placeholder="https://..."
-                      />
+                      <input type="text" className={inputClass} {...register('youtubeLink')} placeholder="https://..." />
                     </div>
 
                     <div className="xl:col-span-2">
                       <label className={labelClass}>Tiêu đề Video</label>
-                      <input
-                        type="text"
-                        className={inputClass}
-                        {...register('videoTitle')}
-                        placeholder="Tiêu đề..."
-                      />
+                      <input type="text" className={inputClass} {...register('videoTitle')} placeholder="Tiêu đề..." />
                     </div>
 
                     <div className="xl:col-span-4">
                       <label className={labelClass}>Mô tả Video</label>
-                      <textarea
-                        className={`${inputClass} resize-none`}
-                        {...register('videoDescription')}
-                        rows={6}
-                        placeholder="Mô tả video..."
-                      />
+                      <textarea className={`${inputClass} resize-none`} {...register('videoDescription')} rows={6} placeholder="Mô tả video..." />
                     </div>
 
                     <div className="xl:col-span-2">
                       <label className={labelClass}>Tiện ích</label>
-                      <textarea
-                        className={`${inputClass} resize-none`}
-                        {...register('amenities')}
-                        rows={6}
-                        placeholder="Nhập tiện ích..."
-                      />
+                      <textarea className={`${inputClass} resize-none`} {...register('amenities')} rows={6} placeholder="Nhập tiện ích..." />
                     </div>
 
                     <div className="xl:col-span-2">
-                      <label className={`${labelClass} text-amber-700`}>
-                        Ghi chú Admin
-                      </label>
+                      <label className={`${labelClass} text-amber-700`}>Ghi chú Admin</label>
                       <textarea
                         className={`${inputClass} resize-none border-amber-200 bg-amber-50 text-amber-900 focus:border-amber-400 focus:ring-amber-100`}
                         {...register('adminNote')}
@@ -853,13 +689,8 @@ export default function RentalPostAdminModal({
               </form>
             </div>
 
-            <div className="z-10 flex shrink-0 items-center justify-end gap-2 border-t border-neutral-200 bg-white px-2 py-2">
-              <CancelBtn
-                onClick={onClose}
-                type="button"
-                value="Hủy"
-                className="min-w-[96px] rounded-md font-bold"
-              />
+            <div className="flex shrink-0 items-center justify-end gap-2 border-t border-neutral-200 bg-white px-2 py-2">
+              <CancelBtn onClick={onClose} type="button" value="Hủy" className="min-w-[96px] rounded-md font-bold" />
 
               <Button
                 color="success"

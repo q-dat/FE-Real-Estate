@@ -104,18 +104,12 @@ const getLocationText = (item: IRentalPostAdmin): string => {
 const getAreaText = (item: IRentalPostAdmin): string => {
   if (!item.area) return '';
 
-  const dimension =
-    item.frontageWidth && item.lotDepth ? ` · ${item.frontageWidth}x${item.lotDepth}` : '';
+  const dimension = item.frontageWidth && item.lotDepth ? ` · ${item.frontageWidth}x${item.lotDepth}` : '';
 
   return `${item.area}m²${dimension}`;
 };
 
-export default function HeaderResponsive({
-  user,
-  onLogout,
-  searchButtonLabel = 'Tìm',
-  searchButtonClassName,
-}: HeaderResponsiveProps) {
+export default function HeaderResponsive({ user, onLogout, searchButtonLabel = 'Tìm', searchButtonClassName }: HeaderResponsiveProps) {
   const router = useRouter();
   const { favoriteCount } = useRentalFavorite();
 
@@ -246,14 +240,7 @@ export default function HeaderResponsive({
       <div className="fixed left-0 top-0 z-[999999] w-full border-b border-white/15 bg-primary shadow-sm">
         <div className="flex h-[58px] items-center justify-between px-2">
           <Link href="/" className="flex h-[48px] w-[58px] items-center justify-start">
-            <Image
-              src={images.Logo}
-              alt="Nguồn Nhà Giá Rẻ"
-              width={54}
-              height={54}
-              priority
-              className="h-[54px] w-[54px] object-contain"
-            />
+            <Image src={images.Logo} alt="Nguồn Nhà Giá Rẻ" width={54} height={54} priority className="h-[54px] w-[54px] object-contain" />
           </Link>
 
           <div className="flex items-center gap-1.5">
@@ -273,10 +260,7 @@ export default function HeaderResponsive({
               href="/yeu-thich"
               className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:border-white/40 hover:bg-white/15"
             >
-              <AiFillHeart
-                size={19}
-                className={clsx(favoriteCount > 0 ? 'text-red-300' : 'text-white')}
-              />
+              <AiFillHeart size={19} className={clsx(favoriteCount > 0 ? 'text-red-300' : 'text-white')} />
 
               {favoriteCount > 0 && (
                 <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-black text-white ring-1 ring-white">
@@ -293,10 +277,7 @@ export default function HeaderResponsive({
                 <IoPerson size={18} />
               </Link>
             ) : (
-              <Link
-                href="/profile"
-                className="relative h-9 w-9 overflow-hidden rounded-lg border border-white/30 bg-white/10"
-              >
+              <Link href="/profile" className="relative h-9 w-9 overflow-hidden rounded-lg border border-white/30 bg-white/10">
                 <Image
                   src={user.profile?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}
                   alt="avatar"
@@ -339,12 +320,8 @@ export default function HeaderResponsive({
               <div className="border-b border-primary/10 bg-primary px-2 py-2">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <div>
-                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-white">
-                      Tìm kiếm bất động sản
-                    </p>
-                    <p className="mt-0.5 text-[10px] font-medium text-white/65">
-                      Tra nhanh theo tiêu đề hoặc mã bài đăng
-                    </p>
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-white">Tìm kiếm bất động sản</p>
+                    <p className="mt-0.5 text-[10px] font-medium text-white/65">Tra nhanh theo tiêu đề hoặc mã bài đăng</p>
                   </div>
 
                   <button
@@ -356,10 +333,7 @@ export default function HeaderResponsive({
                   </button>
                 </div>
 
-                <form
-                  onSubmit={handleSubmit}
-                  className="flex items-center rounded-lg border border-white/20 bg-white shadow-sm"
-                >
+                <form onSubmit={handleSubmit} className="flex items-center rounded-lg border border-white/20 bg-white shadow-sm">
                   <div className="relative shrink-0 border-r border-primary/10 px-2">
                     <select
                       value={searchType}
@@ -376,10 +350,7 @@ export default function HeaderResponsive({
                       <option value="code">Mã code</option>
                     </select>
 
-                    <HiOutlineChevronDown
-                      className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-primary/70"
-                      size={12}
-                    />
+                    <HiOutlineChevronDown className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-primary/70" size={12} />
                   </div>
 
                   <input
@@ -463,9 +434,7 @@ export default function HeaderResponsive({
                             </div>
 
                             <div className="min-w-0 flex-1">
-                              <h4 className="line-clamp-2 text-xs font-black leading-snug text-neutral-950 group-hover:text-primary">
-                                {item.title}
-                              </h4>
+                              <h4 className="line-clamp-2 text-xs font-black leading-snug text-neutral-950 group-hover:text-primary">{item.title}</h4>
 
                               <div className="mt-1 flex flex-wrap gap-1">
                                 {item.propertyType ? (
@@ -492,18 +461,14 @@ export default function HeaderResponsive({
                                   {formatCurrency(item.price)} {item.priceUnit}
                                 </span>
 
-                                <span className="min-w-0 truncate text-[10px] font-medium text-neutral-500">
-                                  {getLocationText(item)}
-                                </span>
+                                <span className="min-w-0 truncate text-[10px] font-medium text-neutral-500">{getLocationText(item)}</span>
                               </div>
                             </div>
                           </Link>
                         ))}
                       </div>
                     ) : (
-                      <div className="px-3 py-4 text-center text-xs font-semibold text-neutral-500">
-                        Không tìm thấy kết quả phù hợp.
-                      </div>
+                      <div className="px-3 py-4 text-center text-xs font-semibold text-neutral-500">Không tìm thấy kết quả phù hợp.</div>
                     )}
                   </>
                 ) : (
@@ -541,15 +506,9 @@ export default function HeaderResponsive({
               animate="visible"
               exit="exit"
             >
-              <div className="flex items-center justify-between border-b bg-primary border-neutral-200 px-3 py-3">
+              <div className="flex items-center justify-between border-b border-neutral-200 bg-primary px-3 py-3">
                 <Link href="/" onClick={closeMenu} className="flex h-[44px] w-[58px] items-center">
-                  <Image
-                    src={images.Logo}
-                    alt="Nguồn Nhà Giá Rẻ"
-                    width={54}
-                    height={54}
-                    className="h-[54px] w-[54px] object-contain  rounded-full"
-                  />
+                  <Image src={images.Logo} alt="Nguồn Nhà Giá Rẻ" width={54} height={54} className="h-[54px] w-[54px] rounded-full object-contain" />
                 </Link>
 
                 <button
@@ -573,9 +532,7 @@ export default function HeaderResponsive({
                     </div>
                     <div>
                       <p className="text-sm font-black">Đăng nhập / Đăng ký</p>
-                      <p className="text-[10px] font-semibold text-neutral-500">
-                        Quản lý tài khoản và tin yêu thích
-                      </p>
+                      <p className="text-[10px] font-semibold text-neutral-500">Quản lý tài khoản và tin yêu thích</p>
                     </div>
                   </Link>
                 ) : (
@@ -596,15 +553,9 @@ export default function HeaderResponsive({
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-black text-neutral-950">
-                          {user.profile?.displayName}
-                        </p>
-                        <p className="truncate text-[11px] font-medium text-neutral-500">
-                          {user.email}
-                        </p>
-                        <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-primary">
-                          Quản lý tài khoản
-                        </p>
+                        <p className="truncate text-sm font-black text-neutral-950">{user.profile?.displayName}</p>
+                        <p className="truncate text-[11px] font-medium text-neutral-500">{user.email}</p>
+                        <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-primary">Quản lý tài khoản</p>
                       </div>
                     </div>
                   </Link>
@@ -637,10 +588,7 @@ export default function HeaderResponsive({
                       className="group flex items-center justify-between rounded-md border border-transparent px-2 py-2 text-sm font-bold text-neutral-700 transition hover:border-primary/10 hover:bg-primary/5 hover:text-primary"
                     >
                       <span>{item.title}</span>
-                      <MdArrowForwardIos
-                        size={12}
-                        className="text-neutral-300 transition group-hover:text-primary"
-                      />
+                      <MdArrowForwardIos size={12} className="text-neutral-300 transition group-hover:text-primary" />
                     </Link>
                   </motion.div>
                 ))}
@@ -656,9 +604,7 @@ export default function HeaderResponsive({
                   </span>
 
                   {favoriteCount > 0 ? (
-                    <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-black text-white">
-                      {favoriteCount}
-                    </span>
+                    <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-black text-white">{favoriteCount}</span>
                   ) : null}
                 </Link>
               </motion.nav>

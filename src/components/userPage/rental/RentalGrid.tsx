@@ -79,7 +79,7 @@ export default function RentalGrid({ posts }: RentalGridProps) {
                     <IoMdExpand />
                     <span className="text-sm">{post.area} m²</span>
                     {post.frontageWidth && post.lotDepth && (
-                      <p className='text-gray-500'>
+                      <p className="text-gray-500">
                         (<span className="text-xs">{post.frontageWidth}</span>
                         <span>x</span>
                         <span className="text-xs">{post.lotDepth}</span>)

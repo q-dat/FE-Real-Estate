@@ -72,7 +72,7 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
   };
 
   return (
-    <Navbar className="sticky top-0 z-[999999] w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">
+    <Navbar className="sticky top-0 w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">
       {/* LEFT SECTION: Mobile Toggle & Context Info */}
       <Navbar.Start>
         <motion.div whileTap={{ scale: 0.9 }}>
@@ -85,7 +85,7 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
           <motion.h2
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="max-w-xs font-semibold line-clamp-1 uppercase tracking-tight"
+            className="line-clamp-1 max-w-xs font-semibold uppercase tracking-tight"
           >
             <span className="text-xs text-white">Trang </span> <span className="text-lg font-black text-primary">{title}</span>
           </motion.h2>

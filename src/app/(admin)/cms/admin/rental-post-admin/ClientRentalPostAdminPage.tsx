@@ -2,16 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { FaImages, FaPlus } from 'react-icons/fa';
-import {
-  FiEdit3,
-  FiFilm,
-  FiGrid,
-  FiHome,
-  FiLock,
-  FiMapPin,
-  FiTrash2,
-  FiUploadCloud,
-} from 'react-icons/fi';
+import { FiEdit3, FiFilm, FiGrid, FiHome, FiLock, FiMapPin, FiTrash2, FiUploadCloud } from 'react-icons/fi';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { IRentalAuthor, IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
@@ -94,11 +85,7 @@ const getDisplayDate = (date?: string | Date): string => {
   return new Date(date).toLocaleDateString('vi-VN');
 };
 
-export default function ClientRentalPostAdminPage({
-  posts: initialPosts,
-  categories,
-  categoryCode,
-}: Props) {
+export default function ClientRentalPostAdminPage({ posts: initialPosts, categories, categoryCode }: Props) {
   const { user } = useAdminAuth();
   const searchParams = useSearchParams();
   const searchTitle = searchParams.get('title') || undefined;
@@ -106,14 +93,22 @@ export default function ClientRentalPostAdminPage({
   const authorRef: IRentalAuthor = { _id: user.id };
 
   const [posts, setPosts] = useState<IRentalPostAdmin[]>(initialPosts);
-  const [importOpen, setImportOpen] = useState(false);
-  const [openContentGenerator, setOpenContentGenerator] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [editingPost, setEditingPost] = useState<IRentalPostAdmin | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [internalOpen, setInternalOpen] = useState(false);
   const [internalPost, setInternalPost] = useState<IRentalPostAdmin | null>(null);
+
+  const [openContentGenerator, setOpenContentGenerator] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importJsonText, setImportJsonText] = useState('');
+
+  const handleSendContentJsonToImport = (jsonText: string) => {
+    setImportJsonText(jsonText);
+    setOpenContentGenerator(false);
+    setImportOpen(true);
+  };
 
   const activeCount = useMemo(() => {
     return posts.filter((post) => post.status === 'active').length;
@@ -173,7 +168,7 @@ export default function ClientRentalPostAdminPage({
 
   return (
     <div className="min-h-screen w-full bg-neutral-100">
-      <div className=" border-b border-neutral-200 bg-white/95 shadow-sm backdrop-blur-xl">
+      <div className="border-b border-neutral-200 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="px-2 py-2 xl:px-4">
           <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
             <div className="min-w-0">
@@ -183,13 +178,9 @@ export default function ClientRentalPostAdminPage({
                 </div>
 
                 <div className="min-w-0">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">
-                    Portfolio Admin
-                  </p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Portfolio Admin</p>
 
-                  <h1 className="truncate text-lg font-black tracking-tight text-neutral-950 xl:text-2xl">
-                    Quản lý bất động sản
-                  </h1>
+                  <h1 className="truncate text-lg font-black tracking-tight text-neutral-950 xl:text-2xl">Quản lý bất động sản</h1>
                 </div>
 
                 <span className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1 text-xs font-black text-neutral-700">
@@ -200,23 +191,17 @@ export default function ClientRentalPostAdminPage({
 
             <div className="grid grid-cols-3 gap-1.5 xl:flex xl:items-center xl:gap-2">
               <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-2 py-1.5">
-                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">
-                  Active
-                </p>
+                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">Active</p>
                 <p className="text-sm font-black text-emerald-700">{activeCount}</p>
               </div>
 
               <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-2 py-1.5">
-                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">
-                  Pending
-                </p>
+                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">Pending</p>
                 <p className="text-sm font-black text-amber-700">{pendingCount}</p>
               </div>
 
               <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-2 py-1.5">
-                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">
-                  Hidden
-                </p>
+                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">Hidden</p>
                 <p className="text-sm font-black text-neutral-700">{hiddenCount}</p>
               </div>
             </div>
@@ -285,17 +270,13 @@ export default function ClientRentalPostAdminPage({
 
                     <div className="absolute left-2 top-2 flex max-w-[calc(100%-4rem)] flex-wrap gap-1">
                       {post.postType ? (
-                        <span
-                          className={`rounded-md border px-1.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] ${postTypeClassName}`}
-                        >
+                        <span className={`rounded-md border px-1.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] ${postTypeClassName}`}>
                           {post.postType}
                         </span>
                       ) : null}
 
                       {post.status ? (
-                        <span
-                          className={`rounded-md border px-1.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] ${statusTone.className}`}
-                        >
+                        <span className={`rounded-md border px-1.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] ${statusTone.className}`}>
                           {statusTone.label}
                         </span>
                       ) : null}
@@ -311,9 +292,7 @@ export default function ClientRentalPostAdminPage({
                     <div className="absolute bottom-2 left-2 right-2">
                       <div className="flex items-end justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="mb-1 text-[9px] font-black uppercase tracking-[0.16em] text-white/70">
-                            CODE: {post.code || 'N/A'}
-                          </p>
+                          <p className="mb-1 text-[9px] font-black uppercase tracking-[0.16em] text-white/70">CODE: {post.code || 'N/A'}</p>
 
                           <div className="inline-flex max-w-full rounded-md bg-white px-2 py-1 shadow-sm">
                             <span className="truncate text-sm font-black text-primary">
@@ -337,11 +316,7 @@ export default function ClientRentalPostAdminPage({
                   </button>
 
                   <div className="flex min-h-[260px] flex-col p-2">
-                    <button
-                      type="button"
-                      onClick={() => openEditModal(post)}
-                      className="text-left"
-                    >
+                    <button type="button" onClick={() => openEditModal(post)} className="text-left">
                       <h2 className="line-clamp-2 min-h-[2.6rem] text-[14px] font-black leading-snug text-neutral-950 transition hover:text-primary">
                         {post.title}
                       </h2>
@@ -349,21 +324,13 @@ export default function ClientRentalPostAdminPage({
 
                     <div className="mt-2 grid grid-cols-2 gap-1.5">
                       <div className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5">
-                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
-                          Diện tích
-                        </p>
-                        <p className="truncate text-[11px] font-bold text-neutral-800">
-                          {getAreaText(post)}
-                        </p>
+                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">Diện tích</p>
+                        <p className="truncate text-[11px] font-bold text-neutral-800">{getAreaText(post)}</p>
                       </div>
 
                       <div className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5">
-                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
-                          Loại vị trí
-                        </p>
-                        <p className="truncate text-[11px] font-bold text-neutral-800">
-                          {post.locationType || 'Chưa cập nhật'}
-                        </p>
+                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">Loại vị trí</p>
+                        <p className="truncate text-[11px] font-bold text-neutral-800">{post.locationType || 'Chưa cập nhật'}</p>
                       </div>
                     </div>
 
@@ -372,40 +339,28 @@ export default function ClientRentalPostAdminPage({
                         <FiMapPin size={11} />
                         Vị trí
                       </p>
-                      <p className="line-clamp-2 text-[11px] font-medium leading-relaxed text-neutral-600">
-                        {getLocationText(post)}
-                      </p>
+                      <p className="line-clamp-2 text-[11px] font-medium leading-relaxed text-neutral-600">{getLocationText(post)}</p>
                     </div>
 
                     {post.address ? (
                       <div className="mt-1.5 rounded-md border border-neutral-200 bg-white px-2 py-1.5">
-                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
-                          Địa chỉ
-                        </p>
-                        <p className="truncate text-[11px] font-medium text-neutral-600">
-                          {post.address}
-                        </p>
+                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">Địa chỉ</p>
+                        <p className="truncate text-[11px] font-medium text-neutral-600">{post.address}</p>
                       </div>
                     ) : null}
 
                     <div className="mt-auto pt-2">
                       <div className="grid grid-cols-2 gap-1.5 border-t border-neutral-100 pt-2">
                         <div>
-                          <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
-                            Cập nhật
-                          </p>
+                          <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">Cập nhật</p>
                           <p className="text-[11px] font-bold text-red-600">
                             <TimeAgo date={post.updatedAt} />
                           </p>
                         </div>
 
                         <div className="text-right">
-                          <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">
-                            Ngày tạo
-                          </p>
-                          <p className="text-[11px] font-bold text-neutral-700">
-                            {getDisplayDate(post.createdAt)}
-                          </p>
+                          <p className="text-[9px] font-black uppercase tracking-[0.12em] text-neutral-400">Ngày tạo</p>
+                          <p className="text-[11px] font-bold text-neutral-700">{getDisplayDate(post.createdAt)}</p>
                         </div>
                       </div>
 
@@ -485,19 +440,7 @@ export default function ClientRentalPostAdminPage({
         )}
       </main>
 
-      <ImportRentalPostModal
-        open={importOpen}
-        onClose={() => setImportOpen(false)}
-        reload={reload}
-        authorId={authorRef}
-      />
-
-      <AdminInternalModal
-        open={internalOpen}
-        onClose={() => setInternalOpen(false)}
-        post={internalPost}
-        reload={reload}
-      />
+      <AdminInternalModal open={internalOpen} onClose={() => setInternalOpen(false)} post={internalPost} reload={reload} />
 
       <RentalPostAdminModal
         key={editingPost?._id ?? 'create'}
@@ -512,15 +455,20 @@ export default function ClientRentalPostAdminPage({
         authorId={authorRef}
       />
 
-      <DeleteModal
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        onConfirm={confirmDelete}
-      />
+      <DeleteModal open={confirmOpen} onClose={() => setConfirmOpen(false)} onConfirm={confirmDelete} />
 
       <ContentGeneratorModal
         open={openContentGenerator}
         onClose={() => setOpenContentGenerator(false)}
+        onSendToImport={handleSendContentJsonToImport}
+      />
+
+      <ImportRentalPostModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        reload={reload}
+        authorId={authorRef}
+        initialJsonText={importJsonText}
       />
     </div>
   );

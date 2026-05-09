@@ -71,7 +71,7 @@ export default function Header({ user }: HeaderProps) {
           if (searchType === 'title') {
             const results = await rentalPostAdminService.getAll({
               title: searchTerm,
-              limit: 5
+              limit: 5,
             });
             setSearchResults(results || []);
           } else {
@@ -173,7 +173,6 @@ export default function Header({ user }: HeaderProps) {
 
             {/* Search + CTA */}
             <div className="flex w-full items-center justify-center gap-4">
-
               {/* VÙNG CHỨA SEARCH & DROPDOWN */}
               <div ref={searchContainerRef} className="relative flex w-full max-w-xl items-center">
                 <form
@@ -190,12 +189,16 @@ export default function Header({ user }: HeaderProps) {
                         setSearchResults([]);
                         setShowDropdown(false);
                       }}
-                      className="appearance-none bg-transparent py-1 pr-4 text-[11px] font-bold uppercase tracking-wider text-primary outline-none cursor-pointer"
+                      className="cursor-pointer appearance-none bg-transparent py-1 pr-4 text-[11px] font-bold uppercase tracking-wider text-primary outline-none"
                     >
-                      <option className='p-1 rounded-md' value="title">Tiêu đề</option>
-                      <option className='p-1 rounded-md' value="code">Mã Code</option>
+                      <option className="rounded-md p-1" value="title">
+                        Tiêu đề
+                      </option>
+                      <option className="rounded-md p-1" value="code">
+                        Mã Code
+                      </option>
                     </select>
-                    <HiOutlineChevronDown className="absolute right-2 pointer-events-none text-primary" size={12} />
+                    <HiOutlineChevronDown className="pointer-events-none absolute right-2 text-primary" size={12} />
                   </div>
 
                   <input
@@ -204,7 +207,7 @@ export default function Header({ user }: HeaderProps) {
                     onFocus={() => {
                       if (keyword.length >= 1) setShowDropdown(true);
                     }}
-                    placeholder={searchType === 'title' ? "Nhập tiêu đề tìm kiếm..." : "Nhập mã bài (VD: NN123)..."}
+                    placeholder={searchType === 'title' ? 'Nhập tiêu đề tìm kiếm...' : 'Nhập mã bài (VD: NN123)...'}
                     className={clsx(
                       'flex-1 bg-transparent px-4 text-sm text-primary placeholder:text-primary/60 focus:outline-none',
                       scrolled ? 'h-6' : 'h-10'
@@ -246,14 +249,10 @@ export default function Header({ user }: HeaderProps) {
                         </div>
                       ) : searchResults.length > 0 ? (
                         <div className="max-h-[60vh] overflow-y-auto overscroll-contain py-2">
-                          <div className="px-4 pb-2 pt-1 flex justify-between items-center">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-                              Kết quả cho "{keyword}"
-                            </span>
+                          <div className="flex items-center justify-between px-4 pb-2 pt-1">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Kết quả cho "{keyword}"</span>
                             {searchType === 'code' && (
-                              <span className="text-[9px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                                TÌM THEO MÃ
-                              </span>
+                              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-semibold text-primary">TÌM THEO MÃ</span>
                             )}
                           </div>
                           {searchResults.map((item) => (
@@ -272,7 +271,7 @@ export default function Header({ user }: HeaderProps) {
                                   className="object-cover transition-transform group-hover:scale-110"
                                 />
                                 {/* Overlay hiện chữ CODE khi trỏ chuột vào */}
-                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
                                   <span className="text-[10px] font-bold tracking-widest text-white">{item.code}</span>
                                 </div>
                               </div>
@@ -423,7 +422,10 @@ export default function Header({ user }: HeaderProps) {
                     )}
                   </Dropdown.Item>
                   <div className="my-1 h-px bg-gray-100" />
-                  <Dropdown.Item onClick={onLogout} className="w-[200px] whitespace-nowrap rounded-md text-sm font-semibold text-red-600 hover:bg-red-50">
+                  <Dropdown.Item
+                    onClick={onLogout}
+                    className="w-[200px] whitespace-nowrap rounded-md text-sm font-semibold text-red-600 hover:bg-red-50"
+                  >
                     <HiOutlineArrowRightOnRectangle size={16} /> Đăng xuất
                   </Dropdown.Item>
                 </Dropdown.Menu>
