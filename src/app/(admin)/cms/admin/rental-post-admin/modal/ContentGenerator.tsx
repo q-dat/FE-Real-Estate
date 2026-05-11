@@ -491,7 +491,7 @@ const TextAreaField = ({
   placeholder,
   accentClass = '',
   mono = false,
-  rows = 15,
+  rows = 20,
 }: TextAreaFieldProps) => {
   return (
     <div className="min-w-0">
@@ -505,7 +505,7 @@ const TextAreaField = ({
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className={`w-full resize-y overflow-auto rounded-xl border border-slate-700/80 bg-slate-950/80 p-3 text-[13px] leading-relaxed text-slate-100 outline-none transition [scrollbar-width:thin] placeholder:text-slate-600 hover:border-cyan-400/30 focus:border-cyan-400/60 focus:bg-slate-950 focus:ring-4 focus:ring-cyan-400/10 ${mono ? 'font-mono text-[12px]' : ''} ${accentClass}`}
+        className={`w-full resize-y scrollbar-hide  overflow-hidden break-all rounded-xl border border-slate-700/80 bg-slate-950/80 p-3 text-[13px] leading-relaxed text-slate-100 outline-none transition  placeholder:text-slate-600 hover:border-cyan-400/30 focus:border-cyan-400/60 focus:bg-slate-950 focus:ring-4 focus:ring-cyan-400/10 ${mono ? 'font-mono text-[12px]' : ''} ${accentClass}`}
       />
     </div>
   );
