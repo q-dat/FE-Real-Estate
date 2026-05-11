@@ -484,17 +484,17 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                   <div className="grid grid-cols-2 gap-2 xl:grid-cols-7">
                     <div>
                       <label className={labelClass}>Số tầng</label>
-                      <input type="number" className={inputClass} {...register('floorNumber', { valueAsNumber: true })} min="0" placeholder="0" />
+                      <input type="number" className={inputClass} {...register('floorNumber', { valueAsNumber: true })} min="0" step="0.001" placeholder="0" />
                     </div>
 
                     <div>
                       <label className={labelClass}>Phòng ngủ</label>
-                      <input type="number" className={inputClass} {...register('bedroomNumber', { valueAsNumber: true })} min="0" placeholder="0" />
+                      <input type="number" className={inputClass} {...register('bedroomNumber', { valueAsNumber: true })} min="0" step="0.001" placeholder="0" />
                     </div>
 
                     <div>
                       <label className={labelClass}>WC</label>
-                      <input type="number" className={inputClass} {...register('toiletNumber', { valueAsNumber: true })} min="0" placeholder="0" />
+                      <input type="number" className={inputClass} {...register('toiletNumber', { valueAsNumber: true })} min="0" step="0.001" placeholder="0" />
                     </div>
 
                     <div>
