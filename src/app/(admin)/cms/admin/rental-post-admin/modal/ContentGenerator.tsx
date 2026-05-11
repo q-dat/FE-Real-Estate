@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+
+import { type UIEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { FiCheck, FiChevronRight, FiCopy, FiDatabase, FiPlus, FiSend, FiTrash2 } from 'react-icons/fi';
 
 interface PropertyData {
@@ -56,6 +57,8 @@ type TextFieldProps = {
   label: string;
   value: string | number;
   copyId: string;
+  copied: boolean;
+  onCopy: (value: string | number | string[], fieldId: string) => void;
   onChange: (value: string) => void;
   placeholder?: string;
   type?: 'text' | 'number';
@@ -66,11 +69,27 @@ type TextAreaFieldProps = {
   label: string;
   value: string | number;
   copyId: string;
+  copied: boolean;
+  onCopy: (value: string | number | string[], fieldId: string) => void;
   onChange: (value: string) => void;
   placeholder?: string;
   accentClass?: string;
   mono?: boolean;
+  rows?: number;
 };
+
+type HighlightRule = {
+  type: HighlightType;
+  className: string;
+  words: string[];
+};
+
+type HighlightToken = {
+  text: string;
+  type: HighlightType | 'plain';
+};
+
+type HighlightType = 'numberWord' | 'about' | 'money' | 'uncertain' | 'risky';
 
 const STORAGE_POSTS_KEY = 'NN_TEMP_POSTS_V2';
 const STORAGE_STATUS_KEY = 'NN_TEMP_TAB_STATUS_V2';
@@ -164,6 +183,113 @@ const SYSTEM_JSON_KEYS: Array<keyof PropertyData> = [
   'status',
   'adminNote',
 ];
+
+const HIGHLIGHT_RULES: HighlightRule[] = [
+  {
+    type: 'numberWord',
+    className: 'bg-cyan-400',
+    words: ['một', 'hai', 'ba', 'bốn', 'tư', 'năm', 'sáu', 'bảy', 'tám', 'chín'
+      , 'linh', 'lẻ', 'trăm', 'nghìn', 'ngàn', 'triệu', 'tỷ'
+      , 'mốt', 'tư', 'lăm'
+      , '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
+    ],
+  },
+  {
+    type: 'about',
+    className: 'bg-amber-400',
+    words: ['khoảng'],
+  },
+  {
+    type: 'money',
+    className: 'bg-emerald-400',
+    words: [
+      'đồng',
+      'tỷ',
+      'triệu',
+      'nghìn',
+      'ngàn',
+      'giá',
+      'xu',
+      'đồng',
+      'củ',
+      'thương lượng',
+      'thoả thuận',
+      'thỏa thuận',
+      'tl',
+      'chốt',
+      'giảm',
+      'nhỉnh',
+      'gần',
+    ],
+  },
+  {
+    type: 'uncertain',
+    className: 'bg-violet-400',
+    words: [
+      'có thể',
+      'có lẽ',
+      'dường như',
+      'hình như',
+      'ước chừng',
+      'ước tính',
+      'tầm',
+      'gần như',
+      'khả năng',
+      'dự kiến',
+      'nghe nói',
+      'theo lời',
+      'được cho là',
+      'chưa chắc',
+      'không chắc',
+    ],
+  },
+  {
+    type: 'risky',
+    className: 'bg-red-500',
+    words: [
+      'sốc',
+      'siêu sốc',
+      'cực sốc',
+      'cháy hàng',
+      'bùng nổ',
+      'cam kết lời',
+      'lợi nhuận',
+      'độc nhất',
+      'duy nhất',
+      'tốt nhất',
+      'rẻ nhất',
+      'đẹp nhất',
+      'hot nhất',
+      'đảm bảo',
+      'chắc chắn',
+      'bao lời',
+      'không thể bỏ qua',
+      'cơ hội vàng',
+      'hời',
+      'ngon',
+      'cực phẩm',
+      'vip',
+      'đầu tư',
+      'phong thủy',
+      'giữ tiền',
+      'ăn tiền'
+    ],
+  },
+];
+
+const HIGHLIGHT_CLASS_BY_TYPE: Record<HighlightType, string> = HIGHLIGHT_RULES.reduce<Record<HighlightType, string>>(
+  (acc, rule) => {
+    acc[rule.type] = rule.className;
+    return acc;
+  },
+  {
+    numberWord: '',
+    about: '',
+    money: '',
+    uncertain: '',
+    risky: '',
+  }
+);
 
 const createTempId = (): string => {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
@@ -268,6 +394,200 @@ const removeLocalStorage = (key: string): void => {
   window.localStorage.removeItem(key);
 };
 
+const escapeRegExp = (value: string): string => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+const isVietnameseWordCharacter = (value: string): boolean => {
+  return /[0-9A-Za-zÀ-ỹ]/u.test(value);
+};
+
+const tokenizeHighlightText = (value: string): HighlightToken[] => {
+  const tokens: HighlightToken[] = [];
+  const wordMap = new Map<string, HighlightType>();
+
+  HIGHLIGHT_RULES.forEach((rule) => {
+    rule.words.forEach((word) => {
+      wordMap.set(word.toLowerCase(), rule.type);
+    });
+  });
+
+  const sortedWords = Array.from(wordMap.keys()).sort((a, b) => b.length - a.length);
+
+  if (sortedWords.length === 0) {
+    return [{ text: value, type: 'plain' }];
+  }
+
+  const pattern = new RegExp(sortedWords.map(escapeRegExp).join('|'), 'giu');
+  let lastIndex = 0;
+
+  value.replace(pattern, (match: string, offset: number) => {
+    const before = offset > 0 ? value[offset - 1] : '';
+    const after = value[offset + match.length] || '';
+    const hasInvalidBefore = before ? isVietnameseWordCharacter(before) : false;
+    const hasInvalidAfter = after ? isVietnameseWordCharacter(after) : false;
+
+    if (hasInvalidBefore || hasInvalidAfter) {
+      return match;
+    }
+
+    if (offset > lastIndex) {
+      tokens.push({ text: value.slice(lastIndex, offset), type: 'plain' });
+    }
+
+    const type = wordMap.get(match.toLowerCase()) || 'plain';
+    tokens.push({ text: match, type });
+    lastIndex = offset + match.length;
+
+    return match;
+  });
+
+  if (lastIndex < value.length) {
+    tokens.push({ text: value.slice(lastIndex), type: 'plain' });
+  }
+
+  return tokens.length > 0 ? tokens : [{ text: value, type: 'plain' }];
+};
+
+const CopyButton = ({ copied, onClick }: { copied: boolean; onClick: () => void }) => {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-700/70 bg-slate-900/80 text-slate-400 transition hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300"
+      title="Copy"
+    >
+      {copied ? <FiCheck className="text-emerald-400" /> : <FiCopy />}
+    </button>
+  );
+};
+
+const TextField = ({ label, value, copyId, copied, onCopy, onChange, placeholder, type = 'text', accentClass = '' }: TextFieldProps) => {
+  return (
+    <div className="min-w-0">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <label className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">{label}</label>
+        <CopyButton copied={copied} onClick={() => onCopy(value, copyId)} />
+      </div>
+
+      <input
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+        className={`h-11 w-full rounded-xl border border-slate-700/80 bg-slate-950/80 px-3 text-[13px] font-semibold text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-cyan-400/30 focus:border-cyan-400/60 focus:bg-slate-950 focus:ring-4 focus:ring-cyan-400/10 ${accentClass}`}
+      />
+    </div>
+  );
+};
+
+const TextAreaField = ({
+  label,
+  value,
+  copyId,
+  copied,
+  onCopy,
+  onChange,
+  placeholder,
+  accentClass = '',
+  mono = false,
+  rows = 15,
+}: TextAreaFieldProps) => {
+  return (
+    <div className="min-w-0">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <label className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">{label}</label>
+        <CopyButton copied={copied} onClick={() => onCopy(value, copyId)} />
+      </div>
+
+      <textarea
+        rows={rows}
+        value={value}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+        className={`w-full resize-y overflow-auto rounded-xl border border-slate-700/80 bg-slate-950/80 p-3 text-[13px] leading-relaxed text-slate-100 outline-none transition [scrollbar-width:thin] placeholder:text-slate-600 hover:border-cyan-400/30 focus:border-cyan-400/60 focus:bg-slate-950 focus:ring-4 focus:ring-cyan-400/10 ${mono ? 'font-mono text-[12px]' : ''} ${accentClass}`}
+      />
+    </div>
+  );
+};
+
+const HighlightTextAreaField = ({
+  label,
+  value,
+  copyId,
+  copied,
+  onCopy,
+  onChange,
+  placeholder,
+  accentClass = '',
+  rows = 15,
+}: TextAreaFieldProps) => {
+  const textValue = String(value ?? '');
+  const highlightRef = useRef<HTMLDivElement | null>(null);
+  const tokens = useMemo(() => tokenizeHighlightText(textValue), [textValue]);
+
+  const handleScroll = (event: UIEvent<HTMLTextAreaElement>): void => {
+    const highlightElement = highlightRef.current;
+
+    if (!highlightElement) return;
+
+    highlightElement.scrollTop = event.currentTarget.scrollTop;
+    highlightElement.scrollLeft = event.currentTarget.scrollLeft;
+  };
+
+  return (
+    <div className="min-w-0">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <label className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">{label}</label>
+        <CopyButton copied={copied} onClick={() => onCopy(value, copyId)} />
+      </div>
+
+      <div className="mb-2 flex flex-wrap gap-2 rounded-xl border border-slate-800 bg-slate-950/60 p-2 text-[10px] font-bold text-slate-400">
+        <span className="rounded bg-cyan-400/20 px-2 py-1 text-cyan-100">số bằng chữ</span>
+        <span className="rounded bg-amber-400/20 px-2 py-1 text-amber-100">khoảng</span>
+        <span className="rounded bg-emerald-400/20 px-2 py-1 text-emerald-100">tiền</span>
+        <span className="rounded bg-violet-400/20 px-2 py-1 text-violet-100">không chắc chắn</span>
+        <span className="rounded bg-red-500/20 px-2 py-1 text-red-100">từ mạnh/rủi ro</span>
+      </div>
+
+      <div className="relative rounded-xl border border-blue-400/20 bg-blue-950/30 focus-within:border-cyan-400/60 focus-within:ring-4 focus-within:ring-cyan-400/10">
+        <div
+          ref={highlightRef}
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-0 z-0 overflow-hidden whitespace-pre-wrap break-words rounded-xl p-3 text-[13px] leading-loose text-transparent [font-variant-ligatures:none] ${accentClass}`}
+        >
+          {tokens.map((token, index) => {
+            if (token.type === 'plain') {
+              return <span key={`${index}-${token.text}`}>{token.text}</span>;
+            }
+
+            return (
+              <mark
+                key={`${index}-${token.text}`}
+                className={`${HIGHLIGHT_CLASS_BY_TYPE[token.type]} text-transparent`}
+                style={{ color: 'transparent' }}
+              >
+                {token.text}
+              </mark>
+            );
+          })}
+          {textValue.endsWith('\n') ? '\n' : null}
+        </div>
+
+        <textarea
+          rows={rows}
+          value={textValue}
+          placeholder={placeholder}
+          onScroll={handleScroll}
+          onChange={(event) => onChange(event.target.value)}
+          spellCheck={false}
+          className={`relative z-10 w-full resize-y overflow-auto rounded-xl bg-transparent p-3 text-[13px] leading-loose text-blue-100 outline-none transition [scrollbar-width:thin] [font-variant-ligatures:none] placeholder:text-slate-600 selection:bg-cyan-300/30 ${accentClass}`}
+        />
+      </div>
+    </div>
+  );
+};
+
 export default function ContentGeneratorModal({ open, onClose, onSendToImport }: Props) {
   const [jsonInput, setJsonInput] = useState('');
   const [parsedData, setParsedData] = useState<PropertyData[]>([]);
@@ -358,7 +678,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
 
   if (!open) return null;
 
-  const handleCopy = async (text: string | number | string[], fieldId: string) => {
+  const handleCopy = async (text: string | number | string[], fieldId: string): Promise<void> => {
     const value = Array.isArray(text) ? text.join('\n') : String(text ?? '');
 
     try {
@@ -370,7 +690,11 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
     }
   };
 
-  const handleParseJson = () => {
+  const handleCopyClick = (text: string | number | string[], fieldId: string): void => {
+    void handleCopy(text, fieldId);
+  };
+
+  const handleParseJson = (): void => {
     try {
       setError('');
 
@@ -381,7 +705,6 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
 
       const parsed = JSON.parse(jsonInput) as unknown;
       const dataArray = Array.isArray(parsed) ? parsed : [parsed];
-
       const processedData = dataArray.filter(isJsonRecord).map(normalizePropertyData);
 
       if (processedData.length === 0) {
@@ -411,7 +734,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
     }
   };
 
-  const updateField = <K extends PropertyField>(index: number, field: K, value: PropertyData[K]) => {
+  const updateField = <K extends PropertyField>(index: number, field: K, value: PropertyData[K]): void => {
     setParsedData((current) => {
       const nextData = [...current];
       const currentItem = nextData[index];
@@ -432,7 +755,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
     });
   };
 
-  const removeTab = (index: number) => {
+  const removeTab = (index: number): void => {
     setParsedData((current) => {
       const item = current[index];
       const nextData = current.filter((_, itemIndex) => itemIndex !== index);
@@ -455,7 +778,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
     });
   };
 
-  const toggleTabStatus = (tempId: string) => {
+  const toggleTabStatus = (tempId: string): void => {
     setTabStatuses((current) => {
       const currentStatus = current[tempId] || 'pending';
 
@@ -466,7 +789,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
     });
   };
 
-  const clearLocalData = () => {
+  const clearLocalData = (): void => {
     const confirmed = window.confirm(
       'Xoá toàn bộ dữ liệu localStorage của workspace này? Hành động này sẽ xoá các tab đã lưu và trạng thái Done/Pending.'
     );
@@ -484,7 +807,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
     setError('');
   };
 
-  const getSystemJson = (item: PropertyData) => {
+  const getSystemJson = (item: PropertyData): Array<Record<string, string | number | string[]>> => {
     const result = SYSTEM_JSON_KEYS.reduce<Record<string, string | number | string[]>>(
       (acc, key) => {
         const value = item[key];
@@ -510,7 +833,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
 
   const systemJsonText = activeItem ? JSON.stringify(getSystemJson(activeItem), null, 2) : '';
 
-  const handleSendToImport = () => {
+  const handleSendToImport = (): void => {
     if (!activeItem || !systemJsonText.trim()) {
       setError('Không có JSON Admin Export để chuyển sang Import.');
       return;
@@ -524,61 +847,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
     onSendToImport(systemJsonText);
   };
 
-  const renderCopyButton = (fieldId: string, value: string | number | string[]) => {
-    const copied = copiedField === fieldId;
-
-    return (
-      <button
-        type="button"
-        onClick={() => void handleCopy(value, fieldId)}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-700/70 bg-slate-900/80 text-slate-400 transition hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300"
-        title="Copy"
-      >
-        {copied ? <FiCheck className="text-emerald-400" /> : <FiCopy />}
-      </button>
-    );
-  };
-
-  const TextField = ({ label, value, copyId, onChange, placeholder, type = 'text', accentClass = '' }: TextFieldProps) => {
-    return (
-      <div className="min-w-0">
-        <div className="mb-1.5 flex items-center justify-between gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">{label}</label>
-          {renderCopyButton(copyId, value)}
-        </div>
-
-        <input
-          type={type}
-          value={value}
-          placeholder={placeholder}
-          onChange={(event) => onChange(event.target.value)}
-          className={`h-11 w-full rounded-xl border border-slate-700/80 bg-slate-950/80 px-3 text-[13px] font-semibold text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-cyan-400/30 focus:border-cyan-400/60 focus:bg-slate-950 focus:ring-4 focus:ring-cyan-400/10 ${accentClass}`}
-        />
-      </div>
-    );
-  };
-
-  const TextAreaField = ({ label, value, copyId, onChange, placeholder, accentClass = '', mono = false }: TextAreaFieldProps) => {
-    return (
-      <div className="min-w-0">
-        <div className="mb-1.5 flex items-center justify-between gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">{label}</label>
-          {renderCopyButton(copyId, value)}
-        </div>
-
-        <textarea
-          rows={15}
-          value={value}
-          placeholder={placeholder}
-          onChange={(event) => onChange(event.target.value)}
-          className={`w-full resize-none overflow-hidden rounded-xl border border-slate-700/80 bg-slate-950/80 p-3 text-[13px] leading-relaxed text-slate-100 outline-none transition placeholder:text-slate-600 hover:border-cyan-400/30 focus:border-cyan-400/60 focus:bg-slate-950 focus:ring-4 focus:ring-cyan-400/10 ${mono ? 'font-mono text-[12px]' : ''} ${accentClass}`}
-        />
-      </div>
-    );
-  };
-
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-slate-950/80 p-3 backdrop-blur-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-3 backdrop-blur-xl">
       <div className="flex h-[90dvh] w-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-700/70 bg-slate-950 text-slate-100 shadow-2xl">
         <div className="flex shrink-0 items-center justify-between border-b border-slate-800 bg-slate-950 px-5 py-4">
           <div className="flex min-w-0 items-center gap-3">
@@ -637,9 +907,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
 
         <div className="flex min-h-0 flex-1 overflow-hidden">
           <aside
-            className={`group flex min-h-0 shrink-0 flex-col border-r border-slate-800 bg-slate-950 transition-all duration-300 ${
-              isJsonPanelExpanded ? 'w-[390px] xl:w-[460px]' : 'w-[54px]'
-            }`}
+            className={`group flex min-h-0 shrink-0 flex-col border-r border-slate-800 bg-slate-950 transition-all duration-300 ${isJsonPanelExpanded ? 'w-[390px] xl:w-[460px]' : 'w-[54px]'}`}
             onMouseEnter={() => setJsonPanelHovered(true)}
             onMouseLeave={() => setJsonPanelHovered(false)}
           >
@@ -656,7 +924,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                 onClick={() => setJsonPanelPinned((current) => !current)}
                 className="ml-auto flex h-9 min-w-9 items-center justify-center rounded-xl border border-slate-700/70 bg-slate-900 px-2 text-xs font-black text-slate-300 transition hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-300"
               >
-                {isJsonPanelExpanded ? jsonPanelPinned ? 'Bỏ ghim' : 'Ghim' : <FiChevronRight />}
+                {isJsonPanelExpanded ? (jsonPanelPinned ? 'Bỏ ghim' : 'Ghim') : <FiChevronRight />}
               </button>
             </div>
 
@@ -664,7 +932,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
               <div className="flex min-h-0 flex-1 flex-col gap-3 p-4">
                 <button
                   type="button"
-                  onClick={() => void handleCopy(PROMPT_TEMPLATE, 'prompt')}
+                  onClick={() => handleCopyClick(PROMPT_TEMPLATE, 'prompt')}
                   className="w-full rounded-xl bg-cyan-500 px-3 py-2.5 text-xs font-black uppercase tracking-wide text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400"
                 >
                   {copiedField === 'prompt' ? 'Đã copy prompt' : 'Copy prompt mẫu'}
@@ -673,7 +941,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                 <div className="flex min-h-0 flex-1 flex-col">
                   <div className="mb-1.5 flex items-center justify-between gap-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Dán JSON từ AI</label>
-                    {renderCopyButton('json-input', jsonInput)}
+                    <CopyButton copied={copiedField === 'json-input'} onClick={() => handleCopyClick(jsonInput, 'json-input')} />
                   </div>
 
                   <textarea
@@ -724,19 +992,11 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                         key={item._tempId}
                         type="button"
                         onClick={() => setActiveTab(index)}
-                        className={`group flex min-w-[180px] items-center justify-between gap-2 rounded-t-xl border-x border-t px-3 py-2 text-left text-[11px] font-black transition ${
-                          isActive
-                            ? 'border-slate-700 bg-slate-900 text-cyan-300'
-                            : 'border-transparent text-slate-500 hover:bg-slate-800/70 hover:text-slate-300'
-                        }`}
+                        className={`group flex min-w-[180px] items-center justify-between gap-2 rounded-t-xl border-x border-t px-3 py-2 text-left text-[11px] font-black transition ${isActive ? 'border-slate-700 bg-slate-900 text-cyan-300' : 'border-transparent text-slate-500 hover:bg-slate-800/70 hover:text-slate-300'}`}
                       >
                         <span className="min-w-0 flex-1 truncate">{tabLabel}</span>
 
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[9px] uppercase ${
-                            status === 'done' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-amber-400/10 text-amber-300'
-                          }`}
-                        >
+                        <span className={`rounded-full px-2 py-0.5 text-[9px] uppercase ${status === 'done' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-amber-400/10 text-amber-300'}`}>
                           {status}
                         </span>
 
@@ -774,11 +1034,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                           <button
                             type="button"
                             onClick={() => toggleTabStatus(activeItem._tempId)}
-                            className={`rounded-xl border px-4 py-2 text-xs font-black uppercase tracking-wide transition ${
-                              (tabStatuses[activeItem._tempId] || 'pending') === 'done'
-                                ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20'
-                                : 'border-amber-400/30 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20'
-                            }`}
+                            className={`rounded-xl border px-4 py-2 text-xs font-black uppercase tracking-wide transition ${(tabStatuses[activeItem._tempId] || 'pending') === 'done' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20' : 'border-amber-400/30 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20'}`}
                           >
                             {(tabStatuses[activeItem._tempId] || 'pending') === 'done' ? 'Done' : 'Pending'}
                           </button>
@@ -791,6 +1047,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                             label="Tiêu đề gốc"
                             value={activeItem.title}
                             copyId="title"
+                            copied={copiedField === 'title'}
+                            onCopy={handleCopyClick}
                             onChange={(value) => updateField(activeTab, 'title', value)}
                             accentClass="font-black"
                           />
@@ -802,6 +1060,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                               label="File Name"
                               value={activeItem.fileName}
                               copyId="fileName"
+                              copied={copiedField === 'fileName'}
+                              onCopy={handleCopyClick}
                               onChange={(value) => updateField(activeTab, 'fileName', value)}
                             />
 
@@ -809,6 +1069,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                               label="Diện tích Format"
                               value={activeItem.areaContent}
                               copyId="areaContent"
+                              copied={copiedField === 'areaContent'}
+                              onCopy={handleCopyClick}
                               onChange={(value) => updateField(activeTab, 'areaContent', value)}
                             />
 
@@ -816,6 +1078,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                               label="Giá"
                               value={activeItem.price}
                               copyId="price"
+                              copied={copiedField === 'price'}
+                              onCopy={handleCopyClick}
                               onChange={(value) => updateField(activeTab, 'price', value)}
                               accentClass="font-black text-red-300"
                             />
@@ -824,6 +1088,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                               label="Tên đường"
                               value={activeItem.streetName}
                               copyId="streetName"
+                              copied={copiedField === 'streetName'}
+                              onCopy={handleCopyClick}
                               onChange={(value) => updateField(activeTab, 'streetName', value)}
                               accentClass="font-bold text-cyan-200"
                             />
@@ -832,6 +1098,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                               label="Phường, Quận"
                               value={activeItem.wardDistrict}
                               copyId="wardDistrict"
+                              copied={copiedField === 'wardDistrict'}
+                              onCopy={handleCopyClick}
                               onChange={(value) => updateField(activeTab, 'wardDistrict', value)}
                               accentClass="font-bold text-cyan-200"
                             />
@@ -843,6 +1111,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                             label="TikTok Title"
                             value={activeItem.tiktokTitle}
                             copyId="tiktokTitle"
+                            copied={copiedField === 'tiktokTitle'}
+                            onCopy={handleCopyClick}
                             onChange={(value) => updateField(activeTab, 'tiktokTitle', value)}
                             accentClass="font-black"
                           />
@@ -853,6 +1123,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                             label="Facebook Post"
                             value={activeItem.facebookPost}
                             copyId="facebookPost"
+                            copied={copiedField === 'facebookPost'}
+                            onCopy={handleCopyClick}
                             onChange={(value) => updateField(activeTab, 'facebookPost', value)}
                           />
 
@@ -860,6 +1132,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                             label="Description"
                             value={activeItem.description}
                             copyId="description"
+                            copied={copiedField === 'description'}
+                            onCopy={handleCopyClick}
                             onChange={(value) => updateField(activeTab, 'description', value)}
                           />
                         </div>
@@ -868,16 +1142,20 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                           label="Thumbnail Keys"
                           value={activeItem.tiktokThumbnailKeys}
                           copyId="tiktokThumbnailKeys"
+                          copied={copiedField === 'tiktokThumbnailKeys'}
+                          onCopy={handleCopyClick}
                           onChange={(value) => updateField(activeTab, 'tiktokThumbnailKeys', value)}
                           accentClass="border-amber-400/20 bg-amber-950/30 font-bold text-amber-100"
                         />
 
-                        <TextAreaField
+                        <HighlightTextAreaField
                           label="Voiceover"
                           value={activeItem.voice}
                           copyId="voice"
+                          copied={copiedField === 'voice'}
+                          onCopy={handleCopyClick}
                           onChange={(value) => updateField(activeTab, 'voice', value)}
-                          accentClass="border-blue-400/20 bg-blue-950/30 text-blue-100"
+                          accentClass="text-blue-100"
                         />
 
                         <div className="xl:col-span-2">
@@ -885,6 +1163,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                             label="Input thô"
                             value={activeItem.inputData}
                             copyId="inputData"
+                            copied={copiedField === 'inputData'}
+                            onCopy={handleCopyClick}
                             mono
                             onChange={(value) => updateField(activeTab, 'inputData', value)}
                             accentClass="border-red-400/20 bg-red-950/30 text-red-100"
@@ -896,6 +1176,8 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                             label="Admin Note"
                             value={activeItem.adminNote}
                             copyId="adminNote"
+                            copied={copiedField === 'adminNote'}
+                            onCopy={handleCopyClick}
                             mono
                             onChange={(value) => updateField(activeTab, 'adminNote', value)}
                             accentClass="border-emerald-400/20 bg-emerald-950/30 text-emerald-100"
@@ -907,17 +1189,15 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                     <aside className="hidden w-[440px] min-w-[440px] flex-col gap-4 xl:flex">
                       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/70 p-4 shadow-2xl shadow-black/20">
                         <div className="mb-3 flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={handleSendToImport}
-                              className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400"
-                            >
-                              <FiSend />
-                              ImportModal
-                            </button>
-                          </div>
-                          <div>{renderCopyButton('system-json', systemJsonText)}</div>
+                          <button
+                            type="button"
+                            onClick={handleSendToImport}
+                            className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400"
+                          >
+                            <FiSend />
+                            ImportModal
+                          </button>
+                          <CopyButton copied={copiedField === 'system-json'} onClick={() => handleCopyClick(systemJsonText, 'system-json')} />
                         </div>
 
                         <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-xl border border-slate-800 bg-slate-900/80 p-4 font-mono text-[11px] leading-relaxed text-emerald-300 [scrollbar-width:thin]">
