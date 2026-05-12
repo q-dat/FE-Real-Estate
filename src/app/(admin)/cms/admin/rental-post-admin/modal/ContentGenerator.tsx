@@ -220,6 +220,8 @@ const HIGHLIGHT_RULES: HighlightRule[] = [
       'giảm',
       'nhỉnh',
       'gần',
+      'tiền',
+
     ],
   },
   {
@@ -272,7 +274,8 @@ const HIGHLIGHT_RULES: HighlightRule[] = [
       'đầu tư',
       'phong thủy',
       'giữ tiền',
-      'ăn tiền'
+      'ăn tiền',
+      'dòng tiền'
     ],
   },
 ];
