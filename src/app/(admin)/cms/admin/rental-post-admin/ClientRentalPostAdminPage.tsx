@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useMemo, useState } from 'react';
 import { FaImages, FaPlus } from 'react-icons/fa';
 import { FiEdit3, FiFilm, FiGrid, FiHome, FiLock, FiMapPin, FiTrash2, FiUploadCloud } from 'react-icons/fi';
@@ -85,6 +84,14 @@ const getDisplayDate = (date?: string | Date): string => {
   return new Date(date).toLocaleDateString('vi-VN');
 };
 
+const isTypingTarget = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) return false;
+
+  const tagName = target.tagName.toLowerCase();
+
+  return tagName === 'input' || tagName === 'textarea' || tagName === 'select' || target.isContentEditable;
+};
+
 export default function ClientRentalPostAdminPage({ posts: initialPosts, categories, categoryCode }: Props) {
   const { user } = useAdminAuth();
   const searchParams = useSearchParams();
@@ -166,6 +173,55 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
     setOpenModal(true);
   };
 
+  const closeAllModals = () => {
+    setOpenModal(false);
+    setEditingPost(null);
+    setConfirmOpen(false);
+    setDeletingId(null);
+    setInternalOpen(false);
+    setInternalPost(null);
+    setOpenContentGenerator(false);
+    setImportOpen(false);
+  };
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if (isTypingTarget(event.target)) return;
+
+      const key = event.key.toLowerCase();
+
+      if (key === 'escape') {
+        closeAllModals();
+        return;
+      }
+
+      if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+
+      if (key === 'i') {
+        event.preventDefault();
+        setImportOpen(true);
+        return;
+      }
+
+      if (key === 'm') {
+        event.preventDefault();
+        setOpenContentGenerator(true);
+        return;
+      }
+
+      if (key === 't') {
+        event.preventDefault();
+        openCreateModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleShortcut);
+
+    return () => {
+      window.removeEventListener('keydown', handleShortcut);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen w-full bg-neutral-100">
       <div className="border-b border-neutral-200 bg-white/95 shadow-sm backdrop-blur-xl">
@@ -211,27 +267,30 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                 type="button"
                 onClick={() => setImportOpen(true)}
                 className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-2 text-[10px] font-black uppercase tracking-[0.14em] text-neutral-700 transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary xl:px-3"
+                title="Import JSON - phím I"
               >
                 <FiUploadCloud size={14} />
-                Import
+                IMPORT / I
               </button>
 
               <button
                 type="button"
                 onClick={() => setOpenContentGenerator(true)}
                 className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-2 text-[10px] font-black uppercase tracking-[0.14em] text-neutral-700 transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary xl:px-3"
+                title="Media - phím M"
               >
                 <FiFilm size={14} />
-                Media
+                MEDIA / M
               </button>
 
               <button
                 type="button"
                 onClick={openCreateModal}
                 className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-primary bg-primary px-2 text-[10px] font-black uppercase tracking-[0.14em] text-white shadow-sm transition hover:bg-primary/90 xl:px-4"
+                title="Thêm mới - phím T"
               >
                 <FaPlus size={12} />
-                Thêm
+                THÊM / T
               </button>
             </div>
           </div>
@@ -424,7 +483,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                   onClick={() => setImportOpen(true)}
                   className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-neutral-700 transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
                 >
-                  Import JSON
+                  IMPORT / I
                 </button>
 
                 <button
@@ -432,7 +491,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                   onClick={openCreateModal}
                   className="rounded-md border border-primary bg-primary px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-primary/90"
                 >
-                  Thêm mới
+                  THÊM / T
                 </button>
               </div>
             </div>
