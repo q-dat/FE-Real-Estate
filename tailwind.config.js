@@ -26,6 +26,10 @@ export default {
         'mobile-padding-top': '60px',
         'desktop-padding-top': '110px',
       },
+zIndex: {
+       'zindexModal': '9999991',
+      }
+      ,
       fontSize: {
         // mobile-font-size
         'prod-name-mobile': ['12px', { lineHeight: '21px' }],

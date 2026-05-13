@@ -110,9 +110,8 @@ export default function MoreFilterModal({ initialValues, onSelect, onClose }: Mo
           <button
             key={val}
             onClick={() => setter(isActive ? undefined : val)}
-            className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
-              isActive ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 bg-white text-gray-600 hover:border-blue-300'
-            }`}
+            className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all ${isActive ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 bg-white text-gray-600 hover:border-blue-300'
+              }`}
           >
             {label}
           </button>
@@ -122,7 +121,7 @@ export default function MoreFilterModal({ initialValues, onSelect, onClose }: Mo
   );
 
   return (
-    <div className="fixed inset-0 z-[9999991] flex items-center justify-center bg-overlay px-2" onClick={handleClickOutside}>
+    <div className="fixed inset-0 z-zindexModal flex items-center justify-center bg-overlay px-2" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in flex max-h-[75dvh] w-full max-w-xl flex-col rounded-2xl bg-white shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b p-4">

@@ -105,7 +105,7 @@ export default function SocialShareBtn({ fullPath, title, size = 'sm' }: Props) 
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[9999991] flex items-center justify-center bg-black/50 p-2 backdrop-blur-sm"
+            className="fixed inset-0 z-zindexModal flex items-center justify-center bg-black/50 p-2 backdrop-blur-sm"
             onMouseDown={handleBackdrop}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

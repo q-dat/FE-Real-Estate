@@ -89,15 +89,13 @@ const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps)
   };
 
   return (
-    <div className="relative z-[999999] mb-1 px-3">
+    <div className="relative z-50 mb-1 px-3">
       <Link
         href={hasSubmenu ? '#' : item.path}
         onClick={handleClick}
-        className={`group relative flex h-12 items-center rounded-xl transition-all duration-300 ${
-          isExpanded ? 'justify-between px-4' : 'justify-center px-0'
-        } ${
-          isActive ? 'bg-primary/10 text-primary shadow-[inset_0_0_20px_rgba(var(--p),0.05)]' : 'text-slate-400 hover:bg-white/5 hover:text-slate-100'
-        }`}
+        className={`group relative flex h-12 items-center rounded-xl transition-all duration-300 ${isExpanded ? 'justify-between px-4' : 'justify-center px-0'
+          } ${isActive ? 'bg-primary/10 text-primary shadow-[inset_0_0_20px_rgba(var(--p),0.05)]' : 'text-slate-400 hover:bg-white/5 hover:text-slate-100'
+          }`}
       >
         <div className="flex items-center gap-3">
           <Icon className={`flex-shrink-0 text-xl transition-colors duration-300 ${isActive ? 'text-primary' : 'group-hover:text-primary'}`} />
@@ -138,9 +136,8 @@ const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps)
                   key={sub.path}
                   href={sub.path}
                   onClick={onSelect}
-                  className={`flex items-center gap-1 py-2 text-sm transition-all hover:translate-x-1 ${
-                    pathname === sub.path ? 'font-semibold text-primary' : 'text-slate-500 hover:text-slate-200'
-                  }`}
+                  className={`flex items-center gap-1 py-2 text-sm transition-all hover:translate-x-1 ${pathname === sub.path ? 'font-semibold text-primary' : 'text-slate-500 hover:text-slate-200'
+                    }`}
                 >
                   <PiDotDuotone className="text-white" /> {sub.title}
                 </Link>
@@ -155,7 +152,7 @@ const SidebarItem = ({ item, pathname, isExpanded, onSelect }: SidebarItemProps)
 
 // Shared Content
 const SidebarContent = ({ pathname, isExpanded, onSelect, menu, isMobile }: SidebarContentProps) => (
-  <div className="z-[999999] flex h-full flex-col overflow-hidden">
+  <div className=" flex h-full flex-col overflow-hidden">
     {/* Logo Section */}
     <Link href="/" target="_blank" title="Về Trang Chủ">
       <div className="hidden h-24 items-center overflow-hidden px-2 xl:flex">

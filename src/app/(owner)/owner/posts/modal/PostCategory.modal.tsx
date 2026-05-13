@@ -68,7 +68,7 @@ export default function PostCategoryModal({ open, categories, onClose, onChange 
     <>
       <AnimatePresence>
         <motion.div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-3"
+          className="fixed inset-0 z-zindexModal flex items-center justify-center bg-black/50 p-3"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -115,9 +115,8 @@ export default function PostCategoryModal({ open, categories, onClose, onChange 
                         setName(c.name);
                         setDescription(c.description ?? '');
                       }}
-                      className={`group cursor-pointer rounded-lg border px-3 py-2 transition ${
-                        active ? 'border-green-500 bg-green-50 text-black' : 'bg-primary text-white hover:bg-white hover:text-primary'
-                      }`}
+                      className={`group cursor-pointer rounded-lg border px-3 py-2 transition ${active ? 'border-green-500 bg-green-50 text-black' : 'bg-primary text-white hover:bg-white hover:text-primary'
+                        }`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="min-w-0">

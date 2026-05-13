@@ -43,9 +43,8 @@ const FileUploadArea = ({
       </span>
     </label>
     <label
-      className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ${
-        fileCount > 0 ? 'border-green-500 bg-green-50/50' : 'border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5'
-      }`}
+      className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ${fileCount > 0 ? 'border-green-500 bg-green-50/50' : 'border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5'
+        }`}
     >
       <div className="flex flex-col items-center justify-center pb-6 pt-5">
         {fileCount > 0 ? (
@@ -176,11 +175,11 @@ export default function InteriorModal({ open, onClose, editingItem, categories, 
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[999999] flex items-end justify-center bg-slate-900/60 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+          className="fixed inset-0 z-zindexModal flex items-end justify-center bg-slate-900/60 p-0 backdrop-blur-sm sm:items-center sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          // onClick={onClose}
+        // onClick={onClose}
         >
           <motion.div
             onClick={(e) => e.stopPropagation()}

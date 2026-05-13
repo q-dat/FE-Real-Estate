@@ -79,7 +79,7 @@ export default function InteriorCategoryModal({ open, onClose, reload, editing }
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/30 px-2 backdrop-blur-sm"
+          className="fixed inset-0 z-zindexModal flex items-center justify-center bg-black/30 px-2 backdrop-blur-sm"
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

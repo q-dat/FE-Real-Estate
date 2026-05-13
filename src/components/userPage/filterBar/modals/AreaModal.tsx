@@ -118,7 +118,7 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
   const getPercent = (value: number) => Math.round(((value - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT)) * 100);
 
   return (
-    <div className="fixed inset-0 z-[9999991] flex items-center justify-center bg-overlay px-2" onClick={handleClickOutside}>
+    <div className="fixed inset-0 z-zindexModal flex items-center justify-center bg-overlay px-2" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in w-full max-w-lg rounded-2xl bg-white shadow-xl transition-all duration-200">
         {/* Header */}
         <div className="flex items-center justify-between border-b p-2">
@@ -189,11 +189,10 @@ export default function AreaModal({ initialFrontage, initialDepth, initialBack, 
                   type="button"
                   key={opt.label}
                   onClick={() => handleQuickSelect(opt)}
-                  className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all focus:outline-none ${
-                    activeLabel === opt.label
+                  className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all focus:outline-none ${activeLabel === opt.label
                       ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
                       : 'border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   {opt.label}
                 </button>

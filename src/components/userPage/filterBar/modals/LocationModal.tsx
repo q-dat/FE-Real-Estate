@@ -112,7 +112,7 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-[9999991] flex items-center justify-center bg-overlay px-2" onClick={handleClickOutside}>
+    <div className="fixed inset-0 z-zindexModal flex items-center justify-center bg-overlay px-2" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in w-full rounded-2xl bg-white shadow-xl transition-all duration-200 xl:w-1/2">
         {/* Header */}
         <div className="flex items-center justify-between border-b p-2">
@@ -143,11 +143,10 @@ export default function LocationModal({ onClose, onSelect }: BaseLocationModalPr
                 type="button"
                 key={item.code}
                 onClick={() => handleSelectDistrict(item)}
-                className={`rounded-lg border px-3 py-2 text-center text-xs font-medium transition-all duration-150 ${
-                  selectedDistrict?.code === item.code
+                className={`rounded-lg border px-3 py-2 text-center text-xs font-medium transition-all duration-150 ${selectedDistrict?.code === item.code
                     ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
                     : 'border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 {item.name}
               </button>

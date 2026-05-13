@@ -252,6 +252,7 @@ const HIGHLIGHT_RULES: HighlightRule[] = [
       'sốc',
       'siêu sốc',
       'cực sốc',
+      'mạnh',
       'cháy hàng',
       'bùng nổ',
       'cam kết lời',

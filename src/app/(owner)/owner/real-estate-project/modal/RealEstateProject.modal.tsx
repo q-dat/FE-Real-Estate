@@ -48,9 +48,8 @@ const FileUploadArea = ({
       </span>
     </label>
     <label
-      className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ${
-        fileCount > 0 ? 'border-green-500 bg-green-50/50' : 'border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5'
-      }`}
+      className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ${fileCount > 0 ? 'border-green-500 bg-green-50/50' : 'border-gray-300 bg-gray-50 hover:border-primary hover:bg-primary/5'
+        }`}
     >
       <div className="flex flex-col items-center justify-center pb-6 pt-5">
         {fileCount > 0 ? (
@@ -182,7 +181,7 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-[999999] flex items-end justify-center bg-slate-900/60 backdrop-blur-sm sm:items-center"
+        className="fixed inset-0 z-zindexModal flex items-end justify-center bg-slate-900/60 backdrop-blur-sm sm:items-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -197,9 +196,8 @@ export default function RealEstateProjectModal({ open, editingItem, onClose, rel
           <div className="flex items-center justify-between border-b px-6 py-4">
             <div className="flex items-center gap-3">
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                  editingItem ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
-                }`}
+                className={`flex h-10 w-10 items-center justify-center rounded-full ${editingItem ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
+                  }`}
               >
                 {editingItem ? <FaPen /> : <FaPlus />}
               </div>

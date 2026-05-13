@@ -42,7 +42,7 @@ export default function AdminStatusModal({ initialStatus, initialPostType, onSel
   };
 
   return (
-    <div className="fixed inset-0 z-[9999991] flex items-center justify-center bg-black/30 px-4" onClick={handleClickOutside}>
+    <div className="fixed inset-0 z-zindexModal flex items-center justify-center bg-black/30 px-4" onClick={handleClickOutside}>
       <div ref={modalRef} className="animate-in fade-in zoom-in w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between bg-slate-800 px-4 py-3">
@@ -84,11 +84,10 @@ export default function AdminStatusModal({ initialStatus, initialPostType, onSel
                   <button
                     key={item.value}
                     onClick={() => setPostType(isActive ? undefined : item.value)}
-                    className={`rounded-full border px-4 py-1.5 text-xs font-bold transition-all ${
-                      isActive
+                    className={`rounded-full border px-4 py-1.5 text-xs font-bold transition-all ${isActive
                         ? 'scale-105 transform border-purple-600 bg-purple-600 text-white shadow-md'
                         : 'border-gray-300 bg-white text-gray-600 hover:border-purple-300'
-                    }`}
+                      }`}
                   >
                     {item.label}
                   </button>
