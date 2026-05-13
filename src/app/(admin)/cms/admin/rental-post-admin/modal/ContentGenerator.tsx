@@ -249,6 +249,7 @@ const HIGHLIGHT_RULES: HighlightRule[] = [
     type: 'risky',
     className: 'bg-red-500',
     words: [
+      'BTCT',
       'sốc',
       'siêu sốc',
       'cực sốc',
