@@ -72,7 +72,7 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
   };
 
   return (
-    <Navbar className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">
+    <Navbar className="sticky top-0 z-10 w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">
       {/* LEFT SECTION: Mobile Toggle & Context Info */}
       <Navbar.Start>
         <motion.div whileTap={{ scale: 0.9 }}>
