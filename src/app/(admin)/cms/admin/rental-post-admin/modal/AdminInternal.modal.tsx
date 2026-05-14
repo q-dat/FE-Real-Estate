@@ -71,14 +71,14 @@ export default function AdminInternalModal({ open, onClose, post, reload }: Prop
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 flex items-center justify-center bg-overlay backdrop-blur-sm"
+          className="fixed inset-0 flex z-zindexModal items-center justify-center bg-overlay backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
             onClick={(e) => e.stopPropagation()}
-            className="h-[90dvh] w-[90dvw] overflow-y-auto rounded-2xl bg-white shadow-2xl"
+            className="h-[90dvh] w-[90dvw] overflow-y-auto rounded-md bg-white shadow-2xl p-2"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
