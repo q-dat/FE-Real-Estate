@@ -296,7 +296,7 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
               </div>
 
               <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
-                {section.data.slice(0, 12).map((post, index) => (
+                {section.data.map((post, index) => (
                   <PostCard key={post._id} post={post} index={index} />
                 ))}
               </div>
