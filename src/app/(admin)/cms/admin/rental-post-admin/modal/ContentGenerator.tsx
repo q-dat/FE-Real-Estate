@@ -950,6 +950,7 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                   </div>
 
                   <textarea
+                    autoFocus
                     value={jsonInput}
                     placeholder="Dán mảng JSON hoặc object JSON..."
                     onChange={(event) => setJsonInput(event.target.value)}
