@@ -1152,17 +1152,19 @@ export default function ContentGeneratorModal({ open, onClose, onSendToImport }:
                           onChange={(value) => updateField(activeTab, 'tiktokThumbnailKeys', value)}
                           accentClass="border-amber-400/20 bg-amber-950/30 font-bold text-amber-100"
                         />
+                        <div className='relative'>
+                          <span className='absolute top-2 font-bold left-[50%] text-xs'>{activeItem.voice.length}&nbsp;Kí tự</span>
+                          <HighlightTextAreaField
+                            label="Voiceover"
+                            value={activeItem.voice}
+                            copyId="voice"
+                            copied={copiedField === 'voice'}
+                            onCopy={handleCopyClick}
+                            onChange={(value) => updateField(activeTab, 'voice', value)}
+                            accentClass="text-blue-100"
+                          />
 
-                        <HighlightTextAreaField
-                          label="Voiceover"
-                          value={activeItem.voice}
-                          copyId="voice"
-                          copied={copiedField === 'voice'}
-                          onCopy={handleCopyClick}
-                          onChange={(value) => updateField(activeTab, 'voice', value)}
-                          accentClass="text-blue-100"
-                        />
-
+                        </div>
                         <div className="xl:col-span-2">
                           <TextAreaField
                             label="Input thô"
