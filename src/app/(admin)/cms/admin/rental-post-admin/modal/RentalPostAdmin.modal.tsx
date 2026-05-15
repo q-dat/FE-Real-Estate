@@ -250,7 +250,9 @@ export default function RentalPostAdminModal({ open, onClose, editingPost, categ
                 <Image src={url} alt={`preview-${index}`} fill className="object-cover" unoptimized />
               </Zoom>
             ) : (
-              <Image src={url} alt={`preview-${index}`} fill className="object-cover" unoptimized />
+              <Zoom>
+                <Image src={url} alt={`preview-${index}`} fill className="object-cover" unoptimized />
+              </Zoom>
             )}
 
             <button
