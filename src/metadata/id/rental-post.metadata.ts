@@ -2,85 +2,199 @@ import { slugify } from '@/lib/slugify';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { Metadata } from 'next';
 
-// TỐI ƯU 1: Bỏ hàm split để giữ nguyên cụm từ khóa dài (long-tail keywords)
-function normalizeKeywords(input: string[]): string[] {
-  return Array.from(new Set(input.map((item) => item.toLowerCase().trim()).filter(Boolean)));
+const SITE_NAME = 'Nguồn Nhà Giá Rẻ';
+const DEFAULT_SITE_URL = 'https://www.nguonnhagiare.vn';
+const DEFAULT_IMAGE = '/images/default-thumbnail.jpg';
+
+function getSiteUrl(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, '');
+}
+
+function stripHtml(input?: string): string {
+  return (input || '')
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function truncateText(input: string, maxLength: number): string {
+  const safeInput = input.trim();
+
+  if (safeInput.length <= maxLength) return safeInput;
+
+  const sliced = safeInput.slice(0, maxLength).trim();
+  const lastSpaceIndex = sliced.lastIndexOf(' ');
+  const safeText = lastSpaceIndex > 80 ? sliced.slice(0, lastSpaceIndex) : sliced;
+
+  return `${safeText}...`;
+}
+
+function normalizeKeywords(input: readonly string[]): string[] {
+  return Array.from(new Set(input.map((item) => item.toLowerCase().trim()).filter((item) => item.length >= 2)));
+}
+
+function toIsoDate(date?: Date | string): string | undefined {
+  if (!date) return undefined;
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return undefined;
+  }
+
+  return parsedDate.toISOString();
+}
+
+function getPostCanonicalUrl(post: IRentalPostAdmin): string {
+  const siteUrl = getSiteUrl();
+  const slug = slugify(post.title || 'bat-dong-san');
+
+  return `${siteUrl}/${slug}-${post._id}`;
+}
+
+function getAbsoluteImageUrl(image?: string): string {
+  const siteUrl = getSiteUrl();
+  const safeImage = image?.trim();
+
+  if (!safeImage) return `${siteUrl}${DEFAULT_IMAGE}`;
+  if (safeImage.startsWith('http://') || safeImage.startsWith('https://')) return safeImage;
+
+  return `${siteUrl}${safeImage.startsWith('/') ? safeImage : `/${safeImage}`}`;
+}
+
+function formatPriceText(post: IRentalPostAdmin): string {
+  if (!post.price || !post.priceUnit) return '';
+
+  return `${post.price} ${post.priceUnit}`;
+}
+
+function formatAreaText(post: IRentalPostAdmin): string {
+  if (!post.area) return '';
+
+  return `${post.area}m²`;
+}
+
+function formatLocationText(post: IRentalPostAdmin): string {
+  return [post.ward, post.district, post.province].filter(Boolean).join(', ');
 }
 
 function buildKeywords(post: IRentalPostAdmin): string[] {
-  const base: string[] = [post.title, `${post.district} ${post.province}`, post.category?.name].filter(Boolean) as string[];
+  const categoryName = post.category?.name || '';
+  const locationText = formatLocationText(post);
+  const district = post.district || '';
+  const province = post.province || '';
+  const propertyType = post.propertyType || '';
+  const locationType = post.locationType || '';
 
-  const categoryCode = post.category?.categoryCode;
-  let rawKeywords: string[] = [];
+  const rawKeywords = [
+    post.title,
+    categoryName,
+    propertyType,
+    locationType,
+    locationText,
+    district ? `bất động sản ${district}` : '',
+    province ? `nhà đất ${province}` : '',
+    district ? `nhà đất ${district}` : '',
+    'nguồn nhà giá rẻ',
+    'bất động sản',
+    'nhà đất',
+  ].filter(Boolean);
 
-  switch (categoryCode) {
-    case 0:
-      rawKeywords = [...base, 'mua bán nhà đất', 'bán nhà đất', `bán nhà ${post.district}`, `bất động sản bán ${post.province}`];
-      break;
-    case 1:
-      rawKeywords = [...base, 'căn hộ cho thuê', 'thuê căn hộ', `cho thuê căn hộ ${post.district}`, `căn hộ cho thuê ${post.province}`];
-      break;
-    case 2:
-      rawKeywords = [...base, 'nhà nguyên căn cho thuê', 'thuê nhà nguyên căn', `cho thuê nhà ${post.district}`, `nhà cho thuê ${post.province}`];
-      break;
-    case 3:
-      rawKeywords = [...base, 'cho thuê mặt bằng', 'mặt bằng kinh doanh', `thuê mặt bằng ${post.district}`, `mặt bằng ${post.province}`];
-      break;
-    default:
-      rawKeywords = [...base, 'bất động sản', 'nhà đất'];
-  }
-
-  return normalizeKeywords(rawKeywords);
+  return normalizeKeywords(rawKeywords).slice(0, 12);
 }
 
-export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nguonnhagiare.vn';
+function buildMetaTitle(post: IRentalPostAdmin): string {
+  const titleText = stripHtml(post.title || 'Bất động sản');
+  const priceText = formatPriceText(post);
+  const areaText = formatAreaText(post);
+  const districtText = post.district || '';
 
-  // TỐI ƯU 2: Sửa lại Canonical URL thành chuẩn định dạng nối ID bằng gạch ngang
-  const slug = slugify(post.title || '');
-  const canonicalUrl = `${siteUrl}/${slug}-${post._id}`;
+  const compactParts = [titleText, priceText, areaText, districtText].filter(Boolean);
+  const compactTitle = compactParts.join(' | ');
 
-  // Giới hạn từ khóa tối đa
-  const keywords = buildKeywords(post).slice(0, 15);
+  return `${truncateText(compactTitle, 58)} | ${SITE_NAME}`;
+}
 
-  // TỐI ƯU 3: Rút gọn Title thông minh để tránh bị Google cắt cụt (Limit ~65 chars)
-  // Ưu tiên: Title gốc > Giá > Diện tích > Quận
-  const titleParts = [post.title, post.price ? `${post.price} ${post.priceUnit}` : null, post.area ? `${post.area}m²` : null].filter(Boolean);
+function buildMetaDescription(post: IRentalPostAdmin): string {
+  const cleanDescription = stripHtml(post.description);
 
-  const title = titleParts.join(' | ');
+  if (cleanDescription) {
+    return truncateText(cleanDescription, 155);
+  }
 
-  const description =
-    post.description?.slice(0, 155) ||
-    `${post.title}. ${post.category?.name || 'Bất động sản'} tại ${post.district}, ${post.province}. ${
-      post.area ? `Diện tích ${post.area}m².` : ''
-    } ${post.price ? `Giá: ${post.price} ${post.priceUnit}.` : ''} Liên hệ ngay!`;
+  const fallbackParts = [
+    post.title,
+    post.category?.name,
+    post.area ? `Diện tích ${post.area}m²` : '',
+    post.price && post.priceUnit ? `Giá ${post.price} ${post.priceUnit}` : '',
+    formatLocationText(post),
+  ].filter(Boolean);
+
+  return truncateText(fallbackParts.join('. '), 155);
+}
+
+function getNoIndexMetadata(): Metadata {
+  return {
+    title: `Không tìm thấy bất động sản | ${SITE_NAME}`,
+    description: 'Bất động sản không tồn tại, đã hết hạn hoặc đang tạm ẩn.',
+    robots: {
+      index: false,
+      follow: false,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
+    },
+  };
+}
+
+export function generateRentalPostMetadata(post: IRentalPostAdmin | null): Metadata {
+  if (!post || post.status !== 'active') {
+    return getNoIndexMetadata();
+  }
+
+  const canonicalUrl = getPostCanonicalUrl(post);
+  const title = buildMetaTitle(post);
+  const description = buildMetaDescription(post);
+  const keywords = buildKeywords(post);
 
   const images =
     post.images?.length > 0
-      ? post.images.map((img) => ({
-          url: img.startsWith('http') ? img : `${siteUrl}${img}`,
+      ? post.images.slice(0, 6).map((image) => ({
+          url: getAbsoluteImageUrl(image),
           width: 1200,
           height: 630,
-          alt: post.title || 'Bất động sản Nguồn Nhà Giá Rẻ',
+          alt: post.title || SITE_NAME,
         }))
       : [
           {
-            // Nên cung cấp 1 ảnh fallback mặc định nếu bài đăng không có ảnh
-            url: `${siteUrl}/images/default-thumbnail.jpg`,
+            url: getAbsoluteImageUrl(),
             width: 1200,
             height: 630,
-            alt: 'Nguồn Nhà Giá Rẻ',
+            alt: SITE_NAME,
           },
         ];
+
+  const publishedTime = toIsoDate(post.postedAt || post.createdAt);
+  const modifiedTime = toIsoDate(post.updatedAt) || publishedTime;
 
   return {
     title,
     description,
     keywords,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     robots: {
       index: true,
       follow: true,
-      nocache: false, // Cho phép Google lưu cache
+      nocache: false,
       googleBot: {
         index: true,
         follow: true,
@@ -89,35 +203,31 @@ export function generateRentalPostMetadata(post: IRentalPostAdmin): Metadata {
         'max-snippet': -1,
       },
     },
-    alternates: {
-      canonical: canonicalUrl,
-    },
     openGraph: {
       title,
       description,
       url: canonicalUrl,
-      siteName: 'Nguồn Nhà Giá Rẻ',
-      type: 'article', // Bài viết cụ thể nên dùng 'article' tốt hơn 'website'
+      siteName: SITE_NAME,
+      type: 'article',
       locale: 'vi_VN',
       images,
+      publishedTime,
+      modifiedTime,
+      authors: [SITE_NAME],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: images.map((i) => i.url),
+      images: images.map((image) => image.url),
     },
-    // Giữ nguyên các tag hỗ trợ indexing local của bạn
     other: {
-      audience: 'general',
-      'resource-type': 'document',
+      author: SITE_NAME,
+      publisher: SITE_NAME,
       classification: 'Bất động sản Việt Nam',
       area: 'Nhà đất và bất động sản',
-      placename: 'Việt Nam',
-      author: 'Nguồn Nhà Giá Rẻ',
-      owner: 'Nguồn Nhà Giá Rẻ',
+      placename: formatLocationText(post) || 'Việt Nam',
       distribution: 'Global',
-      'revisit-after': '1 days',
       referrer: 'no-referrer-when-downgrade',
     },
   };

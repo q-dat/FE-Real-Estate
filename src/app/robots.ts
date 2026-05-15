@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nguonnhagiare.vn';
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -7,17 +9,19 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/cms/*', // chặn admin/cms nội bộ
-          '/auth/*', // chặn thư mục chứa JS tĩnh (nếu có)
-          '/assets/', // chặn thư mục chứa JS tĩnh (nếu có)
-          '/*.js$', // chặn file .js
-          '/*.css$', // chặn file .css
-          '/*.map$', // chặn source map (nếu public)
-          '/_next/static/', // chặn static assets nội bộ của Next (không ảnh hưởng SEO)
-          '/*?_rsc=', // ❗ chặn mọi URL chứa query `_rsc=...`
+          '/cms/',
+          '/cms/*',
+          '/api/admin/',
+          '/api/admin/*',
+          '/auth/',
+          '/auth/*',
+          '/*?_rsc=',
+          '/*?*preview=',
+          '/*?*token=',
         ],
       },
     ],
-    sitemap: 'https://www.nguonnhagiare.vn/sitemap.xml',
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }
