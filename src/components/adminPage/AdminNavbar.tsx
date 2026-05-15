@@ -58,19 +58,24 @@ export default function AdminNavbar({ title, onMenuClick, user }: AdminNavbarPro
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      const params = new URLSearchParams(searchParams);
+      const params = new URLSearchParams(searchParams.toString());
+
+      params.delete('page');
+      params.delete('limit');
+
       if (searchTerm.trim()) {
         params.set('title', searchTerm.trim());
       } else {
         params.delete('title');
       }
 
-      router.push(`?${params.toString()}`);
+      const queryString = params.toString();
+
+      router.push(queryString ? `?${queryString}` : window.location.pathname);
 
       inputRef.current?.blur();
     }
   };
-
   return (
     <Navbar className="sticky top-0 z-10 w-full border-b border-white/5 bg-[#020617] px-0 backdrop-blur-xl transition-all xl:px-6">
       {/* LEFT SECTION: Mobile Toggle & Context Info */}
