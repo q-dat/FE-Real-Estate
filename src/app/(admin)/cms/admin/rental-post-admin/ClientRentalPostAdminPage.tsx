@@ -1,12 +1,26 @@
 'use client';
+
 import { useEffect, useMemo, useState } from 'react';
 import { FaImages, FaPlus } from 'react-icons/fa';
-import { FiEdit3, FiFilm, FiGrid, FiHome, FiLock, FiMapPin, FiTrash2, FiUploadCloud } from 'react-icons/fi';
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiChevronsLeft,
+  FiChevronsRight,
+  FiEdit3,
+  FiFilm,
+  FiGrid,
+  FiHome,
+  FiLock,
+  FiMapPin,
+  FiTrash2,
+  FiUploadCloud,
+} from 'react-icons/fi';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { IRentalAuthor, IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import RentalPostAdminModal from './modal/RentalPostAdmin.modal';
-import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
+import { RentalPaginationMeta, rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { formatCurrency } from '@/utils/formatCurrency.utils';
 import DeleteModal from '../../../../../components/adminPage/modal/Delete.modal';
 import AdminInternalModal from './modal/AdminInternal.modal';
@@ -24,6 +38,18 @@ interface Props {
 type PostStatusTone = {
   label: string;
   className: string;
+};
+
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 20;
+
+const DEFAULT_PAGINATION: RentalPaginationMeta = {
+  page: DEFAULT_PAGE,
+  limit: DEFAULT_LIMIT,
+  total: 0,
+  totalPages: 0,
+  hasNextPage: false,
+  hasPrevPage: false,
 };
 
 const getPostStatusTone = (status?: string): PostStatusTone => {
@@ -92,14 +118,42 @@ const isTypingTarget = (target: EventTarget | null): boolean => {
   return tagName === 'input' || tagName === 'textarea' || tagName === 'select' || target.isContentEditable;
 };
 
+const getSafeNumberParam = (value: string | null, fallback: number): number => {
+  const parsedValue = Number(value);
+
+  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
+    return fallback;
+  }
+
+  return parsedValue;
+};
+
 export default function ClientRentalPostAdminPage({ posts: initialPosts, categories, categoryCode }: Props) {
   const { user } = useAdminAuth();
+
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const searchTitle = searchParams.get('title') || undefined;
+  const pageParam = getSafeNumberParam(searchParams.get('page'), DEFAULT_PAGE);
+  const limitParam = getSafeNumberParam(searchParams.get('limit'), DEFAULT_LIMIT);
 
   const authorRef: IRentalAuthor = { _id: user.id };
 
   const [posts, setPosts] = useState<IRentalPostAdmin[]>(initialPosts);
+  const [pagination, setPagination] = useState<RentalPaginationMeta>({
+    ...DEFAULT_PAGINATION,
+    page: pageParam,
+    limit: limitParam,
+    total: initialPosts.length,
+    totalPages: initialPosts.length > 0 ? Math.ceil(initialPosts.length / limitParam) : 0,
+    hasPrevPage: pageParam > 1,
+    hasNextPage: initialPosts.length >= limitParam,
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [openModal, setOpenModal] = useState(false);
   const [editingPost, setEditingPost] = useState<IRentalPostAdmin | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -110,12 +164,6 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
   const [openContentGenerator, setOpenContentGenerator] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [importJsonText, setImportJsonText] = useState('');
-
-  const handleSendContentJsonToImport = (jsonText: string) => {
-    setImportJsonText(jsonText);
-    setOpenContentGenerator(false);
-    setImportOpen(true);
-  };
 
   const activeCount = useMemo(() => {
     return posts.filter((post) => post.status === 'active').length;
@@ -129,20 +177,65 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
     return posts.filter((post) => post.status === 'pending').length;
   }, [posts]);
 
-  const reload = async () => {
-    const data: IRentalPostAdmin[] = await rentalPostAdminService.getMyPosts({
-      categoryCode,
-      title: searchTitle,
-    });
+  const pageNumbers = useMemo(() => {
+    const totalPages = pagination.totalPages || 1;
+    const currentPage = pagination.page || 1;
+    const pages: number[] = [];
 
-    setPosts(Array.isArray(data) ? data : []);
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+
+    for (let page = startPage; page <= endPage; page += 1) {
+      pages.push(page);
+    }
+
+    return pages;
+  }, [pagination.page, pagination.totalPages]);
+
+  const updatePaginationQuery = (nextPage: number, nextLimit = pagination.limit || limitParam) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.set('page', String(nextPage));
+    params.set('limit', String(nextLimit));
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const reload = async () => {
+    try {
+      setIsLoading(true);
+
+      const data = await rentalPostAdminService.getMyPosts({
+        categoryCode,
+        title: searchTitle,
+        page: pageParam,
+        limit: limitParam,
+      });
+
+      setPosts(data.rentalPosts);
+      setPagination(data.pagination);
+    } catch (error) {
+      console.error('Lỗi tải danh sách bài đăng:', error);
+      setPosts([]);
+      setPagination({
+        ...DEFAULT_PAGINATION,
+        page: pageParam,
+        limit: limitParam,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    if (initialPosts.length === 0 || searchTitle !== undefined) {
-      void reload();
-    }
-  }, [categoryCode, searchTitle]);
+    void reload();
+  }, [categoryCode, searchTitle, pageParam, limitParam]);
+
+  const handleSendContentJsonToImport = (jsonText: string) => {
+    setImportJsonText(jsonText);
+    setOpenContentGenerator(false);
+    setImportOpen(true);
+  };
 
   const handleDelete = (id: string) => {
     setDeletingId(id);
@@ -240,7 +333,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
                 </div>
 
                 <span className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1 text-xs font-black text-neutral-700">
-                  {posts.length}
+                  {pagination.total}
                 </span>
               </div>
             </div>
@@ -297,8 +390,118 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
         </div>
       </div>
 
-      <main className="px-2">
-        {posts.length > 0 ? (
+      <main className="px-2 py-2">
+        <div className="mb-3 rounded-xl border border-neutral-200 bg-white p-2 shadow-sm">
+          <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
+            <div className="grid grid-cols-3 gap-1.5 xl:flex xl:items-center xl:gap-2">
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2">
+                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">Tổng bài</p>
+                <p className="text-sm font-black text-neutral-950">{pagination.total}</p>
+              </div>
+
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2">
+                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">Trang hiện tại</p>
+                <p className="text-sm font-black text-primary">
+                  {pagination.page}/{pagination.totalPages || 1}
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2">
+                <p className="text-[9px] font-black uppercase tracking-[0.14em] text-neutral-400">Đang hiển thị</p>
+                <p className="text-sm font-black text-neutral-950">{posts.length}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+              <button
+                type="button"
+                disabled={!pagination.hasPrevPage || isLoading}
+                onClick={() => updatePaginationQuery(1)}
+                className="inline-flex h-9 items-center justify-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 text-xs font-black text-neutral-700 transition hover:border-primary hover:bg-primary/5 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 xl:px-3"
+              >
+                <FiChevronsLeft size={14} />
+                Đầu
+              </button>
+
+              <button
+                type="button"
+                disabled={!pagination.hasPrevPage || isLoading}
+                onClick={() => updatePaginationQuery(Math.max(1, pagination.page - 1))}
+                className="inline-flex h-9 items-center justify-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 text-xs font-black text-neutral-700 transition hover:border-primary hover:bg-primary/5 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 xl:px-3"
+              >
+                <FiChevronLeft size={14} />
+                Trước
+              </button>
+
+              <div className="flex items-center gap-1 rounded-lg border border-neutral-200 bg-neutral-50 p-1">
+                {pageNumbers[0] && pageNumbers[0] > 1 ? (
+                  <span className="px-2 text-xs font-black text-neutral-400">...</span>
+                ) : null}
+
+                {pageNumbers.map((pageNumber) => {
+                  const isActive = pageNumber === pagination.page;
+
+                  return (
+                    <button
+                      key={pageNumber}
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => updatePaginationQuery(pageNumber)}
+                      className={`h-8 min-w-8 rounded-md px-2 text-xs font-black transition ${isActive ? 'bg-primary text-white shadow-sm' : 'bg-white text-neutral-700 hover:bg-primary/5 hover:text-primary'
+                        } disabled:cursor-not-allowed disabled:opacity-50`}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                })}
+
+                {pageNumbers[pageNumbers.length - 1] && pageNumbers[pageNumbers.length - 1] < pagination.totalPages ? (
+                  <span className="px-2 text-xs font-black text-neutral-400">...</span>
+                ) : null}
+              </div>
+
+              <button
+                type="button"
+                disabled={!pagination.hasNextPage || isLoading}
+                onClick={() => updatePaginationQuery(pagination.page + 1)}
+                className="inline-flex h-9 items-center justify-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 text-xs font-black text-neutral-700 transition hover:border-primary hover:bg-primary/5 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 xl:px-3"
+              >
+                Sau
+                <FiChevronRight size={14} />
+              </button>
+
+              <button
+                type="button"
+                disabled={!pagination.hasNextPage || isLoading}
+                onClick={() => updatePaginationQuery(pagination.totalPages || 1)}
+                className="inline-flex h-9 items-center justify-center gap-1 rounded-lg border border-neutral-200 bg-white px-2 text-xs font-black text-neutral-700 transition hover:border-primary hover:bg-primary/5 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 xl:px-3"
+              >
+                Cuối
+                <FiChevronsRight size={14} />
+              </button>
+
+              <select
+                value={pagination.limit}
+                disabled={isLoading}
+                onChange={(event) => updatePaginationQuery(1, Number(event.target.value))}
+                className="h-9 rounded-lg border border-neutral-200 bg-white px-2 text-xs font-bold text-neutral-700 outline-none transition focus:border-primary disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <option value={12}>12 / trang</option>
+                <option value={20}>20 / trang</option>
+                <option value={40}>40 / trang</option>
+                <option value={60}>60 / trang</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="flex min-h-[40dvh] items-center justify-center">
+            <div className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-black text-neutral-700 shadow-sm">
+              Đang tải dữ liệu...
+            </div>
+          </div>
+        ) : posts.length > 0 ? (
           <div className="grid grid-cols-1 gap-2 xl:grid-cols-4 xl:gap-3 2xl:grid-cols-5">
             {posts.map((post) => {
               const thumbnail = getThumbnail(post);
@@ -376,7 +579,7 @@ export default function ClientRentalPostAdminPage({ posts: initialPosts, categor
 
                   <div className="flex min-h-[260px] flex-col p-2">
                     <button type="button" onClick={() => openEditModal(post)} className="text-left">
-                      <h2 className="line-clamp-2 min-h-[2.6rem] text-[14px] font-black leading-snug text-neutral-950 transition hover:text-primary">
+                      <h2 className="text-[14px] font-black leading-snug text-neutral-950 transition hover:text-primary">
                         {post.title}
                       </h2>
                     </button>

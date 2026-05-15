@@ -3,36 +3,61 @@ import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { adminFetch } from '../shared/adminFetch.client';
 import { getWithFallback } from '../shared/getWithFallback';
 
-// Type Definitions ---
+export type RentalPaginationMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+};
+
+export type RentalPostAdminListResponse = {
+  message: string;
+  count: number;
+  visibleCount: number;
+  pagination: RentalPaginationMeta;
+  rentalPosts: IRentalPostAdmin[];
+};
+
 type CacheState = {
   list: IRentalPostAdmin[];
   byId: Map<string, IRentalPostAdmin>;
 };
 
-// Singleton Cache State ---
-// Cache này sẽ tồn tại trong memory của server (nếu chạy server-side) hoặc browser (nếu client-side)
-// Lưu ý: Với Server Components, cache này chỉ sống trong vòng đời của request hoặc lambda instance
+const EMPTY_PAGINATION: RentalPaginationMeta = {
+  page: 1,
+  limit: 20,
+  total: 0,
+  totalPages: 0,
+  hasNextPage: false,
+  hasPrevPage: false,
+};
+
 const cache: CacheState = {
   list: [],
   byId: new Map(),
 };
 
-const rentalPostAdminService = {
-  /** Lấy danh sách bài đăng của admin hiện tại */
-  async getMyPosts(params?: Record<string, string | number | undefined>): Promise<IRentalPostAdmin[]> {
-    let apiUrl = getServerApiUrl('api/rental-posts/me');
+const buildQueryString = (params?: Record<string, string | number | undefined>): string => {
+  if (!params) return '';
 
-    if (params) {
-      const query = new URLSearchParams();
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          query.set(key, String(value));
-        }
-      });
-      if (query.toString()) {
-        apiUrl += `?${query.toString()}`;
-      }
+  const query = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      query.set(key, String(value));
     }
+  });
+
+  const queryString = query.toString();
+
+  return queryString ? `?${queryString}` : '';
+};
+
+const rentalPostAdminService = {
+  async getMyPosts(params?: Record<string, string | number | undefined>): Promise<RentalPostAdminListResponse> {
+    const apiUrl = `${getServerApiUrl('api/rental-posts/me')}${buildQueryString(params)}`;
 
     const res = await adminFetch(apiUrl, {
       method: 'GET',
@@ -43,18 +68,23 @@ const rentalPostAdminService = {
       throw new Error(`Admin getMyPosts failed: ${res.status}`);
     }
 
-    const data = (await res.json()) as {
-      rentalPosts?: IRentalPostAdmin[];
-    };
+    const data = (await res.json()) as Partial<RentalPostAdminListResponse>;
 
-    return data.rentalPosts ?? [];
+    const rentalPosts = Array.isArray(data.rentalPosts) ? data.rentalPosts : [];
+
+    return {
+      message: data.message ?? '',
+      count: typeof data.count === 'number' ? data.count : rentalPosts.length,
+      visibleCount: typeof data.visibleCount === 'number' ? data.visibleCount : rentalPosts.length,
+      pagination: data.pagination ?? {
+        ...EMPTY_PAGINATION,
+        total: rentalPosts.length,
+        totalPages: rentalPosts.length > 0 ? 1 : 0,
+      },
+      rentalPosts,
+    };
   },
 
-  /**
-   * Lấy danh sách bài đăng.
-   * - Logic: Luôn fetch "no-store" để lấy dữ liệu mới nhất từ DB.
-   * - Sau khi lấy xong: Cập nhật vào RAM Cache để getById dùng lại.
-   */
   async getAll(params?: Record<string, string | number>) {
     const hasFilter = params && Object.keys(params).length > 0;
 
@@ -62,11 +92,13 @@ const rentalPostAdminService = {
 
     if (hasFilter) {
       const query = new URLSearchParams();
-      Object.entries(params!).forEach(([k, v]) => {
+
+      Object.entries(params).forEach(([k, v]) => {
         if (v !== undefined && v !== null && v !== '') {
           query.set(k, String(v));
         }
       });
+
       apiUrl += `?${query.toString()}`;
     }
 
@@ -85,11 +117,9 @@ const rentalPostAdminService = {
 
     const list: IRentalPostAdmin[] = data.rentalPosts ?? [];
 
-    // Nếu không có filter (tức là lấy toàn bộ danh sách gốc), ta mới update Cache
     if (!hasFilter) {
       cache.list = list;
 
-      // Update Map để truy xuất O(1)
       cache.byId.clear();
       list.forEach((item) => {
         if (item._id) cache.byId.set(item._id, item);
@@ -98,7 +128,7 @@ const rentalPostAdminService = {
 
     return list;
   },
-  /** Lấy chi tiết bài đăng theo mã code ngắn */
+
   async getByCode(code: string): Promise<IRentalPostAdmin | null> {
     if (!code) return null;
 
@@ -116,31 +146,29 @@ const rentalPostAdminService = {
 
     return data.rentalPosts?.[0] ?? null;
   },
-  /**
-   * Lấy chi tiết bài đăng.
-   * - Ưu tiên 1: Lấy ngay từ RAM Cache (nếu người dùng vừa vào trang List xong).
-   * - Ưu tiên 2: Gọi API (nếu reload trang detail hoặc cache rỗng).
-   */
+
   async getById(id: string): Promise<IRentalPostAdmin | null> {
-    // 1. Check RAM Cache
     const cachedItem = cache.byId.get(id);
+
     if (cachedItem) {
       return cachedItem;
     }
 
-    // 2. Nếu không có trong cache, gọi API
     try {
       const apiUrl = getServerApiUrl(`api/rental-admin-post/${id}`);
+
       const res = await fetch(apiUrl, {
-        next: { revalidate: 60 }, // Cache nhẹ 60s cho trường hợp gọi lẻ
+        next: { revalidate: 60 },
       });
 
       if (!res.ok) return null;
 
-      const data = await res.json();
-      const item = data?.rentalPost ?? null;
+      const data = (await res.json()) as {
+        rentalPost?: IRentalPostAdmin;
+      };
 
-      // Cập nhật ngược lại vào Cache nếu tìm thấy
+      const item = data.rentalPost ?? null;
+
       if (item) {
         cache.byId.set(item._id, item);
       }
@@ -152,23 +180,20 @@ const rentalPostAdminService = {
     }
   },
 
-  /**
-   * Fallback pattern
-   */
   async getFallback(id: string): Promise<IRentalPostAdmin | null> {
     return getWithFallback<IRentalPostAdmin>(id, this.getAll.bind(this), this.getById.bind(this));
   },
-
-  // Mutations ---
 
   async create(formData: FormData) {
     const res = await fetch(getServerApiUrl('api/rental-admin-post'), {
       method: 'POST',
       body: formData,
     });
+
     if (!res.ok) throw new Error(`Create Error: ${res.status}`);
 
     await this.handlePostMutation();
+
     return res.json();
   },
 
@@ -177,9 +202,11 @@ const rentalPostAdminService = {
       method: 'PUT',
       body: formData,
     });
+
     if (!res.ok) throw new Error(`Update Error: ${res.status}`);
 
     await this.handlePostMutation();
+
     return res.json();
   },
 
@@ -187,21 +214,21 @@ const rentalPostAdminService = {
     const res = await fetch(getServerApiUrl(`api/rental-admin-post/${id}`), {
       method: 'DELETE',
     });
+
     if (!res.ok) throw new Error(`Delete Error: ${res.status}`);
 
     await this.handlePostMutation();
+
     return res.json();
   },
 
-  /**
-   * Xóa cache local và gọi revalidate server
-   */
   async handlePostMutation() {
     this.resetLocalCache();
+
     try {
       await fetch('/api/revalidate/rental-admin-posts', { method: 'POST' });
-    } catch (e) {
-      console.warn('Revalidate trigger warning:', e);
+    } catch (error) {
+      console.warn('Revalidate trigger warning:', error);
     }
   },
 
@@ -209,6 +236,7 @@ const rentalPostAdminService = {
     cache.list = [];
     cache.byId.clear();
   },
+
   async importRentalPost(items: unknown[]) {
     if (!Array.isArray(items) || items.length === 0) {
       throw new Error('Import data must be non-empty array');
@@ -221,7 +249,6 @@ const rentalPostAdminService = {
       },
       body: JSON.stringify(items),
     });
-    console.log('Import Response:', res);
 
     if (!res.ok) {
       const text = await res.text();
