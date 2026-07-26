@@ -4,9 +4,13 @@ import { fetchData, resolvers } from '@/server/dataSource';
 
 export const interiorCategoryService = {
   async getAll(): Promise<IInteriorCategory[]> {
-    // GET linh động: FE data-layer (mặc định) hoặc BE
+    // FE source (đang dùng)
     const data = await fetchData('/api/interior-categories', resolvers.interiorCategories());
     return (data as unknown as IInteriorCategory[]);
+
+    // BE source (mở khi cần, comment FE bên trên)
+    // const data = await getFromBe<IInteriorCategory[]>('/api/interior-categories');
+    // return data;
   },
 
   async create(payload: Partial<IInteriorCategory>) {

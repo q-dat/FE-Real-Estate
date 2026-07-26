@@ -24,14 +24,23 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 
 export const postCategoryService = {
   async getAll(): Promise<IPostCategory[]> {
-    // GET linh động: FE data-layer (mặc định) hoặc BE
+    // FE source (đang dùng)
     const data = await fetchData('/api/post-categories', resolvers.postCategories());
     return (data as unknown as IPostCategory[]);
+
+    // BE source (mở khi cần, comment FE bên trên)
+    // const data = await getFromBe<IPostCategory[]>('/api/post-categories');
+    // return data;
   },
   async getById(id: string): Promise<IPostCategory | null> {
     try {
+      // FE source (đang dùng)
       const data = await fetchData(`/api/post-category/${id}`, resolvers.postCategoryById(id));
       return ((data as { postCategory?: IPostCategory }).postCategory ?? null) as IPostCategory | null;
+
+      // BE source (mở khi cần, comment FE bên trên)
+      // const data = await getFromBe<{ postCategory?: IPostCategory }>(`/api/post-category/${id}`);
+      // return data.postCategory ?? null;
     } catch (error) {
       console.error('GetById Error:', error);
       return null;

@@ -48,12 +48,24 @@ export const postService = {
   async getAll(params?: Record<string, string | number>) {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    // GET linh động: FE data-layer (mặc định) hoặc BE
+    // FE source (đang dùng)
     const data = await fetchData(
       '/api/posts',
       resolvers.posts((params ?? {}) as Record<string, string>)
     );
     const list: IPost[] = ((data as { posts?: IPost[] }).posts ?? []) as IPost[];
+
+    // BE source (mở khi cần, comment FE bên trên)
+    // let path = '/api/posts';
+    // if (hasFilter) {
+    //   const q = new URLSearchParams();
+    //   Object.entries(params!).forEach(([k, v]) => {
+    //     if (v !== undefined && v !== null && v !== '') q.set(k, String(v));
+    //   });
+    //   path += `?${q.toString()}`;
+    // }
+    // const data = await getFromBe<{ posts?: IPost[] }>(path);
+    // const list: IPost[] = data.posts ?? [];
 
     if (!hasFilter) {
       cache.list = list;
@@ -67,8 +79,13 @@ export const postService = {
   },
   async getById(id: string): Promise<IPost | null> {
     try {
+      // FE source (đang dùng)
       const data = await fetchData(`/api/post/${id}`, resolvers.postById(id));
       return ((data as { post?: IPost }).post ?? null) as IPost | null;
+
+      // BE source (mở khi cần, comment FE bên trên)
+      // const data = await getFromBe<{ post?: IPost }>(`/api/post/${id}`);
+      // return data.post ?? null;
     } catch (error) {
       console.error('Error fetching post by ID:', error);
       return null;
@@ -76,8 +93,14 @@ export const postService = {
   },
   async getBySlug(slug: string): Promise<IPost | null> {
     try {
+      // FE source (đang dùng)
       const data = await fetchData(`/api/post/slug/${slug}`, resolvers.postBySlug(slug));
       const post = ((data as { post?: IPost }).post ?? null) as IPost | null;
+
+      // BE source (mở khi cần, comment FE bên trên)
+      // const data = await getFromBe<{ post?: IPost }>(`/api/post/slug/${slug}`);
+      // const post = data.post ?? null;
+
       if (post?._id) cache.byId.set(post._id, post);
       return post;
     } catch (error) {

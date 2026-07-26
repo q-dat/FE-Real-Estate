@@ -4,10 +4,14 @@ import { fetchData, resolvers } from '@/server/dataSource';
 
 export const rentalCategoryService = {
   async getAll(): Promise<IRentalCategory[]> {
-    // GET linh động: FE data-layer (mặc định) hoặc BE
+    // FE source (đang dùng)
     const data = await fetchData('/api/rental-categories', resolvers.rentalCategories());
     const list = data as unknown as IRentalCategory[];
     return Array.isArray(list) ? list : ((list as { rentalCategories?: IRentalCategory[] }).rentalCategories ?? []);
+
+    // BE source (mở khi cần, comment FE bên trên)
+    // const data = await getFromBe<IRentalCategory[]>('/api/rental-categories');
+    // return Array.isArray(data) ? data : [];
   },
 
   async create(payload: Partial<IRentalCategory>) {

@@ -24,12 +24,24 @@ const interiorService = {
   async getAll(params?: Record<string, string | number>): Promise<IInterior[]> {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    // GET linh động: FE data-layer (mặc định) hoặc BE
+    // FE source (đang dùng)
     const data = await fetchData(
       '/api/interiors',
       resolvers.interiors((params ?? {}) as Record<string, string>)
     );
     const list: IInterior[] = ((data as { interiors?: IInterior[] }).interiors ?? []) as IInterior[];
+
+    // BE source (mở khi cần, comment FE bên trên)
+    // let path = '/api/interiors';
+    // if (hasFilter) {
+    //   const q = new URLSearchParams();
+    //   Object.entries(params!).forEach(([key, value]) => {
+    //     if (value !== undefined && value !== null && value !== '') q.set(key, String(value));
+    //   });
+    //   path += `?${q.toString()}`;
+    // }
+    // const data = await getFromBe<{ interiors?: IInterior[] }>(path);
+    // const list: IInterior[] = data.interiors ?? [];
 
     if (!hasFilter) {
       cache.list = list;
@@ -45,7 +57,7 @@ const interiorService = {
   /**
    * Lấy chi tiết thiết kế nội thất.
    * - Ưu tiên lấy từ RAM Cache.
-   * - Nếu không có, gọi qua fetchData (FE hoặc BE).
+   * - Nếu không có, gọi FE (đang dùng) hoặc BE (mở comment).
    */
   async getById(id: string): Promise<IInterior | null> {
     const cached = cache.byId.get(id);
@@ -54,8 +66,13 @@ const interiorService = {
     }
 
     try {
+      // FE source (đang dùng)
       const data = await fetchData(`/api/interior/${id}`, resolvers.interiorById(id));
       const item = ((data as { interior?: IInterior }).interior ?? null) as IInterior | null;
+
+      // BE source (mở khi cần, comment FE bên trên)
+      // const data = await getFromBe<{ interior?: IInterior }>(`/api/interior/${id}`);
+      // const item = data.interior ?? null;
 
       if (item) {
         cache.byId.set(item._id, item);

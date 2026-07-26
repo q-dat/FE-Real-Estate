@@ -89,13 +89,19 @@ const rentalPostAdminService = {
   async getAll(params?: Record<string, string | number>) {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    // GET linh động: FE data-layer (mặc định) hoặc BE qua NEXT_PUBLIC_API_MODE=be
+    // FE source (đang dùng)
     const data = await fetchData(
       '/api/rental-admin-posts',
       resolvers.rentalPostsAdmin((params ?? {}) as Record<string, string | number | undefined>)
     );
-
     const list: IRentalPostAdmin[] = ((data as { rentalPosts?: IRentalPostAdmin[] }).rentalPosts ?? []) as IRentalPostAdmin[];
+
+    // BE source (mở khi cần, comment FE bên trên)
+    // const path = buildQueryString(params)
+    //   ? `/api/rental-admin-posts?${buildQueryString(params)}`
+    //   : '/api/rental-admin-posts';
+    // const data = await getFromBe<{ rentalPosts?: IRentalPostAdmin[] }>(path);
+    // const list: IRentalPostAdmin[] = data.rentalPosts ?? [];
 
     if (!hasFilter) {
       cache.list = list;
@@ -111,11 +117,18 @@ const rentalPostAdminService = {
   async getByCode(code: string): Promise<IRentalPostAdmin | null> {
     if (!code) return null;
     try {
+      // FE source (đang dùng)
       const data = await fetchData(
         `/api/rental-admin-posts?code=${encodeURIComponent(code)}`,
         resolvers.rentalPostAdminByCode(code)
       );
       return ((data as { rentalPosts?: IRentalPostAdmin[] }).rentalPosts?.[0] ?? null) as IRentalPostAdmin | null;
+
+      // BE source (mở khi cần, comment FE bên trên)
+      // const data = await getFromBe<{ rentalPosts?: IRentalPostAdmin[] }>(
+      //   `/api/rental-admin-posts?code=${encodeURIComponent(code)}`
+      // );
+      // return data.rentalPosts?.[0] ?? null;
     } catch (error) {
       console.error('GetByCode Error:', error);
       return null;
@@ -127,11 +140,19 @@ const rentalPostAdminService = {
     if (cachedItem) return cachedItem;
 
     try {
+      // FE source (đang dùng)
       const data = await fetchData(
         `/api/rental-admin-post/${id}`,
         resolvers.rentalPostAdminById(id)
       );
       const item = ((data as { rentalPost?: IRentalPostAdmin }).rentalPost ?? null) as IRentalPostAdmin | null;
+
+      // BE source (mở khi cần, comment FE bên trên)
+      // const data = await getFromBe<{ rentalPost?: IRentalPostAdmin }>(
+      //   `/api/rental-admin-post/${id}`
+      // );
+      // const item = data.rentalPost ?? null;
+
       if (item && item._id) cache.byId.set(item._id, item);
       return item;
     } catch (error) {
