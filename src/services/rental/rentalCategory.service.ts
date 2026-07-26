@@ -1,12 +1,13 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalCategory } from '@/types/rentalCategory/rentalCategory.types';
+import { fetchData, resolvers } from '@/server/dataSource';
 
 export const rentalCategoryService = {
   async getAll(): Promise<IRentalCategory[]> {
-    const res = await fetch(getServerApiUrl('api/rental-categories'));
-    if (!res.ok) throw new Error(`Fetch danh mục lỗi: ${res.status}`);
-    const data = await res.json();
-    return Array.isArray(data) ? data : (data?.rentalCategories ?? []);
+    // GET linh động: FE data-layer (mặc định) hoặc BE
+    const data = await fetchData('/api/rental-categories', resolvers.rentalCategories());
+    const list = data as unknown as IRentalCategory[];
+    return Array.isArray(list) ? list : ((list as { rentalCategories?: IRentalCategory[] }).rentalCategories ?? []);
   },
 
   async create(payload: Partial<IRentalCategory>) {

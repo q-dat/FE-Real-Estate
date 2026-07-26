@@ -1,38 +1,24 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
+import { fetchData, resolvers } from '@/server/dataSource';
 
 export const realEstateProjectService = {
   async getAll(): Promise<IRealEstateProject[]> {
-    const res = await fetch(getServerApiUrl('api/real-estate-projects'), {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) throw new Error('Fetch real estate projects failed');
-
-    const data = await res.json();
-    return Array.isArray(data?.projects) ? data.projects : [];
+    const data = await fetchData('/api/real-estate-projects', resolvers.realEstateProjects({}));
+    const list = ((data as { projects?: IRealEstateProject[] }).projects ?? []) as IRealEstateProject[];
+    return list;
   },
 
   async getById(id: string): Promise<IRealEstateProject> {
-    const res = await fetch(getServerApiUrl(`api/real-estate-project/${id}`), {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) throw new Error('Fetch project failed');
-
-    const data = await res.json();
-    return data.project;
+    const data = await fetchData(`/api/real-estate-project/${id}`, resolvers.realEstateProjectById(id));
+    const item = ((data as { project?: IRealEstateProject }).project ?? null) as IRealEstateProject | null;
+    if (!item) throw new Error('Fetch project failed');
+    return item;
   },
 
   async getBySlug(slug: string): Promise<IRealEstateProject | null> {
-    const res = await fetch(getServerApiUrl(`api/real-estate-project/slug/${slug}`), {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    return data?.project ?? null;
+    const data = await fetchData(`/api/real-estate-project/slug/${slug}`, resolvers.realEstateProjectBySlug(slug));
+    return ((data as { project?: IRealEstateProject }).project ?? null) as IRealEstateProject | null;
   },
 
   // =========================

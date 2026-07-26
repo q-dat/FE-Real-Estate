@@ -1,12 +1,12 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IInteriorCategory } from '@/types/interiorsCategory/interiorsCategory.types';
+import { fetchData, resolvers } from '@/server/dataSource';
 
 export const interiorCategoryService = {
   async getAll(): Promise<IInteriorCategory[]> {
-    const res = await fetch(getServerApiUrl('api/interior-categories'));
-    if (!res.ok) throw new Error('Fetch failed');
-    const data = await res.json();
-    return Array.isArray(data) ? data : (data?.interiorCategories ?? []);
+    // GET linh động: FE data-layer (mặc định) hoặc BE
+    const data = await fetchData('/api/interior-categories', resolvers.interiorCategories());
+    return (data as unknown as IInteriorCategory[]);
   },
 
   async create(payload: Partial<IInteriorCategory>) {

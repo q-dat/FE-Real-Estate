@@ -1,15 +1,10 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IPostCategory } from '@/types/post/post-category.types';
+import { fetchData, resolvers } from '@/server/dataSource';
 
 export interface PostCategoryPayload {
   name: string;
   description?: string;
-}
-
-interface ApiResponse<T> {
-  message?: string;
-  postCategory: T;
-  postCategories: T;
 }
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
@@ -29,13 +24,14 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 
 export const postCategoryService = {
   async getAll(): Promise<IPostCategory[]> {
-    const res = await request<{ postCategories: IPostCategory[] }>(getServerApiUrl('api/post-categories'));
-    return res.postCategories;
+    // GET linh động: FE data-layer (mặc định) hoặc BE
+    const data = await fetchData('/api/post-categories', resolvers.postCategories());
+    return (data as unknown as IPostCategory[]);
   },
   async getById(id: string): Promise<IPostCategory | null> {
     try {
-      const res = await request<{ postCategory: IPostCategory }>(getServerApiUrl(`api/post-category/${id}`));
-      return res.postCategory;
+      const data = await fetchData(`/api/post-category/${id}`, resolvers.postCategoryById(id));
+      return ((data as { postCategory?: IPostCategory }).postCategory ?? null) as IPostCategory | null;
     } catch (error) {
       console.error('GetById Error:', error);
       return null;

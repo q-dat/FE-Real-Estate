@@ -1,6 +1,7 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { getWithFallback } from '../shared/getWithFallback';
 import { IInterior } from '@/types/interiors/interiors.types';
+import { fetchData, resolvers } from '@/server/dataSource';
 
 // Cache Types ---
 type CacheState = {
@@ -23,30 +24,15 @@ const interiorService = {
   async getAll(params?: Record<string, string | number>): Promise<IInterior[]> {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    let apiUrl = getServerApiUrl('api/interiors');
-
-    if (hasFilter) {
-      const query = new URLSearchParams();
-      Object.entries(params!).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          query.set(key, String(value));
-        }
-      });
-      apiUrl += `?${query.toString()}`;
-    }
-
-    const res = await fetch(apiUrl, { cache: 'no-store' });
-
-    if (!res.ok) {
-      throw new Error(`GetAll Failed: ${res.status}`);
-    }
-
-    const data = await res.json();
-    const list: IInterior[] = data?.interiors ?? [];
+    // GET linh động: FE data-layer (mặc định) hoặc BE
+    const data = await fetchData(
+      '/api/interiors',
+      resolvers.interiors((params ?? {}) as Record<string, string>)
+    );
+    const list: IInterior[] = ((data as { interiors?: IInterior[] }).interiors ?? []) as IInterior[];
 
     if (!hasFilter) {
       cache.list = list;
-
       cache.byId.clear();
       list.forEach((item) => {
         if (item._id) cache.byId.set(item._id, item);
@@ -59,7 +45,7 @@ const interiorService = {
   /**
    * Lấy chi tiết thiết kế nội thất.
    * - Ưu tiên lấy từ RAM Cache.
-   * - Nếu không có, gọi API và lưu lại vào cache.
+   * - Nếu không có, gọi qua fetchData (FE hoặc BE).
    */
   async getById(id: string): Promise<IInterior | null> {
     const cached = cache.byId.get(id);
@@ -68,15 +54,8 @@ const interiorService = {
     }
 
     try {
-      const apiUrl = getServerApiUrl(`api/interior/${id}`);
-      const res = await fetch(apiUrl, {
-        next: { revalidate: 60 },
-      });
-
-      if (!res.ok) return null;
-
-      const data = await res.json();
-      const item: IInterior | null = data?.interior ?? null;
+      const data = await fetchData(`/api/interior/${id}`, resolvers.interiorById(id));
+      const item = ((data as { interior?: IInterior }).interior ?? null) as IInterior | null;
 
       if (item) {
         cache.byId.set(item._id, item);

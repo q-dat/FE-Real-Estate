@@ -1,48 +1,49 @@
-// import mongoose, { Connection } from 'mongoose';
+import mongoose from 'mongoose';
 
-// const MONGO_URI = process.env.MONGODB_URI as string;
+const MONGO_URI = process.env.MONGODB_URI as string;
 
-// if (!MONGO_URI) {
-//   throw new Error('⚠️ MONGODB_URI is missing in environment variables!');
-// }
+if (!MONGO_URI) {
+  // Chỉ warn ở build time, không throw để trang không DB vẫn build được.
+  console.warn('⚠️ MONGODB_URI is missing — server-side DB queries will fail at runtime.');
+}
 
-// interface MongooseCache {
-//   conn: Connection | null;
-//   promise: Promise<Connection> | null;
-// }
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
 
-// declare global {
-//   // eslint-disable-next-line no-var
-//   var mongooseCache: MongooseCache | undefined;
-// }
+declare global {
+  var mongooseCache: MongooseCache | undefined;
+}
 
-// const cached: MongooseCache = global.mongooseCache ?? { conn: null, promise: null };
+const cached: MongooseCache = global.mongooseCache ?? { conn: null, promise: null };
 
-// export async function connectDB(): Promise<Connection> {
-//   if (cached.conn) {
-//     console.log('✅ MongoDB đã được kết nối.');
-//     return cached.conn;
-//   }
+if (!global.mongooseCache) {
+  global.mongooseCache = cached;
+}
 
-//   if (!cached.promise) {
-//     console.log('Đang kết nối đến MongoDB...');
-//     cached.promise = mongoose
-//       .connect(MONGO_URI, {
-//         dbName: '',
-//         bufferCommands: false,
-//       })
-//       .then((mongooseInstance) => {
-//         console.log('✅ Kết nối MongoDB thành công!');
-//         return mongooseInstance.connection;
-//       })
-//       .catch((err) => {
-//         console.error('❌ Lỗi kết nối MongoDB:', err);
-//         throw err;
-//       });
-//   }
+export async function connectDB(): Promise<typeof mongoose> {
+  if (cached.conn) {
+    return cached.conn;
+  }
 
-//   cached.conn = await cached.promise;
-//   global.mongooseCache = cached;
+  if (!cached.promise) {
+    cached.promise = mongoose
+      .connect(MONGO_URI, {
+        maxPoolSize: 10,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 30000,
+        retryWrites: true,
+      })
+      .then((m) => m);
+  }
 
-//   return cached.conn;
-// }
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    cached.promise = null;
+    throw err;
+  }
+
+  return cached.conn;
+}

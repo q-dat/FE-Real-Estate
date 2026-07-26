@@ -2,6 +2,7 @@ import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { adminFetch } from '../shared/adminFetch.client';
 import { getWithFallback } from '../shared/getWithFallback';
+import { fetchData, resolvers } from '@/server/dataSource';
 
 export type RentalPaginationMeta = {
   page: number;
@@ -88,38 +89,16 @@ const rentalPostAdminService = {
   async getAll(params?: Record<string, string | number>) {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    let apiUrl = getServerApiUrl('api/rental-admin-posts');
+    // GET linh động: FE data-layer (mặc định) hoặc BE qua NEXT_PUBLIC_API_MODE=be
+    const data = await fetchData(
+      '/api/rental-admin-posts',
+      resolvers.rentalPostsAdmin((params ?? {}) as Record<string, string | number | undefined>)
+    );
 
-    if (hasFilter) {
-      const query = new URLSearchParams();
-
-      Object.entries(params).forEach(([k, v]) => {
-        if (v !== undefined && v !== null && v !== '') {
-          query.set(k, String(v));
-        }
-      });
-
-      apiUrl += `?${query.toString()}`;
-    }
-
-    const res = await fetch(apiUrl, {
-      cache: 'force-cache',
-      next: { revalidate: 60 },
-    });
-
-    if (!res.ok) {
-      throw new Error(`GetAll failed: ${res.status}`);
-    }
-
-    const data = (await res.json()) as {
-      rentalPosts?: IRentalPostAdmin[];
-    };
-
-    const list: IRentalPostAdmin[] = data.rentalPosts ?? [];
+    const list: IRentalPostAdmin[] = ((data as { rentalPosts?: IRentalPostAdmin[] }).rentalPosts ?? []) as IRentalPostAdmin[];
 
     if (!hasFilter) {
       cache.list = list;
-
       cache.byId.clear();
       list.forEach((item) => {
         if (item._id) cache.byId.set(item._id, item);
@@ -131,48 +110,29 @@ const rentalPostAdminService = {
 
   async getByCode(code: string): Promise<IRentalPostAdmin | null> {
     if (!code) return null;
-
-    const apiUrl = getServerApiUrl(`api/rental-admin-posts?code=${encodeURIComponent(code)}`);
-
-    const res = await fetch(apiUrl, {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) return null;
-
-    const data = (await res.json()) as {
-      rentalPosts?: IRentalPostAdmin[];
-    };
-
-    return data.rentalPosts?.[0] ?? null;
+    try {
+      const data = await fetchData(
+        `/api/rental-admin-posts?code=${encodeURIComponent(code)}`,
+        resolvers.rentalPostAdminByCode(code)
+      );
+      return ((data as { rentalPosts?: IRentalPostAdmin[] }).rentalPosts?.[0] ?? null) as IRentalPostAdmin | null;
+    } catch (error) {
+      console.error('GetByCode Error:', error);
+      return null;
+    }
   },
 
   async getById(id: string): Promise<IRentalPostAdmin | null> {
     const cachedItem = cache.byId.get(id);
-
-    if (cachedItem) {
-      return cachedItem;
-    }
+    if (cachedItem) return cachedItem;
 
     try {
-      const apiUrl = getServerApiUrl(`api/rental-admin-post/${id}`);
-
-      const res = await fetch(apiUrl, {
-        next: { revalidate: 60 },
-      });
-
-      if (!res.ok) return null;
-
-      const data = (await res.json()) as {
-        rentalPost?: IRentalPostAdmin;
-      };
-
-      const item = data.rentalPost ?? null;
-
-      if (item) {
-        cache.byId.set(item._id, item);
-      }
-
+      const data = await fetchData(
+        `/api/rental-admin-post/${id}`,
+        resolvers.rentalPostAdminById(id)
+      );
+      const item = ((data as { rentalPost?: IRentalPostAdmin }).rentalPost ?? null) as IRentalPostAdmin | null;
+      if (item && item._id) cache.byId.set(item._id, item);
       return item;
     } catch (error) {
       console.error('GetById Error:', error);

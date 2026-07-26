@@ -1,6 +1,7 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IPost } from '@/types/post/post.types';
 import { getWithFallback } from '../shared/getWithFallback';
+import { fetchData, resolvers } from '@/server/dataSource';
 
 // interface ListResponse<T> {
 //   message?: string;
@@ -47,38 +48,15 @@ export const postService = {
   async getAll(params?: Record<string, string | number>) {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    let apiUrl = getServerApiUrl('api/posts');
+    // GET linh động: FE data-layer (mặc định) hoặc BE
+    const data = await fetchData(
+      '/api/posts',
+      resolvers.posts((params ?? {}) as Record<string, string>)
+    );
+    const list: IPost[] = ((data as { posts?: IPost[] }).posts ?? []) as IPost[];
 
-    if (hasFilter) {
-      const query = new URLSearchParams();
-      Object.entries(params!).forEach(([k, v]) => {
-        if (v !== undefined && v !== null && v !== '') {
-          query.set(k, String(v));
-        }
-      });
-      apiUrl += `?${query.toString()}`;
-    }
-
-    const res = await fetch(apiUrl, {
-      cache: 'force-cache',
-      next: { revalidate: 60 },
-    });
-
-    if (!res.ok) {
-      throw new Error(`GetAll failed: ${res.status}`);
-    }
-
-    const data = (await res.json()) as {
-      posts?: IPost[];
-    };
-
-    const list: IPost[] = data.posts ?? [];
-
-    // Nếu không có filter (tức là lấy toàn bộ danh sách gốc), ta mới update Cache
     if (!hasFilter) {
       cache.list = list;
-
-      // Update Map để truy xuất O(1)
       cache.byId.clear();
       list.forEach((item) => {
         if (item._id) cache.byId.set(item._id, item);
@@ -89,8 +67,8 @@ export const postService = {
   },
   async getById(id: string): Promise<IPost | null> {
     try {
-      const res = await request<SingleResponse<IPost>>(getServerApiUrl(`api/post/${id}`));
-      return res.post;
+      const data = await fetchData(`/api/post/${id}`, resolvers.postById(id));
+      return ((data as { post?: IPost }).post ?? null) as IPost | null;
     } catch (error) {
       console.error('Error fetching post by ID:', error);
       return null;
@@ -98,13 +76,9 @@ export const postService = {
   },
   async getBySlug(slug: string): Promise<IPost | null> {
     try {
-      const res = await request<SingleResponse<IPost>>(getServerApiUrl(`api/post/slug/${slug}`));
-      const post = res.post;
-
-      if (post?._id) {
-        cache.byId.set(post._id, post);
-      }
-
+      const data = await fetchData(`/api/post/slug/${slug}`, resolvers.postBySlug(slug));
+      const post = ((data as { post?: IPost }).post ?? null) as IPost | null;
+      if (post?._id) cache.byId.set(post._id, post);
       return post;
     } catch (error) {
       console.error('Error fetching post by Slug:', error);
