@@ -1,13 +1,12 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalCategory } from '@/types/rentalCategory/rentalCategory.types';
-import { fetchData, resolvers } from '@/server/dataSource';
+import { fetchData } from '@/server/dataSource';
 
 export const rentalCategoryService = {
   async getAll(): Promise<IRentalCategory[]> {
-    // FE source (đang dùng)
-    const data = await fetchData('/api/rental-categories', resolvers.rentalCategories());
-    const list = data as unknown as IRentalCategory[];
-    return Array.isArray(list) ? list : ((list as { rentalCategories?: IRentalCategory[] }).rentalCategories ?? []);
+    // FE source (đang dùng): gọi route /api/* của chính FE
+    const data = await fetchData<IRentalCategory[]>('/api/rental-categories');
+    return Array.isArray(data) ? data : [];
 
     // BE source (mở khi cần, comment FE bên trên)
     // const data = await getFromBe<IRentalCategory[]>('/api/rental-categories');

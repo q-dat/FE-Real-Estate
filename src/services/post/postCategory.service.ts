@@ -1,6 +1,6 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IPostCategory } from '@/types/post/post-category.types';
-import { fetchData, resolvers } from '@/server/dataSource';
+import { fetchData } from '@/server/dataSource';
 
 export interface PostCategoryPayload {
   name: string;
@@ -24,9 +24,9 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 
 export const postCategoryService = {
   async getAll(): Promise<IPostCategory[]> {
-    // FE source (đang dùng)
-    const data = await fetchData('/api/post-categories', resolvers.postCategories());
-    return (data as unknown as IPostCategory[]);
+    // FE source (đang dùng): gọi route /api/* của chính FE
+    const data = await fetchData<IPostCategory[]>('/api/post-categories');
+    return data;
 
     // BE source (mở khi cần, comment FE bên trên)
     // const data = await getFromBe<IPostCategory[]>('/api/post-categories');
@@ -35,8 +35,8 @@ export const postCategoryService = {
   async getById(id: string): Promise<IPostCategory | null> {
     try {
       // FE source (đang dùng)
-      const data = await fetchData(`/api/post-category/${id}`, resolvers.postCategoryById(id));
-      return ((data as { postCategory?: IPostCategory }).postCategory ?? null) as IPostCategory | null;
+      const data = await fetchData<{ postCategory?: IPostCategory }>(`/api/post-category/${id}`);
+      return data.postCategory ?? null;
 
       // BE source (mở khi cần, comment FE bên trên)
       // const data = await getFromBe<{ postCategory?: IPostCategory }>(`/api/post-category/${id}`);

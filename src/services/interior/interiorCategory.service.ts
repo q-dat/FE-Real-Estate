@@ -1,12 +1,12 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IInteriorCategory } from '@/types/interiorsCategory/interiorsCategory.types';
-import { fetchData, resolvers } from '@/server/dataSource';
+import { fetchData } from '@/server/dataSource';
 
 export const interiorCategoryService = {
   async getAll(): Promise<IInteriorCategory[]> {
-    // FE source (đang dùng)
-    const data = await fetchData('/api/interior-categories', resolvers.interiorCategories());
-    return (data as unknown as IInteriorCategory[]);
+    // FE source (đang dùng): gọi route /api/* của chính FE
+    const data = await fetchData<IInteriorCategory[]>('/api/interior-categories');
+    return data;
 
     // BE source (mở khi cần, comment FE bên trên)
     // const data = await getFromBe<IInteriorCategory[]>('/api/interior-categories');

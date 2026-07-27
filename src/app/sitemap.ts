@@ -1,8 +1,7 @@
 import { MetadataRoute } from 'next';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
-import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 import { IPost } from '@/types/post/post.types';
-import { postService } from '@/services/post/post.service';
+import { getAllRentalPostsAdmin, getAllPosts } from '@/server/queries';
 import { slugify } from '@/lib/slugify';
 
 const DOMAIN = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nguonnhagiare.vn').replace(/\/$/, '');
@@ -32,7 +31,8 @@ function getValidDate(input?: string | Date): Date {
 
 async function getRentalPostSitemap(): Promise<MetadataRoute.Sitemap> {
   try {
-    const rentalPosts: IRentalPostAdmin[] = await rentalPostAdminService.getAll();
+    const res = await getAllRentalPostsAdmin({});
+    const rentalPosts: IRentalPostAdmin[] = (res as { rentalPosts?: IRentalPostAdmin[] }).rentalPosts ?? [];
 
     return rentalPosts
       .filter((post) => post._id && post.title && (!post.status || post.status === 'active'))
@@ -50,7 +50,8 @@ async function getRentalPostSitemap(): Promise<MetadataRoute.Sitemap> {
 
 async function getNewsPostSitemap(): Promise<MetadataRoute.Sitemap> {
   try {
-    const posts: IPost[] = await postService.getAll();
+    const res = await getAllPosts({});
+    const posts: IPost[] = (res as { posts?: IPost[] }).posts ?? [];
 
     return posts
       .filter((post) => post._id && (post.slug || post.title))

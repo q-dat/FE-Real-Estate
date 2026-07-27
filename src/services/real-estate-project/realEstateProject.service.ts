@@ -1,13 +1,12 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRealEstateProject } from '@/types/realEstateProject/realEstateProject.types';
-import { fetchData, resolvers } from '@/server/dataSource';
+import { fetchData } from '@/server/dataSource';
 
 export const realEstateProjectService = {
   async getAll(): Promise<IRealEstateProject[]> {
-    // FE source (đang dùng)
-    const data = await fetchData('/api/real-estate-projects', resolvers.realEstateProjects({}));
-    const list = ((data as { projects?: IRealEstateProject[] }).projects ?? []) as IRealEstateProject[];
-    return list;
+    // FE source (đang dùng): gọi route /api/* của chính FE
+    const data = await fetchData<{ projects?: IRealEstateProject[] }>('/api/real-estate-projects');
+    return data.projects ?? [];
 
     // BE source (mở khi cần, comment FE bên trên)
     // const data = await getFromBe<{ projects?: IRealEstateProject[] }>('/api/real-estate-projects');
@@ -16,8 +15,8 @@ export const realEstateProjectService = {
 
   async getById(id: string): Promise<IRealEstateProject> {
     // FE source (đang dùng)
-    const data = await fetchData(`/api/real-estate-project/${id}`, resolvers.realEstateProjectById(id));
-    const item = ((data as { project?: IRealEstateProject }).project ?? null) as IRealEstateProject | null;
+    const data = await fetchData<{ project?: IRealEstateProject }>(`/api/real-estate-project/${id}`);
+    const item = data.project ?? null;
 
     // BE source (mở khi cần, comment FE bên trên)
     // const data = await getFromBe<{ project?: IRealEstateProject }>(`/api/real-estate-project/${id}`);
@@ -29,8 +28,8 @@ export const realEstateProjectService = {
 
   async getBySlug(slug: string): Promise<IRealEstateProject | null> {
     // FE source (đang dùng)
-    const data = await fetchData(`/api/real-estate-project/slug/${slug}`, resolvers.realEstateProjectBySlug(slug));
-    return ((data as { project?: IRealEstateProject }).project ?? null) as IRealEstateProject | null;
+    const data = await fetchData<{ project?: IRealEstateProject }>(`/api/real-estate-project/slug/${slug}`);
+    return data.project ?? null;
 
     // BE source (mở khi cần, comment FE bên trên)
     // const data = await getFromBe<{ project?: IRealEstateProject }>(`/api/real-estate-project/slug/${slug}`);

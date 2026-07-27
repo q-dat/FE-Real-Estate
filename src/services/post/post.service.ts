@@ -1,7 +1,7 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IPost } from '@/types/post/post.types';
 import { getWithFallback } from '../shared/getWithFallback';
-import { fetchData, resolvers } from '@/server/dataSource';
+import { fetchData } from '@/server/dataSource';
 
 // interface ListResponse<T> {
 //   message?: string;
@@ -48,22 +48,19 @@ export const postService = {
   async getAll(params?: Record<string, string | number>) {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    // FE source (đang dùng)
-    const data = await fetchData(
-      '/api/posts',
-      resolvers.posts((params ?? {}) as Record<string, string>)
-    );
-    const list: IPost[] = ((data as { posts?: IPost[] }).posts ?? []) as IPost[];
+    // FE source (đang dùng): gọi route /api/* của chính FE
+    let path = '/api/posts';
+    if (hasFilter) {
+      const q = new URLSearchParams();
+      Object.entries(params!).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') q.set(k, String(v));
+      });
+      path += `?${q.toString()}`;
+    }
+    const data = await fetchData<{ posts?: IPost[] }>(path);
+    const list: IPost[] = data.posts ?? [];
 
     // BE source (mở khi cần, comment FE bên trên)
-    // let path = '/api/posts';
-    // if (hasFilter) {
-    //   const q = new URLSearchParams();
-    //   Object.entries(params!).forEach(([k, v]) => {
-    //     if (v !== undefined && v !== null && v !== '') q.set(k, String(v));
-    //   });
-    //   path += `?${q.toString()}`;
-    // }
     // const data = await getFromBe<{ posts?: IPost[] }>(path);
     // const list: IPost[] = data.posts ?? [];
 
@@ -80,8 +77,8 @@ export const postService = {
   async getById(id: string): Promise<IPost | null> {
     try {
       // FE source (đang dùng)
-      const data = await fetchData(`/api/post/${id}`, resolvers.postById(id));
-      return ((data as { post?: IPost }).post ?? null) as IPost | null;
+      const data = await fetchData<{ post?: IPost }>(`/api/post/${id}`);
+      return data.post ?? null;
 
       // BE source (mở khi cần, comment FE bên trên)
       // const data = await getFromBe<{ post?: IPost }>(`/api/post/${id}`);
@@ -94,8 +91,8 @@ export const postService = {
   async getBySlug(slug: string): Promise<IPost | null> {
     try {
       // FE source (đang dùng)
-      const data = await fetchData(`/api/post/slug/${slug}`, resolvers.postBySlug(slug));
-      const post = ((data as { post?: IPost }).post ?? null) as IPost | null;
+      const data = await fetchData<{ post?: IPost }>(`/api/post/slug/${slug}`);
+      const post = data.post ?? null;
 
       // BE source (mở khi cần, comment FE bên trên)
       // const data = await getFromBe<{ post?: IPost }>(`/api/post/slug/${slug}`);

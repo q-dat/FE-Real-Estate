@@ -1,7 +1,7 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { getWithFallback } from '../shared/getWithFallback';
 import { IInterior } from '@/types/interiors/interiors.types';
-import { fetchData, resolvers } from '@/server/dataSource';
+import { fetchData } from '@/server/dataSource';
 
 // Cache Types ---
 type CacheState = {
@@ -24,22 +24,19 @@ const interiorService = {
   async getAll(params?: Record<string, string | number>): Promise<IInterior[]> {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    // FE source (đang dùng)
-    const data = await fetchData(
-      '/api/interiors',
-      resolvers.interiors((params ?? {}) as Record<string, string>)
-    );
-    const list: IInterior[] = ((data as { interiors?: IInterior[] }).interiors ?? []) as IInterior[];
+    // FE source (đang dùng): gọi route /api/* của chính FE
+    let path = '/api/interiors';
+    if (hasFilter) {
+      const q = new URLSearchParams();
+      Object.entries(params!).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') q.set(key, String(value));
+      });
+      path += `?${q.toString()}`;
+    }
+    const data = await fetchData<{ interiors?: IInterior[] }>(path);
+    const list: IInterior[] = data.interiors ?? [];
 
     // BE source (mở khi cần, comment FE bên trên)
-    // let path = '/api/interiors';
-    // if (hasFilter) {
-    //   const q = new URLSearchParams();
-    //   Object.entries(params!).forEach(([key, value]) => {
-    //     if (value !== undefined && value !== null && value !== '') q.set(key, String(value));
-    //   });
-    //   path += `?${q.toString()}`;
-    // }
     // const data = await getFromBe<{ interiors?: IInterior[] }>(path);
     // const list: IInterior[] = data.interiors ?? [];
 
@@ -67,8 +64,8 @@ const interiorService = {
 
     try {
       // FE source (đang dùng)
-      const data = await fetchData(`/api/interior/${id}`, resolvers.interiorById(id));
-      const item = ((data as { interior?: IInterior }).interior ?? null) as IInterior | null;
+      const data = await fetchData<{ interior?: IInterior }>(`/api/interior/${id}`);
+      const item = data.interior ?? null;
 
       // BE source (mở khi cần, comment FE bên trên)
       // const data = await getFromBe<{ interior?: IInterior }>(`/api/interior/${id}`);

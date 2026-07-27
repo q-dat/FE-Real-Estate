@@ -2,7 +2,7 @@ import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { adminFetch } from '../shared/adminFetch.client';
 import { getWithFallback } from '../shared/getWithFallback';
-import { fetchData, resolvers } from '@/server/dataSource';
+import { fetchData } from '@/server/dataSource';
 
 export type RentalPaginationMeta = {
   page: number;
@@ -89,12 +89,12 @@ const rentalPostAdminService = {
   async getAll(params?: Record<string, string | number>) {
     const hasFilter = params && Object.keys(params).length > 0;
 
-    // FE source (đang dùng)
-    const data = await fetchData(
-      '/api/rental-admin-posts',
-      resolvers.rentalPostsAdmin((params ?? {}) as Record<string, string | number | undefined>)
-    );
-    const list: IRentalPostAdmin[] = ((data as { rentalPosts?: IRentalPostAdmin[] }).rentalPosts ?? []) as IRentalPostAdmin[];
+    // FE source (đang dùng): gọi route /api/* của chính FE (query DB ở server)
+    const path = buildQueryString(params)
+      ? `/api/rental-admin-posts?${buildQueryString(params)}`
+      : '/api/rental-admin-posts';
+    const data = await fetchData<{ rentalPosts?: IRentalPostAdmin[] }>(path);
+    const list: IRentalPostAdmin[] = data.rentalPosts ?? [];
 
     // BE source (mở khi cần, comment FE bên trên)
     // const path = buildQueryString(params)
@@ -118,16 +118,13 @@ const rentalPostAdminService = {
     if (!code) return null;
     try {
       // FE source (đang dùng)
-      const data = await fetchData(
-        `/api/rental-admin-posts?code=${encodeURIComponent(code)}`,
-        resolvers.rentalPostAdminByCode(code)
-      );
-      return ((data as { rentalPosts?: IRentalPostAdmin[] }).rentalPosts?.[0] ?? null) as IRentalPostAdmin | null;
+      const path = `/api/rental-admin-posts?code=${encodeURIComponent(code)}`;
+      const data = await fetchData<{ rentalPosts?: IRentalPostAdmin[] }>(path);
+      return data.rentalPosts?.[0] ?? null;
 
       // BE source (mở khi cần, comment FE bên trên)
-      // const data = await getFromBe<{ rentalPosts?: IRentalPostAdmin[] }>(
-      //   `/api/rental-admin-posts?code=${encodeURIComponent(code)}`
-      // );
+      // const path = `/api/rental-admin-posts?code=${encodeURIComponent(code)}`;
+      // const data = await getFromBe<{ rentalPosts?: IRentalPostAdmin[] }>(path);
       // return data.rentalPosts?.[0] ?? null;
     } catch (error) {
       console.error('GetByCode Error:', error);
@@ -141,16 +138,11 @@ const rentalPostAdminService = {
 
     try {
       // FE source (đang dùng)
-      const data = await fetchData(
-        `/api/rental-admin-post/${id}`,
-        resolvers.rentalPostAdminById(id)
-      );
-      const item = ((data as { rentalPost?: IRentalPostAdmin }).rentalPost ?? null) as IRentalPostAdmin | null;
+      const data = await fetchData<{ rentalPost?: IRentalPostAdmin }>(`/api/rental-admin-post/${id}`);
+      const item = data.rentalPost ?? null;
 
       // BE source (mở khi cần, comment FE bên trên)
-      // const data = await getFromBe<{ rentalPost?: IRentalPostAdmin }>(
-      //   `/api/rental-admin-post/${id}`
-      // );
+      // const data = await getFromBe<{ rentalPost?: IRentalPostAdmin }>(`/api/rental-admin-post/${id}`);
       // const item = data.rentalPost ?? null;
 
       if (item && item._id) cache.byId.set(item._id, item);
