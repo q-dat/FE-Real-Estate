@@ -1,9 +1,6 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { getWithFallback } from '../shared/getWithFallback';
 import { IInterior } from '@/types/interiors/interiors.types';
 import { fetchData } from '@/server/dataSource';
-
-// Cache Types ---
 type CacheState = {
   list: IInterior[];
   byId: Map<string, IInterior>;
@@ -80,13 +77,6 @@ const interiorService = {
       console.error('GetById Error:', error);
       return null;
     }
-  },
-
-  /**
-   * Fallback Pattern
-   */
-  async getFallback(id: string): Promise<IInterior | null> {
-    return getWithFallback<IInterior>(id, this.getAll.bind(this), this.getById.bind(this));
   },
 
   // Mutations ----------------------------------

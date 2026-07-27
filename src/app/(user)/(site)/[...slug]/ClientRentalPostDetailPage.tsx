@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
-import { FaBed, FaShower, FaRulerHorizontal, FaRulerVertical, FaTools, FaCheckCircle, FaClock } from 'react-icons/fa';
+import { FaBed, FaShower, FaRulerHorizontal, FaRulerVertical, FaTools, FaCheckCircle } from 'react-icons/fa';
 import { Divider, Badge } from 'react-daisyui';
 import { GiHouse, GiPencilRuler, GiStarsStack } from 'react-icons/gi';
 import { BsBuildingFillUp } from 'react-icons/bs';

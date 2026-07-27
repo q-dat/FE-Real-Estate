@@ -1,8 +1,8 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 import { adminFetch } from '../shared/adminFetch.client';
-import { getWithFallback } from '../shared/getWithFallback';
 import { fetchData } from '@/server/dataSource';
+import { cache as reactCache } from 'react';
 
 export type RentalPaginationMeta = {
   page: number;
@@ -153,8 +153,10 @@ const rentalPostAdminService = {
     }
   },
 
-  async getFallback(id: string): Promise<IRentalPostAdmin | null> {
-    return getWithFallback<IRentalPostAdmin>(id, this.getAll.bind(this), this.getById.bind(this));
+  // Lấy 1 bài theo id, dedupe trong cùng request bằng React cache().
+  // Thay thế getFallback (vốn tải toàn bộ danh sách) để không làm nặng prod.
+  getDetailById(id: string): Promise<IRentalPostAdmin | null> {
+    return getDetailByIdCached(id);
   },
 
   async create(formData: FormData) {
@@ -238,5 +240,28 @@ const rentalPostAdminService = {
     }>;
   },
 };
+
+// Dedupe getDetailById trong cùng request (generateMetadata + page)
+// bằng React cache(). Không tải toàn bộ danh sách.
+const getDetailByIdCached = reactCache(async (id: string): Promise<IRentalPostAdmin | null> => {
+  const cachedItem = cache.byId.get(id);
+  if (cachedItem) return cachedItem;
+
+  try {
+    // FE source (đang dùng)
+    const data = await fetchData<{ rentalPost?: IRentalPostAdmin }>(`/api/rental-admin-post/${id}`);
+    const item = data.rentalPost ?? null;
+
+    // BE source (mở khi cần, comment FE bên trên)
+    // const data = await getFromBe<{ rentalPost?: IRentalPostAdmin }>(`/api/rental-admin-post/${id}`);
+    // const item = data.rentalPost ?? null;
+
+    if (item && item._id) cache.byId.set(item._id, item);
+    return item;
+  } catch (error) {
+    console.error('GetDetailById Error:', error);
+    return null;
+  }
+});
 
 export { rentalPostAdminService };

@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  const post = await rentalPostAdminService.getFallback(potentialId);
+  const post = await rentalPostAdminService.getDetailById(potentialId);
 
   if (!post) {
     return {
@@ -77,7 +77,7 @@ export default async function RentalPostPage({ params }: PageProps) {
     return notFound();
   }
 
-  const post = await rentalPostAdminService.getFallback(potentialId);
+  const post = await rentalPostAdminService.getDetailById(potentialId);
 
   if (!post) {
     return notFound();
@@ -85,7 +85,7 @@ export default async function RentalPostPage({ params }: PageProps) {
 
   const correctSlug = slugify(post.title || '');
 
-  // Self-healing URL & Redirect 301
+  // Self-healing URL: gom slug sai hoặc dạng slash về canonical gạch ngang
   if (isUsingSlash || rawSlug !== correctSlug) {
     permanentRedirect(`/${correctSlug}-${post._id}`);
   }

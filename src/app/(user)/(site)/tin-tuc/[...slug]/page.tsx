@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  const post = await postService.getFallback(potentialId);
+  const post = await postService.getById(potentialId);
 
   if (!post) {
     return {
@@ -65,7 +65,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
   const isMongoId = /^[a-fA-F0-9]{24}$/.test(potentialId);
 
   if (isMongoId) {
-    const post = await postService.getFallback(potentialId);
+    const post = await postService.getById(potentialId);
 
     if (!post) {
       return notFound();

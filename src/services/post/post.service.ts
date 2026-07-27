@@ -1,6 +1,5 @@
 import { getServerApiUrl } from '@/hooks/useApiUrl';
 import { IPost } from '@/types/post/post.types';
-import { getWithFallback } from '../shared/getWithFallback';
 import { fetchData } from '@/server/dataSource';
 
 // interface ListResponse<T> {
@@ -104,10 +103,6 @@ export const postService = {
       console.error('Error fetching post by Slug:', error);
       return null;
     }
-  },
-
-  async getFallback(id: string): Promise<IPost | null> {
-    return getWithFallback<IPost>(id, this.getAll.bind(this), this.getById.bind(this));
   },
 
   async create(formData: FormData): Promise<IPost> {

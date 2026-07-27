@@ -46,7 +46,7 @@ export default function RentalGrid({ posts }: RentalGridProps) {
           return (
             <Link
               key={post._id}
-              href={`/${slug}/${post._id}`}
+              href={`/${slug}-${post._id}`}
               className="group card relative overflow-hidden rounded-md bg-base-100 shadow-md transition-all duration-300 xl:hover:-translate-y-2 xl:hover:shadow-xl"
             >
               {/* Thumbnail */}

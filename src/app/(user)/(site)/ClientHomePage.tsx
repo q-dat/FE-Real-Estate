@@ -80,7 +80,7 @@ export const PostCard = ({ post, index = 0 }: PostCardProps) => {
 
   const thumbnail = useMemo(() => getFirstValidImage(post.images), [post.images]);
   const slug = useMemo(() => slugify(post.title), [post.title]);
-  const detailHref = `/${slug}/${post._id}`;
+  const detailHref = `/${slug}-${post._id}`;
 
   const priceDisplay = useMemo(() => {
     return `${formatCurrency(post.price)} ${post.priceUnit}`;

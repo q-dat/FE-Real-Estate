@@ -9,7 +9,7 @@ type PageProps = {
 
 export default async function InteriorDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const interior = await interiorService.getFallback(id);
+  const interior = await interiorService.getById(id);
 
   if (!interior) {
     notFound();
