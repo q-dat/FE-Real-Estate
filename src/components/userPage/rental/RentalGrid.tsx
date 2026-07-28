@@ -6,10 +6,10 @@ import { MdLocationPin } from 'react-icons/md';
 import { FaImage } from 'react-icons/fa6';
 import { slugify } from '@/lib/slugify';
 import { formatCurrency } from '@/utils/formatCurrency.utils';
-import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
+import { RentalGridItem } from '@/types/rentalGridItem';
 
 interface RentalGridProps {
-  posts: IRentalPostAdmin[];
+  posts: RentalGridItem[];
   title?: string;
   basePath?: string;
   slogan?: string;

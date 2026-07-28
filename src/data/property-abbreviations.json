@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "description": "Bản đồ từ viết tắt bất động sản. Chỉ thêm các quy tắc có nghĩa rõ ràng trong dữ liệu. Mở rộng bằng cách thêm phần tử vào mảng 'variants' của mỗi entry. Matching áp dụng theo token boundary (từ đứng riêng hoặc liền nhau), không thay thế khi alias chỉ là substring ngẫu nhiên trong từ khác.",
+  "aliases": [
+    {
+      "canonical": "phòng ngủ",
+      "variants": ["pn", "phong ngu", "phong ngu", "phòng ngủ", "phong ngu", "pn"]
+    },
+    {
+      "canonical": "nhà vệ sinh",
+      "variants": ["wc", "toilet", "nha ve sinh", "nhà vệ sinh"]
+    },
+    {
+      "canonical": "mặt tiền",
+      "variants": ["mt", "mat tien", "mặt tiền"]
+    },
+    {
+      "canonical": "hẻm xe",
+      "variants": ["hx", "hem xe", "hẻm xe"]
+    },
+    {
+      "canonical": "hẻm xe hơi",
+      "variants": ["hxh", "hem xe hoi", "hẻm xe hơi"]
+    },
+    {
+      "canonical": "hẻm xe tải",
+      "variants": ["hxt", "hem xe tai", "hẻm xe tải"]
+    },
+    {
+      "canonical": "xe hơi",
+      "variants": ["oto", "o to", "ô tô", "xe hơi"]
+    },
+    {
+      "canonical": "thương lượng",
+      "variants": ["tl", "thuong luong", "thương lượng"]
+    }
+  ]
+}

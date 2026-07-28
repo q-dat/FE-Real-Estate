@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { FiCheckCircle, FiMenu, FiSearch, FiX } from 'react-icons/fi';
+import { FiMenu, FiSearch, FiX } from 'react-icons/fi';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,12 +14,12 @@ import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { IoPerson } from 'react-icons/io5';
 import { MeResponse } from '@/types/auth/auth.types';
 import { HiOutlineArrowRightOnRectangle, HiOutlineChevronDown } from 'react-icons/hi2';
-import { MdArrowForwardIos, MdLocationPin } from 'react-icons/md';
-import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
-import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
+import { MdArrowForwardIos } from 'react-icons/md';
+import { useSearchSuggestions } from '@/hooks/useSearchSuggestions';
+import type { SearchKind } from '@/types/rentalGridItem';
+import { slugify } from '@/lib/slugify';
 import { formatCurrency } from '@/utils/formatCurrency.utils';
-
-type SearchType = 'title' | 'code';
+import type { RentalSearchResult } from '@/types/rentalGridItem';
 
 interface HeaderResponsiveProps {
   user: MeResponse['data'];
@@ -87,21 +87,20 @@ const searchPanelVariants: Variants = {
   },
 };
 
-const getResultImage = (item: IRentalPostAdmin): string => {
+const getResultImage = (item: RentalSearchResult): string => {
   return item.images?.[0] || '/no-image.png';
 };
 
-const getResultHref = (item: IRentalPostAdmin): string => {
-  if (item.code) return `/c/${item.code}`;
-  return '/';
+const getResultHref = (item: RentalSearchResult): string => {
+  return `/${slugify(item.title)}-${item._id}`;
 };
 
-const getLocationText = (item: IRentalPostAdmin): string => {
+const getLocationText = (item: RentalSearchResult): string => {
   const parts = [item.district, item.province].filter(Boolean);
   return parts.length > 0 ? parts.join(', ') : 'Đang cập nhật';
 };
 
-const getAreaText = (item: IRentalPostAdmin): string => {
+const getAreaText = (item: RentalSearchResult): string => {
   if (!item.area) return '';
 
   const dimension = item.frontageWidth && item.lotDepth ? ` · ${item.frontageWidth}x${item.lotDepth}` : '';
@@ -109,17 +108,47 @@ const getAreaText = (item: IRentalPostAdmin): string => {
   return `${item.area}m²${dimension}`;
 };
 
+
+function highlightMatch(text: string, phrase?: string): React.ReactNode {
+  if (!phrase) return text;
+  const index = text.toLowerCase().indexOf(phrase.toLowerCase());
+  if (index < 0) return text;
+
+  return (
+    <>
+      {text.slice(0, index)}
+      <span className="text-red-600">{text.slice(index, index + phrase.length)}</span>
+      {text.slice(index + phrase.length)}
+    </>
+  );
+}
+
+function getFeatureTags(item: RentalSearchResult): string[] {
+  const tags = [
+    item.bedroomNumber && item.bedroomNumber > 0 ? `${item.bedroomNumber} phòng ngủ` : '',
+    item.floorNumber && item.floorNumber > 0 ? `${item.floorNumber} tầng` : '',
+    item.toiletNumber && item.toiletNumber > 0 ? `${item.toiletNumber} WC` : '',
+  ].filter(Boolean);
+
+  const matched = new Set(
+    (item.matchedAttributes ?? []).map((attribute) => attribute.displayText.trim().toLowerCase())
+  );
+
+  return tags.filter((tag) => !matched.has(tag.toLowerCase()));
+}
+
 export default function HeaderResponsive({ user, onLogout, searchButtonLabel = 'Tìm', searchButtonClassName }: HeaderResponsiveProps) {
   const router = useRouter();
   const { favoriteCount } = useRentalFavorite();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchType, setSearchType] = useState<SearchType>('title');
+  const [searchType, setSearchType] = useState<SearchKind>('title');
   const [keyword, setKeyword] = useState('');
-  const [searchResults, setSearchResults] = useState<IRentalPostAdmin[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const { results: searchResults, isSearching, error: searchError, run: runSearch, reset: resetSearch } =
+    useSearchSuggestions({ debounce: 450 });
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -147,7 +176,7 @@ export default function HeaderResponsive({ user, onLogout, searchButtonLabel = '
 
   const handleClearSearch = () => {
     setKeyword('');
-    setSearchResults([]);
+    resetSearch();
     setShowDropdown(false);
     searchInputRef.current?.focus();
   };
@@ -176,43 +205,17 @@ export default function HeaderResponsive({ user, onLogout, searchButtonLabel = '
     };
   }, [isMenuOpen, isSearchOpen]);
 
+  // Dùng chung hook search với desktop -> cùng backend, cùng cache, kết quả nhất quán.
   useEffect(() => {
-    if (!isSearchOpen) return;
-
-    const timer = window.setTimeout(async () => {
-      if (!canSearch) {
-        setSearchResults([]);
-        setShowDropdown(false);
-        return;
-      }
-
-      setIsSearching(true);
+    if (isSearchOpen && canSearch) {
+      runSearch(keyword, searchType as SearchKind);
       setShowDropdown(true);
+      return;
+    }
 
-      try {
-        if (searchType === 'title') {
-          const results = await rentalPostAdminService.getAll({
-            title: normalizedKeyword,
-            limit: 5,
-          });
-
-          setSearchResults(results || []);
-          return;
-        }
-
-        const result = await rentalPostAdminService.getByCode(normalizedKeyword);
-        setSearchResults(result ? [result] : []);
-      } catch {
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 420);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [canSearch, isSearchOpen, normalizedKeyword, searchType]);
+    resetSearch();
+    setShowDropdown(false);
+  }, [keyword, searchType, isSearchOpen, canSearch, runSearch, resetSearch]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -338,9 +341,9 @@ export default function HeaderResponsive({ user, onLogout, searchButtonLabel = '
                     <select
                       value={searchType}
                       onChange={(event) => {
-                        setSearchType(event.target.value as SearchType);
+                        setSearchType(event.target.value as SearchKind);
                         setKeyword('');
-                        setSearchResults([]);
+                        resetSearch();
                         setShowDropdown(false);
                         searchInputRef.current?.focus();
                       }}
@@ -434,7 +437,9 @@ export default function HeaderResponsive({ user, onLogout, searchButtonLabel = '
                             </div>
 
                             <div className="min-w-0 flex-1">
-                              <h4 className="line-clamp-2 text-xs font-black leading-snug text-neutral-950 group-hover:text-primary">{item.title}</h4>
+                              <h4 className="line-clamp-2 text-xs font-black leading-snug text-neutral-950 group-hover:text-primary">
+                                {highlightMatch(item.title, item.matchedPhrase)}
+                              </h4>
 
                               <div className="mt-1 flex flex-wrap gap-1">
                                 {item.propertyType ? (
@@ -456,6 +461,29 @@ export default function HeaderResponsive({ user, onLogout, searchButtonLabel = '
                                 ) : null}
                               </div>
 
+                              {getFeatureTags(item).length > 0 ? (
+                                <div className="mt-1 flex flex-wrap gap-1">
+                                  {getFeatureTags(item).map((tag) => (
+                                    <span key={tag} className="rounded bg-neutral-100 px-1.5 py-0.5 text-[9px] font-semibold text-neutral-700">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
+
+                              {item.matchedAttributes && item.matchedAttributes.length > 0 ? (
+                                <div className="mt-1 flex flex-wrap gap-1">
+                                  {item.matchedAttributes.map((attribute) => (
+                                    <span
+                                      key={`${attribute.type}-${attribute.displayText}`}
+                                      className="rounded bg-red-50 px-1.5 py-0.5 text-[9px] font-black text-red-600"
+                                    >
+                                      {attribute.displayText}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
+
                               <div className="mt-1.5 flex items-center justify-between gap-2">
                                 <span className="shrink-0 text-xs font-black text-primary">
                                   {formatCurrency(item.price)} {item.priceUnit}
@@ -467,6 +495,8 @@ export default function HeaderResponsive({ user, onLogout, searchButtonLabel = '
                           </Link>
                         ))}
                       </div>
+                    ) : searchError ? (
+                      <div className="px-3 py-4 text-center text-xs font-semibold text-red-500">Có lỗi xảy ra, thử lại.</div>
                     ) : (
                       <div className="px-3 py-4 text-center text-xs font-semibold text-neutral-500">Không tìm thấy kết quả phù hợp.</div>
                     )}

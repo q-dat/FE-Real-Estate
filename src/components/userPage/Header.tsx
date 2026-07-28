@@ -18,15 +18,43 @@ import { HiOutlineArrowRightOnRectangle, HiOutlineUserCircle, HiOutlineChevronDo
 import { useRentalFavorite } from '@/context/RentalFavoriteContext';
 import { useLogout } from '@/hooks/useLogout';
 import { formatCurrency } from '@/utils/formatCurrency.utils';
-
-import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
-import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
+import { slugify } from '@/lib/slugify';
+import { RentalSearchResult } from '@/types/rentalGridItem';
+import { useSearchSuggestions } from '@/hooks/useSearchSuggestions';
+import type { SearchKind } from '@/types/rentalGridItem';
 
 interface HeaderProps {
   user: MeResponse['data'];
 }
 
-type SearchType = 'title' | 'code';
+// Tô đỏ cụm khớp (case-insensitive, giữ nguyên văn bản gốc).
+function highlightMatch(text: string, phrase?: string): React.ReactNode {
+  if (!phrase) return text;
+  const idx = text.toLowerCase().indexOf(phrase.toLowerCase());
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <span className="text-red-600">{text.slice(idx, idx + phrase.length)}</span>
+      {text.slice(idx + phrase.length)}
+    </>
+  );
+}
+
+
+function getFeatureTags(item: RentalSearchResult): string[] {
+  const tags = [
+    item.bedroomNumber && item.bedroomNumber > 0 ? `${item.bedroomNumber} phòng ngủ` : '',
+    item.floorNumber && item.floorNumber > 0 ? `${item.floorNumber} tầng` : '',
+    item.toiletNumber && item.toiletNumber > 0 ? `${item.toiletNumber} WC` : '',
+  ].filter(Boolean);
+
+  const matched = new Set(
+    (item.matchedAttributes ?? []).map((attribute) => attribute.displayText.trim().toLowerCase())
+  );
+
+  return tags.filter((tag) => !matched.has(tag.toLowerCase()));
+}
 
 export default function Header({ user }: HeaderProps) {
   const router = useRouter();
@@ -37,12 +65,20 @@ export default function Header({ user }: HeaderProps) {
   const controls = useAnimation();
   const [scrolled, setScrolled] = useState(false);
 
-  const [searchType, setSearchType] = useState<SearchType>('title');
+  const [searchType, setSearchType] = useState<SearchKind>('title');
   const [keyword, setKeyword] = useState('');
-  const [searchResults, setSearchResults] = useState<IRentalPostAdmin[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  const { results: searchResults, isSearching, error: searchError, run: runSearch, reset: resetSearch } =
+    useSearchSuggestions({ debounce: 450 });
+
+  useEffect(() => {
+    runSearch(keyword, searchType as SearchKind);
+    if (keyword.trim().length >= 1) setShowDropdown(true);
+    else { setShowDropdown(false); setActiveIndex(-1); }
+  }, [keyword, searchType, runSearch]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,41 +95,6 @@ export default function Header({ user }: HeaderProps) {
   }, [controls]);
 
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      const searchTerm = keyword.trim();
-
-      const minLength = searchType === 'code' ? 1 : 2;
-
-      if (searchTerm.length >= minLength) {
-        setIsSearching(true);
-        setShowDropdown(true);
-        try {
-          if (searchType === 'title') {
-            const results = await rentalPostAdminService.getAll({
-              title: searchTerm,
-              limit: 5,
-            });
-            setSearchResults(results || []);
-          } else {
-            const result = await rentalPostAdminService.getByCode(searchTerm);
-            setSearchResults(result ? [result] : []);
-          }
-        } catch (error) {
-          console.error('Search error:', error);
-          setSearchResults([]);
-        } finally {
-          setIsSearching(false);
-        }
-      } else {
-        setSearchResults([]);
-        setShowDropdown(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [keyword, searchType]);
-
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
@@ -106,20 +107,47 @@ export default function Header({ user }: HeaderProps) {
   const handleClearSearch = () => {
     setKeyword('');
     setShowDropdown(false);
-    setSearchResults([]);
+    resetSearch();
+    setActiveIndex(-1);
+  };
+
+  const goToDetail = (hit: RentalSearchResult) => {
+    setShowDropdown(false);
+    router.push(`/${slugify(hit.title)}-${hit._id}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showDropdown) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, searchResults.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, -1));
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+    } else if (e.key === 'Enter') {
+      if (activeIndex >= 0 && searchResults[activeIndex]) {
+        e.preventDefault();
+        goToDetail(searchResults[activeIndex]);
+      } else if (keyword.trim().length >= 1) {
+        setShowDropdown(false);
+        router.push(`/tim-kiem?q=${encodeURIComponent(keyword.trim())}`);
+      }
+    }
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (searchType === 'code' && searchResults.length === 1) {
-      router.push(`/c/${searchResults[0].code}`);
-      setShowDropdown(false);
+      goToDetail(searchResults[0]);
       setKeyword('');
       return;
     }
-
-    if (keyword.trim().length >= 1) setShowDropdown(true);
+    if (keyword.trim().length >= 1) {
+      setShowDropdown(true);
+      router.push(`/tim-kiem?q=${encodeURIComponent(keyword.trim())}`);
+    }
   };
 
   return (
@@ -184,9 +212,9 @@ export default function Header({ user }: HeaderProps) {
                     <select
                       value={searchType}
                       onChange={(e) => {
-                        setSearchType(e.target.value as SearchType);
+                        setSearchType(e.target.value as SearchKind);
                         setKeyword('');
-                        setSearchResults([]);
+                        resetSearch();
                         setShowDropdown(false);
                       }}
                       className="cursor-pointer appearance-none bg-transparent py-1 pr-4 text-[11px] font-bold uppercase tracking-wider text-primary outline-none"
@@ -204,10 +232,16 @@ export default function Header({ user }: HeaderProps) {
                   <input
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     onFocus={() => {
                       if (keyword.length >= 1) setShowDropdown(true);
                     }}
-                    placeholder={searchType === 'title' ? 'Nhập tiêu đề tìm kiếm...' : 'Nhập mã bài (VD: NN123)...'}
+                    aria-label="Tìm kiếm bất động sản"
+                    role="combobox"
+                    aria-expanded={showDropdown}
+                    aria-controls="header-search-list"
+                    aria-autocomplete="list"
+                    placeholder={searchType === 'title' ? 'Tìm theo tiêu đề, đường, quận hoặc nội dung' : 'Nhập mã bài (VD: NN123)...'}
                     className={clsx(
                       'flex-1 bg-transparent px-4 text-sm text-primary placeholder:text-primary/60 focus:outline-none',
                       scrolled ? 'h-6' : 'h-10'
@@ -234,7 +268,7 @@ export default function Header({ user }: HeaderProps) {
 
                 {/* DROPDOWN HIỂN THỊ KẾT QUẢ */}
                 <AnimatePresence>
-                  {showDropdown && keyword.length >= (searchType === 'code' ? 1 : 2) && (
+                  {showDropdown && keyword.length >= 1 && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -247,10 +281,14 @@ export default function Header({ user }: HeaderProps) {
                           <span className="loading loading-spinner loading-sm mr-2 text-primary"></span>
                           Đang tìm kiếm {searchType === 'code' ? 'mã bài' : 'tiêu đề'}...
                         </div>
+                      ) : searchError ? (
+                        <div className="p-6 text-center text-sm text-red-500">
+                          Có lỗi xảy ra, thử lại.
+                        </div>
                       ) : searchResults.length > 0 ? (
-                        <div className="max-h-[60vh] overflow-y-auto overscroll-contain py-2">
+                        <div id="header-search-list" role="listbox" className="max-h-[60vh] overflow-y-auto overscroll-contain py-2">
                           <div className="flex items-center justify-between px-4 pb-2 pt-1">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Kết quả cho "{keyword}"</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Kết quả cho {keyword}</span>
                             {searchType === 'code' && (
                               <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-semibold text-primary">TÌM THEO MÃ</span>
                             )}
@@ -258,9 +296,16 @@ export default function Header({ user }: HeaderProps) {
                           {searchResults.map((item) => (
                             <Link
                               key={item._id}
-                              href={`/c/${item.code}`}
+                              id={`header-search-opt-${item._id}`}
+                              role="option"
+                              aria-selected={activeIndex === searchResults.indexOf(item)}
+                              href={`/${slugify(item.title)}-${item._id}`}
+                              onMouseEnter={() => setActiveIndex(searchResults.indexOf(item))}
                               onClick={() => setShowDropdown(false)}
-                              className="group flex items-center gap-4 border-b border-neutral-100 px-4 py-3 transition-colors last:border-0 hover:bg-neutral-50"
+                              className={clsx(
+                                'group flex items-center gap-4 border-b border-neutral-100 px-4 py-3 transition-colors last:border-0 hover:bg-neutral-50',
+                                activeIndex === searchResults.indexOf(item) ? 'bg-primary-lighter' : ''
+                              )}
                             >
                               <div className="relative h-[4.5rem] w-24 shrink-0 overflow-hidden rounded-md bg-neutral-100">
                                 <Image
@@ -270,45 +315,67 @@ export default function Header({ user }: HeaderProps) {
                                   sizes="96px"
                                   className="object-cover transition-transform group-hover:scale-110"
                                 />
-                                {/* Overlay hiện chữ CODE khi trỏ chuột vào */}
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
-                                  <span className="text-[10px] font-bold tracking-widest text-white">{item.code}</span>
-                                </div>
+                                {item.code ? (
+                                  <span className="absolute bottom-1 left-1 rounded bg-primary px-1.5 py-0.5 text-[9px] font-black tracking-wide text-white">
+                                    {item.code}
+                                  </span>
+                                ) : null}
                               </div>
                               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                                <h4 className="truncate text-[13px] font-bold leading-tight text-neutral-900 transition-colors group-hover:text-primary">
-                                  {item.title}
+                                <h4 className="line-clamp-2 text-[13px] font-bold leading-tight text-neutral-900 transition-colors group-hover:text-primary">
+                                  {highlightMatch(item.title, item.matchedPhrase)}
                                 </h4>
 
-                                {/* Dòng Tags */}
                                 <div className="flex flex-wrap items-center gap-1.5">
-                                  {item.propertyType && (
-                                    <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold tracking-tight text-blue-600">
+                                  {item.propertyType ? (
+                                    <span className="rounded border border-primary/10 bg-primary/5 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                                       {item.propertyType}
                                     </span>
-                                  )}
-                                  {item.locationType && (
-                                    <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold tracking-tight text-emerald-600">
+                                  ) : null}
+                                  {item.locationType ? (
+                                    <span className="rounded border border-primary/10 bg-primary/5 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                                       {item.locationType}
                                     </span>
-                                  )}
-                                  {item.area && (
+                                  ) : null}
+                                  {item.area > 0 ? (
                                     <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-tight text-neutral-600">
-                                      {item.area}m² {item.frontageWidth && item.lotDepth ? `(${item.frontageWidth}x${item.lotDepth})` : ''}
+                                      {item.area}m²
                                     </span>
-                                  )}
+                                  ) : null}
                                 </div>
 
-                                {/* Giá & Vị trí */}
-                                <div className="flex items-center justify-between">
+                                {getFeatureTags(item).length > 0 ? (
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    {getFeatureTags(item).map((tag) => (
+                                      <span key={tag} className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-700">
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : null}
+
+                                {item.matchedAttributes && item.matchedAttributes.length > 0 ? (
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    {item.matchedAttributes.map((attribute) => (
+                                      <span
+                                        key={`${attribute.type}-${attribute.displayText}`}
+                                        className="rounded bg-red-50 px-1.5 py-0.5 text-[10px] font-bold tracking-tight text-red-600"
+                                      >
+                                        {attribute.displayText}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : null}
+
+                                <div className="flex items-center justify-between gap-2">
                                   <span className="text-xs font-black tracking-tight text-red-600">
                                     {formatCurrency(item.price)} {item.priceUnit}
                                   </span>
-                                  {item.district && item.province && (
-                                    <span className="truncate text-[10px] font-medium text-neutral-500">
-                                      {item.district}, {item.province}
+                                  {(item.district || item.province) ? (
+                                    <span className="min-w-0 truncate text-[10px] font-medium text-neutral-500">
+                                      {[item.district, item.province].filter(Boolean).join(', ')}
                                     </span>
-                                  )}
+                                  ) : null}
                                 </div>
                               </div>
                             </Link>

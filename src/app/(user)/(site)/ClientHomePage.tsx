@@ -15,13 +15,6 @@ import FavoriteBtn from '@/components/userPage/ui/btn/FavoriteBtn';
 import imageRepresent from '../../../../public/image-represent';
 import HerroBanner from '@/components/userPage/HerroBanner';
 
-interface Props {
-  salePosts: IRentalPostAdmin[];
-  apartmentPosts: IRentalPostAdmin[];
-  housePosts: IRentalPostAdmin[];
-  businessSpacePosts: IRentalPostAdmin[];
-}
-
 interface PostCardProps {
   post: IRentalPostAdmin;
   index?: number;
@@ -181,11 +174,8 @@ export const PostCard = ({ post, index = 0 }: PostCardProps) => {
 
         <div className="mt-2 grid grid-cols-2 gap-1.5">
           {post.area ? <CompactStat icon={<IoMdExpand size={14} />} label="Diện tích" value={`${post.area} m²`} /> : null}
-
           {dimensionText ? <CompactStat icon={<AiOutlineColumnWidth size={14} />} label="Ngang dài" value={dimensionText} /> : null}
-
           {roomText ? <CompactStat icon={<MdOutlineBedroomParent size={14} />} label="Công năng" value={roomText} /> : null}
-
           {post.floorNumber ? <CompactStat icon={<MdHomeWork size={14} />} label="Số tầng" value={`${post.floorNumber} tầng`} /> : null}
         </div>
 
@@ -211,36 +201,47 @@ export const PostCard = ({ post, index = 0 }: PostCardProps) => {
   );
 };
 
-export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, businessSpacePosts }: Props) {
-  const sections: HomeSection[] = [
-    {
-      title: 'Bất động sản bán',
-      subtitle: 'Sales Portfolio',
-      description: 'Danh sách nhà đất được trình bày rõ vị trí, diện tích, công năng và mức giá.',
-      link: '/bat-dong-san-ban',
-      data: salePosts,
-    },
-    {
-      title: 'Căn hộ dịch vụ',
-      subtitle: 'Apartments',
-      description: 'Các căn hộ dịch vụ được sắp xếp gọn, dễ đọc và dễ so sánh.',
-      link: '/can-ho',
-      data: apartmentPosts,
-    },
-    {
-      title: 'Nhà nguyên căn',
-      subtitle: 'Townhouses',
-      description: 'Nhà nguyên căn với thông tin chính được ưu tiên hiển thị trực quan.',
-      link: '/nha-nguyen-can',
-      data: housePosts,
-    },
-    {
-      title: 'Mặt bằng kinh doanh',
-      subtitle: 'Commercial Space',
-      description: 'Mặt bằng được hiển thị theo tiêu chí vị trí, diện tích và giá rõ ràng.',
-      link: '/mat-bang',
-      data: businessSpacePosts,
-    },
+// Section danh sách — dùng trong Suspense boundary (page.tsx).
+export const HomeSection = ({ title, subtitle, description, link, data }: HomeSection) => {
+  if (!data.length) return null;
+
+  return (
+    <section className="mb-10 xl:mb-14">
+      <div className="mb-3 rounded-lg border border-zinc-200 bg-white px-3 py-3 shadow-sm xl:mb-4">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+          <div className="min-w-0">
+            <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{subtitle}</p>
+            <h2 className="text-2xl font-black tracking-tight text-zinc-950 xl:text-3xl">{title}</h2>
+            <p className="mt-1 max-w-2xl text-sm font-medium leading-relaxed text-zinc-500">{description}</p>
+          </div>
+
+          <Link
+            href={link}
+            className="inline-flex w-fit items-center gap-2 rounded-md border border-zinc-900 bg-zinc-950 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-white transition hover:bg-zinc-800"
+          >
+            Xem bộ sưu tập
+            <MdArrowForward size={15} />
+          </Link>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
+        {data.map((post, index) => (
+          <PostCard key={post._id} post={post} index={index} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// Shell mặc định: Banner + cấu trúc category + footer.
+// (Danh sách từng category được stream qua Suspense ở page.tsx.)
+export default function ClientHomePage() {
+  const categories = [
+    { title: 'Bất động sản bán', subtitle: 'Sales Portfolio', link: '/bat-dong-san-ban' },
+    { title: 'Căn hộ dịch vụ', subtitle: 'Apartments', link: '/can-ho' },
+    { title: 'Nhà nguyên căn', subtitle: 'Townhouses', link: '/nha-nguyen-can' },
+    { title: 'Mặt bằng kinh doanh', subtitle: 'Commercial Space', link: '/mat-bang' },
   ];
 
   return (
@@ -250,7 +251,7 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
       <section className="relative z-10 mx-auto max-w-[1700px] px-2 pt-3 xl:-mt-6 xl:px-desktop-padding 2xl:px-8">
         <div className="rounded-lg border border-zinc-200 bg-white p-2 shadow-sm">
           <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
-            {sections.map((section, index) => (
+            {categories.map((section, index) => (
               <Link
                 key={section.title}
                 href={section.link}
@@ -261,7 +262,6 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
                 </div>
 
                 <p className="mb-1 text-[9px] font-black uppercase tracking-[0.16em] text-zinc-400">{section.subtitle}</p>
-
                 <p className="line-clamp-2 text-sm font-black leading-snug text-zinc-950 group-hover:text-zinc-700">{section.title}</p>
               </Link>
             ))}
@@ -269,51 +269,13 @@ export default function ClientHomePage({ salePosts, apartmentPosts, housePosts, 
         </div>
       </section>
 
-      <div className="mx-auto max-w-[1700px] px-2 py-8 xl:px-desktop-padding xl:py-12 2xl:px-8">
-        {sections.map((section) => {
-          if (!section.data.length) return null;
-
-          return (
-            <section key={section.title} className="mb-10 xl:mb-14">
-              <div className="mb-3 rounded-lg border border-zinc-200 bg-white px-3 py-3 shadow-sm xl:mb-4">
-                <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-                  <div className="min-w-0">
-                    <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{section.subtitle}</p>
-
-                    <h2 className="text-2xl font-black tracking-tight text-zinc-950 xl:text-3xl">{section.title}</h2>
-
-                    <p className="mt-1 max-w-2xl text-sm font-medium leading-relaxed text-zinc-500">{section.description}</p>
-                  </div>
-
-                  <Link
-                    href={section.link}
-                    className="inline-flex w-fit items-center gap-2 rounded-md border border-zinc-900 bg-zinc-950 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-white transition hover:bg-zinc-800"
-                  >
-                    Xem bộ sưu tập
-                    <MdArrowForward size={15} />
-                  </Link>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-3 xl:gap-3 2xl:grid-cols-4">
-                {section.data.map((post, index) => (
-                  <PostCard key={post._id} post={post} index={index} />
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
-
       <section className="px-2 pb-8 xl:px-desktop-padding xl:pb-12 2xl:px-8">
         <div className="mx-auto max-w-[1700px] rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-10 text-center text-white shadow-sm xl:px-4 xl:py-12">
           <div className="mx-auto max-w-3xl">
             <p className="mb-2 text-[10px] font-black uppercase tracking-[0.22em] text-zinc-400">Nguồn Nhà Giá Rẻ</p>
-
             <h3 className="text-2xl font-black tracking-tight xl:text-4xl">Bạn cần ký gửi bất động sản?</h3>
-
             <p className="mx-auto mt-3 max-w-2xl text-sm font-medium leading-relaxed text-zinc-400">
-              Gửi thông tin nhà đất để được hỗ trợ trình bày nội dung rõ ràng, hình ảnh chỉn chu và phù hợp nhu cầu tìm kiếm.
+              Gửi thông tin nhà đất để được hỗ trợ trình bày nội dung rõ ràng, hình ảnh sạch chu và phù hợp nhu cầu tìm kiếm.
             </p>
 
             <Link

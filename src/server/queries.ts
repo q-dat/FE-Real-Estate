@@ -417,3 +417,293 @@ export async function getAllInteriorCategories(): Promise<unknown[]> {
     return { _id: String(_id), ...rest };
   });
 }
+
+// ===================== SEARCH =====================
+// Tìm kiếm gợi ý: projection nội bộ đủ để đối chiếu, response whitelist nhẹ cho Header.
+// Quy trình: parse structured fields -> lọc AND -> exact phrase trên title/amenities/
+// thuộc tính/vị trí -> fallback token an toàn -> ranking.
+import { RentalSearchResult, MatchedAttribute, RENTAL_SEARCH_RESULT_FIELDS, SearchKind } from '@/types/rentalGridItem';
+import {
+  normalizeSearchText,
+  normalizeBase,
+  parseStructuredQuery,
+  districtMatch,
+  buildMatchedAttributes,
+  matchAmenities,
+  escapeRegex,
+} from './searchNormalize';
+
+// Field CHỈ dùng server search (ward/address để ghép address-text,
+// legalStatus/furnitureStatus/direction để match attribute) — KHÔNG trả raw xuống client.
+const SEARCH_INTERNAL_FIELDS = [
+  ...RENTAL_SEARCH_RESULT_FIELDS,
+  'description',
+  'amenities',
+  'ward',
+  'address',
+  'legalStatus',
+  'furnitureStatus',
+  'direction',
+] as const;
+const SEARCH_RESPONSE_PROJECTION = RENTAL_SEARCH_RESULT_FIELDS.join(' ');
+const SEARCH_INTERNAL_PROJECTION = SEARCH_INTERNAL_FIELDS.join(' ');
+
+const TEXT_ATTRIBUTE_FIELDS = [
+  { key: 'propertyType', type: 'propertyType' },
+  { key: 'locationType', type: 'locationType' },
+  { key: 'legalStatus', type: 'legalStatus' },
+  { key: 'furnitureStatus', type: 'furnitureStatus' },
+  { key: 'direction', type: 'direction' },
+] as const;
+
+function splitAmenityComponents(value: unknown): string[] {
+  if (typeof value !== 'string') return [];
+
+  return value
+    .split(/[,;\r\n]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Tìm theo substring trong từng component amenities.
+ * Ví dụ keyword "bao quanh" phải khớp component "bán đảo bao quanh là sông".
+ * Giữ lại matchAmenities hiện có để hỗ trợ alias và nhiều tiện ích trong một query.
+ */
+function matchAmenityComponents(phrase: string, value: unknown): string[] {
+  const normalizedPhrase = normalizeSearchText(phrase);
+  if (!normalizedPhrase) return [];
+
+  const directMatches = splitAmenityComponents(value).filter((component) =>
+    normalizeSearchText(component).includes(normalizedPhrase)
+  );
+  const aliasMatches = matchAmenities(phrase, value);
+
+  return Array.from(new Set([...directMatches, ...aliasMatches]));
+}
+
+function matchTextAttributes(
+  phrase: string,
+  doc: Record<string, unknown>
+): MatchedAttribute[] {
+  if (!phrase) return [];
+
+  return TEXT_ATTRIBUTE_FIELDS.flatMap(({ key, type }) => {
+    const rawValue = String(doc[key] ?? '').trim();
+    if (!rawValue) return [];
+
+    const normalizedValue = normalizeSearchText(rawValue);
+    if (!normalizedValue.includes(phrase)) return [];
+
+    return [
+      {
+        type,
+        displayText: rawValue.toUpperCase(),
+        matchedText: rawValue,
+      },
+    ];
+  });
+}
+
+function dedupeAttributes(attributes: MatchedAttribute[]): MatchedAttribute[] {
+  const seen = new Set<string>();
+
+  return attributes.filter((attribute) => {
+    const key = `${attribute.type}:${normalizeBase(attribute.displayText)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function containsWholeToken(text: string, token: string): boolean {
+  return new RegExp(`(?:^|\\s)${escapeRegex(token)}(?:$|\\s)`, 'i').test(text);
+}
+
+function stripDoc(doc: Record<string, unknown>): RentalSearchResult {
+  const out: Record<string, unknown> = { _id: String(doc._id) };
+
+  for (const key of RENTAL_SEARCH_RESULT_FIELDS) {
+    if (key === '_id') continue;
+    if (doc[key] !== undefined) out[key] = doc[key];
+  }
+
+  return out as RentalSearchResult;
+}
+
+export async function searchRentalPosts(
+  rawKeyword: string,
+  limit = 8,
+  searchType: SearchKind = 'title'
+): Promise<RentalSearchResult[]> {
+  await db();
+
+  if (searchType === 'code') {
+    const code = normalizeBase(rawKeyword).toLowerCase();
+    if (!code) return [];
+
+    const docs = await RentalPostAdminModel.find({
+      code: new RegExp(`^${escapeRegex(code)}`, 'i'),
+      status: { $in: ['active', undefined] },
+    })
+      .select(SEARCH_RESPONSE_PROJECTION)
+      .sort({ _id: -1 })
+      .limit(limit)
+      .lean();
+
+    return docs.map((doc) => {
+      const result = stripDoc(doc as Record<string, unknown>);
+      result.matchSource = 'code';
+      result.matchedPhrase = String(doc.code ?? '');
+      return result;
+    });
+  }
+
+  const sq = parseStructuredQuery(rawKeyword);
+  if (
+    sq.bedroom === undefined &&
+    sq.floor === undefined &&
+    sq.toilet === undefined &&
+    !sq.district &&
+    !sq.province &&
+    !sq.remaining
+  ) {
+    return [];
+  }
+
+  // Dữ liệu hiện còn nhỏ; sort xác định để kết quả ổn định.
+  const docs = await RentalPostAdminModel.find({
+    status: { $in: ['active', undefined] },
+  })
+    .select(SEARCH_INTERNAL_PROJECTION)
+    .sort({ _id: -1 })
+    .limit(300)
+    .lean();
+
+  type Scored = {
+    doc: Record<string, unknown>;
+    score: number;
+    source: RentalSearchResult['matchSource'];
+    matchedAttributes?: MatchedAttribute[];
+    matched?: string;
+  };
+
+  const scored: Scored[] = [];
+
+  for (const rawDoc of docs) {
+    const d = rawDoc as Record<string, unknown>;
+
+    // Structured filters luôn kết hợp AND và kiểm tra theo đúng field.
+    if (sq.bedroom !== undefined) {
+      const value = typeof d.bedroomNumber === 'number'
+        ? d.bedroomNumber
+        : Number.parseInt(String(d.bedroomNumber ?? ''), 10);
+      if (value !== sq.bedroom) continue;
+    }
+
+    if (sq.floor !== undefined) {
+      const value = typeof d.floorNumber === 'number'
+        ? d.floorNumber
+        : Number.parseInt(String(d.floorNumber ?? ''), 10);
+      if (value !== sq.floor) continue;
+    }
+
+    if (sq.toilet !== undefined) {
+      const value = typeof d.toiletNumber === 'number'
+        ? d.toiletNumber
+        : Number.parseInt(String(d.toiletNumber ?? ''), 10);
+      if (value !== sq.toilet) continue;
+    }
+
+    if (sq.district) {
+      const district = normalizeBase(String(d.district ?? ''));
+      if (!districtMatch(district, sq.district)) continue;
+    }
+
+    if (sq.province) {
+      const province = normalizeBase(String(d.province ?? ''));
+      if (province !== sq.province) continue;
+    }
+
+    const phrase = sq.remaining;
+    const title = normalizeSearchText(String(d.title ?? ''));
+    const description = normalizeSearchText(String(d.description ?? ''));
+    const address = normalizeSearchText(
+      [d.address, d.ward, d.district, d.province].filter(Boolean).join(' ')
+    );
+
+    const amenityMatches = phrase ? matchAmenityComponents(phrase, d.amenities) : [];
+    const textAttributeMatches = phrase ? matchTextAttributes(phrase, d) : [];
+    const hasDigit = /\d/.test(phrase);
+    const tokens = phrase.split(' ').filter(Boolean);
+    const allTokensInOneField = (text: string) =>
+      !hasDigit &&
+      tokens.length > 1 &&
+      tokens.every((token) => containsWholeToken(text, token));
+
+    let score = 0;
+    let source: RentalSearchResult['matchSource'] | null = null;
+    let matched: string | undefined;
+
+    if (phrase && title.includes(phrase)) {
+      score = 100;
+      source = 'title';
+      matched = phrase;
+    } else if (amenityMatches.length > 0) {
+      score = 95;
+      source = 'amenity';
+    } else if (textAttributeMatches.length > 0) {
+      score = 90;
+      source = 'attribute';
+    } else if (phrase && address.includes(phrase)) {
+      score = 85;
+      source = 'address';
+      matched = phrase;
+    } else if (phrase && description.includes(phrase)) {
+      score = 75;
+      source = 'description';
+      matched = phrase;
+    } else if (phrase && allTokensInOneField(title)) {
+      score = 55;
+      source = 'title';
+    } else if (phrase && allTokensInOneField(description)) {
+      score = 40;
+      source = 'description';
+    } else if (!phrase) {
+      score = 95;
+      source = 'attribute';
+    }
+
+    if (score <= 0 || !source) continue;
+
+    const structuredAttributes = buildMatchedAttributes(sq, d);
+    const amenityAttributes: MatchedAttribute[] = amenityMatches.map((component) => ({
+      type: 'amenity',
+      displayText: component.toUpperCase(),
+      matchedText: component,
+    }));
+    const matchedAttributes = dedupeAttributes([
+      ...structuredAttributes,
+      ...textAttributeMatches,
+      ...amenityAttributes,
+    ]);
+
+    scored.push({
+      doc: d,
+      score,
+      source,
+      matchedAttributes: matchedAttributes.length > 0 ? matchedAttributes : undefined,
+      matched,
+    });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+
+  return scored.slice(0, limit).map(({ doc, source, matchedAttributes, matched }) => {
+    const result = stripDoc(doc);
+    result.matchSource = source;
+    result.matchedAttributes = matchedAttributes;
+    result.matchedPhrase = matched;
+    return result;
+  });
+}
