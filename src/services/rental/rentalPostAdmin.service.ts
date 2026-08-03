@@ -1,28 +1,15 @@
-import { getServerApiUrl } from '@/hooks/useApiUrl';
-import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
-import { adminFetch } from '../shared/adminFetch.client';
-import { fetchData } from '@/server/dataSource';
 import { cache as reactCache } from 'react';
 
-export type RentalPaginationMeta = {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-};
+import { getServerApiUrl } from '@/hooks/useApiUrl';
+import { fetchData } from '@/server/dataSource';
+import type { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
+import type { RentalPaginationMeta, RentalPostAdminListResponse } from '@/types/rentalAdmin/rentalPagination.types';
 
-export type RentalPostAdminListResponse = {
-  message: string;
-  count: number;
-  visibleCount: number;
-  pagination: RentalPaginationMeta;
-  rentalPosts: IRentalPostAdmin[];
-};
+import { adminFetch } from '../shared/adminFetch.client';
+
+type RentalListParams = Record<string, string | number | undefined>;
 
 type CacheState = {
-  list: IRentalPostAdmin[];
   byId: Map<string, IRentalPostAdmin>;
 };
 
@@ -36,19 +23,22 @@ const EMPTY_PAGINATION: RentalPaginationMeta = {
 };
 
 const cache: CacheState = {
-  list: [],
-  byId: new Map(),
+  byId: new Map<string, IRentalPostAdmin>(),
 };
 
-const buildQueryString = (params?: Record<string, string | number | undefined>): string => {
-  if (!params) return '';
+const buildQueryString = (params?: RentalListParams): string => {
+  if (!params) {
+    return '';
+  }
 
   const query = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
-      query.set(key, String(value));
+    if (value === undefined || value === null || value === '') {
+      return;
     }
+
+    query.set(key, String(value));
   });
 
   const queryString = query.toString();
@@ -56,168 +46,210 @@ const buildQueryString = (params?: Record<string, string | number | undefined>):
   return queryString ? `?${queryString}` : '';
 };
 
-const rentalPostAdminService = {
-  async getMyPosts(params?: Record<string, string | number | undefined>): Promise<RentalPostAdminListResponse> {
-    const apiUrl = `${getServerApiUrl('api/rental-posts/me')}${buildQueryString(params)}`;
+const normalizeListResponse = (data: Partial<RentalPostAdminListResponse>): RentalPostAdminListResponse => {
+  const rentalPosts = Array.isArray(data.rentalPosts) ? data.rentalPosts : [];
 
-    const res = await adminFetch(apiUrl, {
-      method: 'GET',
-      cache: 'no-store',
-    });
+  const count = typeof data.count === 'number' ? data.count : rentalPosts.length;
 
-    if (!res.ok) {
-      throw new Error(`Admin getMyPosts failed: ${res.status}`);
+  const visibleCount = typeof data.visibleCount === 'number' ? data.visibleCount : rentalPosts.length;
+
+  const pagination = data.pagination ?? {
+    ...EMPTY_PAGINATION,
+    total: count,
+    totalPages: count > 0 ? 1 : 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  };
+
+  return {
+    message: data.message ?? '',
+    count,
+    visibleCount,
+    pagination,
+    rentalPosts,
+  };
+};
+
+const fetchRentalPostAdminList = async (params?: RentalListParams): Promise<RentalPostAdminListResponse> => {
+  const queryString = buildQueryString(params);
+
+  return fetchData<RentalPostAdminListResponse>(`/api/rental-admin-posts${queryString}`);
+};
+
+const fetchRentalPostById = async (id: string): Promise<IRentalPostAdmin | null> => {
+  if (!id) {
+    return null;
+  }
+
+  const cachedItem = cache.byId.get(id);
+
+  if (cachedItem) {
+    return cachedItem;
+  }
+
+  try {
+    const data = await fetchData<{
+      rentalPost?: IRentalPostAdmin;
+    }>(`/api/rental-admin-post/${encodeURIComponent(id)}`);
+
+    const item = data.rentalPost ?? null;
+
+    if (item?._id) {
+      cache.byId.set(item._id, item);
     }
 
-    const data = (await res.json()) as Partial<RentalPostAdminListResponse>;
+    return item;
+  } catch (error) {
+    console.error('Get rental post by id error:', error);
+    return null;
+  }
+};
 
-    const rentalPosts = Array.isArray(data.rentalPosts) ? data.rentalPosts : [];
+const getDetailByIdCached = reactCache(async (id: string): Promise<IRentalPostAdmin | null> => {
+  return fetchRentalPostById(id);
+});
 
-    return {
-      message: data.message ?? '',
-      count: typeof data.count === 'number' ? data.count : rentalPosts.length,
-      visibleCount: typeof data.visibleCount === 'number' ? data.visibleCount : rentalPosts.length,
-      pagination: data.pagination ?? {
-        ...EMPTY_PAGINATION,
-        total: rentalPosts.length,
-        totalPages: rentalPosts.length > 0 ? 1 : 0,
-      },
-      rentalPosts,
-    };
+const rentalPostAdminService = {
+  /**
+   * Lấy đầy đủ response danh sách:
+   * count, visibleCount, pagination và rentalPosts.
+   */
+  async getList(params?: RentalListParams): Promise<RentalPostAdminListResponse> {
+    return fetchRentalPostAdminList(params);
   },
 
-  async getAll(params?: Record<string, string | number>) {
-    const hasFilter = params && Object.keys(params).length > 0;
+  /**
+   * Giữ lại cho những nơi cũ chỉ cần mảng bài đăng.
+   */
+  async getAll(params?: RentalListParams): Promise<IRentalPostAdmin[]> {
+    const data = await fetchRentalPostAdminList(params);
+    const list = data.rentalPosts;
 
-    // FE source (đang dùng): gọi route /api/* của chính FE (query DB ở server)
-    const path = buildQueryString(params)
-      ? `/api/rental-admin-posts?${buildQueryString(params)}`
-      : '/api/rental-admin-posts';
-    const data = await fetchData<{ rentalPosts?: IRentalPostAdmin[] }>(path);
-    const list: IRentalPostAdmin[] = data.rentalPosts ?? [];
-
-    // BE source (mở khi cần, comment FE bên trên)
-    // const path = buildQueryString(params)
-    //   ? `/api/rental-admin-posts?${buildQueryString(params)}`
-    //   : '/api/rental-admin-posts';
-    // const data = await getFromBe<{ rentalPosts?: IRentalPostAdmin[] }>(path);
-    // const list: IRentalPostAdmin[] = data.rentalPosts ?? [];
+    const hasFilter = params !== undefined && Object.keys(params).length > 0;
 
     if (!hasFilter) {
-      cache.list = list;
       cache.byId.clear();
+
       list.forEach((item) => {
-        if (item._id) cache.byId.set(item._id, item);
+        if (item._id) {
+          cache.byId.set(item._id, item);
+        }
       });
     }
 
     return list;
   },
 
-  async getByCode(code: string): Promise<IRentalPostAdmin | null> {
-    if (!code) return null;
-    try {
-      // FE source (đang dùng)
-      const path = `/api/rental-admin-posts?code=${encodeURIComponent(code)}`;
-      const data = await fetchData<{ rentalPosts?: IRentalPostAdmin[] }>(path);
-      return data.rentalPosts?.[0] ?? null;
+  async getMyPosts(params?: RentalListParams): Promise<RentalPostAdminListResponse> {
+    const apiUrl = `${getServerApiUrl('api/rental-posts/me')}${buildQueryString(params)}`;
 
-      // BE source (mở khi cần, comment FE bên trên)
-      // const path = `/api/rental-admin-posts?code=${encodeURIComponent(code)}`;
-      // const data = await getFromBe<{ rentalPosts?: IRentalPostAdmin[] }>(path);
-      // return data.rentalPosts?.[0] ?? null;
+    const response = await adminFetch(apiUrl, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Admin getMyPosts failed: ${response.status}`);
+    }
+
+    const data = (await response.json()) as Partial<RentalPostAdminListResponse>;
+
+    return normalizeListResponse(data);
+  },
+
+  async getByCode(code: string): Promise<IRentalPostAdmin | null> {
+    if (!code) {
+      return null;
+    }
+
+    try {
+      const data = await fetchRentalPostAdminList({
+        code,
+        page: 1,
+        limit: 1,
+      });
+
+      return data.rentalPosts[0] ?? null;
     } catch (error) {
-      console.error('GetByCode Error:', error);
+      console.error('Get rental post by code error:', error);
       return null;
     }
   },
 
   async getById(id: string): Promise<IRentalPostAdmin | null> {
-    const cachedItem = cache.byId.get(id);
-    if (cachedItem) return cachedItem;
-
-    try {
-      // FE source (đang dùng)
-      const data = await fetchData<{ rentalPost?: IRentalPostAdmin }>(`/api/rental-admin-post/${id}`);
-      const item = data.rentalPost ?? null;
-
-      // BE source (mở khi cần, comment FE bên trên)
-      // const data = await getFromBe<{ rentalPost?: IRentalPostAdmin }>(`/api/rental-admin-post/${id}`);
-      // const item = data.rentalPost ?? null;
-
-      if (item && item._id) cache.byId.set(item._id, item);
-      return item;
-    } catch (error) {
-      console.error('GetById Error:', error);
-      return null;
-    }
+    return fetchRentalPostById(id);
   },
 
-  // Lấy 1 bài theo id, dedupe trong cùng request bằng React cache().
-  // Thay thế getFallback (vốn tải toàn bộ danh sách) để không làm nặng prod.
   getDetailById(id: string): Promise<IRentalPostAdmin | null> {
     return getDetailByIdCached(id);
   },
 
   async create(formData: FormData) {
-    const res = await fetch(getServerApiUrl('api/rental-admin-post'), {
+    const response = await fetch(getServerApiUrl('api/rental-admin-post'), {
       method: 'POST',
       body: formData,
     });
 
-    if (!res.ok) throw new Error(`Create Error: ${res.status}`);
+    if (!response.ok) {
+      throw new Error(`Create rental post error: ${response.status}`);
+    }
 
     await this.handlePostMutation();
 
-    return res.json();
+    return response.json();
   },
 
   async update(id: string, formData: FormData) {
-    const res = await fetch(getServerApiUrl(`api/rental-admin-post/${id}`), {
+    const response = await fetch(getServerApiUrl(`api/rental-admin-post/${encodeURIComponent(id)}`), {
       method: 'PUT',
       body: formData,
     });
 
-    if (!res.ok) throw new Error(`Update Error: ${res.status}`);
+    if (!response.ok) {
+      throw new Error(`Update rental post error: ${response.status}`);
+    }
 
     await this.handlePostMutation();
 
-    return res.json();
+    return response.json();
   },
 
   async delete(id: string) {
-    const res = await fetch(getServerApiUrl(`api/rental-admin-post/${id}`), {
+    const response = await fetch(getServerApiUrl(`api/rental-admin-post/${encodeURIComponent(id)}`), {
       method: 'DELETE',
     });
 
-    if (!res.ok) throw new Error(`Delete Error: ${res.status}`);
+    if (!response.ok) {
+      throw new Error(`Delete rental post error: ${response.status}`);
+    }
 
     await this.handlePostMutation();
 
-    return res.json();
+    return response.json();
   },
 
-  async handlePostMutation() {
+  async handlePostMutation(): Promise<void> {
     this.resetLocalCache();
 
     try {
-      await fetch('/api/revalidate/rental-admin-posts', { method: 'POST' });
+      await fetch('/api/revalidate/rental-admin-posts', {
+        method: 'POST',
+      });
     } catch (error) {
-      console.warn('Revalidate trigger warning:', error);
+      console.warn('Revalidate rental posts warning:', error);
     }
   },
 
-  resetLocalCache() {
-    cache.list = [];
+  resetLocalCache(): void {
     cache.byId.clear();
   },
 
   async importRentalPost(items: unknown[]) {
     if (!Array.isArray(items) || items.length === 0) {
-      throw new Error('Import data must be non-empty array');
+      throw new Error('Import data must be a non-empty array');
     }
 
-    const res = await fetch(getServerApiUrl('api/rental-admin-posts/import'), {
+    const response = await fetch(getServerApiUrl('api/rental-admin-posts/import'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -225,14 +257,15 @@ const rentalPostAdminService = {
       body: JSON.stringify(items),
     });
 
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Import Error: ${res.status} - ${text}`);
+    if (!response.ok) {
+      const text = await response.text();
+
+      throw new Error(`Import rental posts error: ${response.status} - ${text}`);
     }
 
     await this.handlePostMutation();
 
-    return res.json() as Promise<{
+    return response.json() as Promise<{
       success: number;
       updated: number;
       failed: number;
@@ -240,28 +273,5 @@ const rentalPostAdminService = {
     }>;
   },
 };
-
-// Dedupe getDetailById trong cùng request (generateMetadata + page)
-// bằng React cache(). Không tải toàn bộ danh sách.
-const getDetailByIdCached = reactCache(async (id: string): Promise<IRentalPostAdmin | null> => {
-  const cachedItem = cache.byId.get(id);
-  if (cachedItem) return cachedItem;
-
-  try {
-    // FE source (đang dùng)
-    const data = await fetchData<{ rentalPost?: IRentalPostAdmin }>(`/api/rental-admin-post/${id}`);
-    const item = data.rentalPost ?? null;
-
-    // BE source (mở khi cần, comment FE bên trên)
-    // const data = await getFromBe<{ rentalPost?: IRentalPostAdmin }>(`/api/rental-admin-post/${id}`);
-    // const item = data.rentalPost ?? null;
-
-    if (item && item._id) cache.byId.set(item._id, item);
-    return item;
-  } catch (error) {
-    console.error('GetDetailById Error:', error);
-    return null;
-  }
-});
 
 export { rentalPostAdminService };

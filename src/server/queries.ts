@@ -9,6 +9,7 @@ import { InteriorModel } from './models/interior';
 import { InteriorCategoryModel } from './models/interiorCategory';
 import { RealEstateProjectModel } from './models/realEstateProject';
 import { UserModel } from './models/user';
+import { IRentalPostAdmin } from '@/types/rentalAdmin/rentalAdmin.types';
 
 async function db() {
   await connectDB();
@@ -33,7 +34,7 @@ export type RentalPostAdminListResponse = {
   count: number;
   visibleCount: number;
   pagination: RentalPaginationMeta;
-  rentalPosts: unknown[];
+  rentalPosts: IRentalPostAdmin[];
 };
 
 function buildPaginationMeta(page: number, limit: number, total: number) {

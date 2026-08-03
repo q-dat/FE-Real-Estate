@@ -1,74 +1,130 @@
-import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
-import { RentalGrid } from '@/components/userPage/rental';
-import FilterBar from '@/components/userPage/filterBar/FilterBar';
 import Breadcrumbs from '@/components/userPage/Breadcrumbs';
-import QueryPagination from '@/components/userPage/filterBar/QueryPagination';
+import FilterBar from '@/components/userPage/filterBar/FilterBar';
+import FixedQueryPagination from '@/components/userPage/filterBar/FixedQueryPagination';
+import { RentalGrid } from '@/components/userPage/rental';
+import {
+  DEFAULT_RENTAL_LIMIT,
+  DEFAULT_RENTAL_PAGE,
+  isRentalLimit,
+} from '@/constants/rentalPagination';
+import { rentalPostAdminService } from '@/services/rental/rentalPostAdmin.service';
 // 0. Mua bán nhà đất
 // 1. Căn hộ cho thuê
 // 2. Nhà nguyên căn
 // 3. Cho thuê mặt bằng
-
 const CATEGORY_CODE = 0;
 const CATEGORY_NAME = 'Bất Động Sản Bán';
 
-const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 20;
+type SearchParams = Record<
+  string,
+  string | string[] | undefined
+>;
 
 type PageProps = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<SearchParams>;
 };
 
-const getSingleParam = (value: string | string[] | undefined): string | undefined => {
-  if (typeof value === 'string') return value;
-  if (Array.isArray(value) && value.length > 0) return value[0];
+const getSingleParam = (
+  value: string | string[] | undefined,
+): string | undefined => {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (Array.isArray(value) && value.length > 0) {
+    return value[0];
+  }
 
   return undefined;
 };
 
-const getPositiveNumberParam = (value: string | string[] | undefined, fallback: number): number => {
+const getPositiveIntegerParam = (
+  value: string | string[] | undefined,
+  fallback: number,
+): number => {
   const singleValue = getSingleParam(value);
   const parsedValue = Number(singleValue);
 
-  if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
+  if (
+    !Number.isInteger(parsedValue) ||
+    parsedValue <= 0
+  ) {
     return fallback;
   }
 
   return parsedValue;
 };
 
-export default async function Page({ searchParams }: PageProps) {
+export default async function Page({
+  searchParams,
+}: PageProps) {
   const resolvedSearchParams = await searchParams;
 
-  const page = getPositiveNumberParam(resolvedSearchParams.page, DEFAULT_PAGE);
-  const limit = getPositiveNumberParam(resolvedSearchParams.limit, DEFAULT_LIMIT);
+  const requestedPage = getPositiveIntegerParam(
+    resolvedSearchParams.page,
+    DEFAULT_RENTAL_PAGE,
+  );
 
-  const params: Record<string, string | number> = {
-    categoryCode: CATEGORY_CODE,
-    page,
-    limit: limit + 1,
+  const requestedLimit = getPositiveIntegerParam(
+    resolvedSearchParams.limit,
+    DEFAULT_RENTAL_LIMIT,
+  );
+
+  const limit = isRentalLimit(requestedLimit)
+    ? requestedLimit
+    : DEFAULT_RENTAL_LIMIT;
+
+  const params: Record<
+    string,
+    string | number | undefined
+  > = {
+    page: requestedPage,
+    limit,
   };
 
-  Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-    const singleValue = getSingleParam(value);
+  Object.entries(resolvedSearchParams).forEach(
+    ([key, value]) => {
+      if (
+        key === 'page' ||
+        key === 'limit' ||
+        key === 'categoryCode'
+      ) {
+        return;
+      }
 
-    if (!singleValue) return;
-    if (key === 'page' || key === 'limit') return;
+      const singleValue = getSingleParam(value);
 
-    params[key] = singleValue;
-  });
+      if (!singleValue) {
+        return;
+      }
 
-  const fetchedPosts = await rentalPostAdminService.getAll(params);
+      params[key] = singleValue;
+    },
+  );
 
-  const posts = fetchedPosts.slice(0, limit);
-  const hasPrevPage = page > 1;
-  const hasNextPage = fetchedPosts.length > limit;
+  // Gán sau cùng để query trên URL không thể đổi category
+  // cố định của trang này.
+  params.categoryCode = CATEGORY_CODE;
+
+  const data =
+    await rentalPostAdminService.getList(params);
 
   return (
     <div className="pt-mobile-padding-top xl:pt-desktop-padding-top">
       <FilterBar />
-      <QueryPagination page={page} limit={limit} hasPrevPage={hasPrevPage} hasNextPage={hasNextPage} visibleCount={posts.length} />
+
       <Breadcrumbs label={CATEGORY_NAME} />
-      <RentalGrid posts={posts} title={CATEGORY_NAME} slogan="" />
+
+      <RentalGrid
+        posts={data.rentalPosts}
+        title={CATEGORY_NAME}
+        slogan=""
+      />
+
+      <FixedQueryPagination
+        {...data.pagination}
+        visibleCount={data.visibleCount}
+      />
     </div>
   );
 }
